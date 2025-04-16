@@ -7,10 +7,11 @@ const AppleLoginButton = () => {
     return (
         <AppleSignin
             authOptions={{
-                clientId: "com.test.oauthLogin",
+                clientId: import.meta.env
+                    .VITE_OAUTH_CLIENT_ID,
                 scope: "email",
-                redirectURI:
-                    "https://kyeongbin-test.netlify.app",
+                redirectURI: import.meta.env
+                    .VITE_OAUTH_REDIRECT_URI,
                 usePopup: true,
             }}
             onSuccess={(response) => {

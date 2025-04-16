@@ -1,7 +1,8 @@
 const KakaoLoginButton = () => {
-    const rest_api_key = "79e94c15013247d2fa57d7f094e88e76";
-    const redirect_uri =
-        "https://kyeongbin-test.netlify.app/oauth/kakao/callback";
+    const rest_api_key = import.meta.env
+        .VITE_KAKAO_REST_API_KEY;
+    const redirect_uri = import.meta.env
+        .VITE_KAKAO_REDIRECT_URI;
     const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${rest_api_key}&redirect_uri=${redirect_uri}&response_type=code`;
 
     const handleLogin = () => {
