@@ -98,14 +98,14 @@ const PhoneAuthForm = () => {
 
             <div>
                 <AuthInput
+                    width="283px"
                     name="phoneNumber"
-                    placeholder="전화번호 (+821012345678)"
+                    type="text"
+                    placeholder="전화번호(11자리)"
                     value={phoneNumber}
                     onChange={(e) =>
                         setPhoneNumber(e.target.value)
                     }
-                    pattern="\+82\d{9,10}"
-                    title="+821012345678 형식으로 입력"
                     required
                     disabled={loading}
                 />
@@ -123,7 +123,8 @@ const PhoneAuthForm = () => {
             <div>
                 <AuthInput
                     name="verificationCode"
-                    placeholder="인증번호 6자리"
+                    type="text"
+                    placeholder="인증번호 입력"
                     value={verificationCode}
                     onChange={(e) =>
                         setVerificationCode(e.target.value)

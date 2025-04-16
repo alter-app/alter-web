@@ -40,8 +40,9 @@ const SignUp = () => {
                         알려주시겠어요?
                     </p>
                     <AuthInput
+                        width="290px"
                         type="text"
-                        placeholder="이름"
+                        placeholder="박알바"
                         value={name}
                         onChange={(e) =>
                             setName(e.target.value)
@@ -53,7 +54,7 @@ const SignUp = () => {
                     />
                     <AuthInput
                         type="tel"
-                        placeholder="휴대폰 번호"
+                        placeholder="010-1234-5678"
                         value={phone}
                         onChange={(e) =>
                             setPhone(e.target.value)
@@ -61,7 +62,7 @@ const SignUp = () => {
                     />
                     <AuthInput
                         type="text"
-                        placeholder="생년월일"
+                        placeholder="19450815"
                         value={birth}
                         onChange={(e) =>
                             setBirth(e.target.value)
@@ -93,6 +94,7 @@ const SignUp = () => {
                     <div>
                         <AuthInput
                             type="text"
+                            width="290px"
                             placeholder="닉네임"
                             value={nickname}
                             onChange={(e) => {
