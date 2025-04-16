@@ -1,58 +1,162 @@
-import { Link } from "react-router-dom";
 import { useState } from "react";
-import AuthButton from "../components/auth/AuthButton";
+import { Link } from "react-router-dom";
 import AuthInput from "../components/auth/AuthInput";
-import GenderSelect from "../components/auth/GenderSelect";
-import DateInput from "../components/auth/DateInput";
+import AuthButton from "../components/auth/AuthButton";
+import GenderSelector from "../components/auth/GenderSelector";
 
 const SignUp = () => {
+    // 단계 관리
+    const [step, setStep] = useState(1);
+
+    // 1단계 state
+    const [name, setName] = useState("");
+    const [gender, setGender] = useState("남");
+    const [phone, setPhone] = useState("");
+    const [birth, setBirth] = useState("");
+
+    // 2단계 state
+    const [nickname, setNickname] = useState("");
+    const [nicknameChecked, setNicknameChecked] =
+        useState(false);
     const [agreed, setAgreed] = useState(false);
-    const [gender, setGender] = useState("male");
-    const [date, setDate] = useState("");
+    const [adAgreed, setAdAgreed] = useState(false);
+
+    // 1단계 완료 조건
+    const isStep1Valid = name && gender && phone && birth;
+
+    // 2단계 완료 조건
+    const isStep2Valid = nicknameChecked && agreed;
 
     return (
         <div>
-            <AuthInput type="email" placeholder="이메일" />
+            {step === 1 && (
+                <div>
+                    <h2>회원님의 정보를 알려주세요!</h2>
+                    <p>
+                        알터가 회원님이 동의해 주신 내용을
+                        바탕으로 작성했어요.
+                        <br />
+                        틀리거나 빈 정보가 있다면
+                        알려주시겠어요?
+                    </p>
+                    <AuthInput
+                        type="text"
+                        placeholder="이름"
+                        value={name}
+                        onChange={(e) =>
+                            setName(e.target.value)
+                        }
+                    />
+                    <GenderSelector
+                        value={gender}
+                        onChange={setGender}
+                    />
+                    <AuthInput
+                        type="tel"
+                        placeholder="휴대폰 번호"
+                        value={phone}
+                        onChange={(e) =>
+                            setPhone(e.target.value)
+                        }
+                    />
+                    <AuthInput
+                        type="text"
+                        placeholder="생년월일"
+                        value={birth}
+                        onChange={(e) =>
+                            setBirth(e.target.value)
+                        }
+                    />
+                    <p>
+                        만약 내용이 없다면 모든 내용을
+                        기입해 주세요!
+                    </p>
+                    <AuthButton
+                        disabled={!isStep1Valid}
+                        onClick={() => setStep(2)}
+                    >
+                        다 했어요.
+                    </AuthButton>
+                </div>
+            )}
 
-            <AuthInput
-                type="number"
-                placeholder="휴대폰 번호"
-            />
-
-            <AuthInput type="text" placeholder="닉네임" />
-
-            <GenderSelect
-                value={gender}
-                onChange={setGender}
-            />
-
-            <DateInput
-                value={date}
-                onChange={setDate}
-                placeholder="생년월일"
-            />
-
-            <AuthInput type="text" placeholder="지역" />
-
-            <div
-                style={{
-                    display: "flex",
-                }}
-            >
-                <AuthInput
-                    type="checkbox"
-                    checked={agreed}
-                    onChange={(e) =>
-                        setAgreed(e.target.checked)
-                    }
-                />
-                사용자 <Link to="/terms">약관</Link>에
-                동의합니다
-            </div>
-
-            <AuthButton disabled={!agreed}>
-                회원가입 완료
-            </AuthButton>
+            {step === 2 && (
+                <div>
+                    <h2>이제 마지막이에요!</h2>
+                    <p>
+                        회원님이 알터에서 불릴 닉네임을
+                        알려주세요.
+                        <br />
+                        그리고 필수 정보 제공에 동의해
+                        주시면 완료예요.
+                    </p>
+                    <div>
+                        <AuthInput
+                            type="text"
+                            placeholder="닉네임"
+                            value={nickname}
+                            onChange={(e) => {
+                                setNickname(e.target.value);
+                                setNicknameChecked(false);
+                            }}
+                        />
+                        <AuthButton
+                            type="button"
+                            onClick={() =>
+                                setNicknameChecked(true)
+                            }
+                            disabled={!nickname}
+                        >
+                            중복 확인
+                        </AuthButton>
+                    </div>
+                    <p>
+                        부정적이거나, 타인을 공격하는
+                        메시지의 이름은 쓸 수 없어요!
+                    </p>
+                    <div>
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={agreed}
+                                onChange={(e) =>
+                                    setAgreed(
+                                        e.target.checked
+                                    )
+                                }
+                            />
+                            (필수){" "}
+                            <Link to="/terms">
+                                이용약관
+                            </Link>
+                            과 개인정보 보호정책 동의
+                        </label>
+                    </div>
+                    <div>
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={adAgreed}
+                                onChange={(e) =>
+                                    setAdAgreed(
+                                        e.target.checked
+                                    )
+                                }
+                            />
+                            (선택) 이메일 및 SMS 광고성 정보
+                            수신 동의
+                        </label>
+                    </div>
+                    <AuthButton
+                        disabled={!isStep2Valid}
+                        onClick={() =>
+                            alert("회원가입 완료!")
+                        }
+                    >
+                        가입하기
+                    </AuthButton>
+                </div>
+            )}
         </div>
     );
 };
