@@ -31,16 +31,11 @@ export default function KakaoCallback() {
                     } else {
                         switch (data.code) {
                             case "A003": {
-                                const {
-                                    name,
-                                    gender,
-                                    birthday,
-                                } = data.data || {};
+                                const allData =
+                                    data.data || {};
                                 navigate("/phoneauth", {
                                     state: {
-                                        name,
-                                        gender,
-                                        birthday,
+                                        ...allData,
                                     },
                                 });
                                 break;

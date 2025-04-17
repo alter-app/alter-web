@@ -1,11 +1,16 @@
 import { useState } from "react";
-import { useLocation, Link } from "react-router-dom";
+import {
+    useLocation,
+    Link,
+    useNavigate,
+} from "react-router-dom";
 import AuthInput from "../components/auth/AuthInput";
 import AuthButton from "../components/auth/AuthButton";
 import GenderSelector from "../components/auth/GenderSelector";
 
 const SignUp = () => {
     const location = useLocation();
+    const navigate = useNavigate();
 
     // 단계 관리
     const [step, setStep] = useState(1);
@@ -23,7 +28,12 @@ const SignUp = () => {
     const [gender, setGender] = useState(
         location.state?.gender === "GENDER_MALE"
             ? "남"
-            : "여"
+            : location.state?.gender === "GENDER_FEMALE"
+            ? "여"
+            : ""
+    );
+    const [signupSessionId] = useState(
+        location.state?.signupSessionId || ""
     );
 
     // 2단계 state
@@ -38,6 +48,53 @@ const SignUp = () => {
 
     // 2단계 완료 조건
     const isStep2Valid = nicknameChecked && agreed;
+
+    const getGenderCode = (genderStr) => {
+        if (genderStr === "남") return "GENDER_MALE";
+        if (genderStr === "여") return "GENDER_FEMALE";
+        return "";
+    };
+
+    const handleSignUp = async () => {
+        try {
+            const response = await fetch(
+                "/api/public/users/signup",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        name,
+                        contact: phone,
+                        birthday: birth,
+                        gender: getGenderCode(gender),
+                        nickname,
+                        signupSessionId,
+                    }),
+                }
+            );
+
+            if (!response.ok) {
+                let errorMsg = "회원가입에 실패했습니다.";
+                try {
+                    const errorData = await response.json();
+                    console.log(errorData);
+                } catch (e) {
+                    // JSON 파싱 실패 시 기본 메시지 사용
+                }
+                throw new Error(errorMsg);
+            }
+
+            alert("회원가입 완료!");
+            navigate("/");
+        } catch (error) {
+            alert(
+                error.message ||
+                    "회원가입 중 오류가 발생했습니다."
+            );
+        }
+    };
 
     return (
         <div>
@@ -165,9 +222,7 @@ const SignUp = () => {
                     </div>
                     <AuthButton
                         disabled={!isStep2Valid}
-                        onClick={() =>
-                            alert("회원가입 완료!")
-                        }
+                        onClick={handleSignUp}
                     >
                         가입하기
                     </AuthButton>
