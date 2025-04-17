@@ -6,7 +6,7 @@ import SignUp from "./pages/SignUp";
 import NotFound from "./pages/NotFound";
 import PhoneAuthPage from "./pages/PhoneAuth";
 import KakaoCallback from "./pages/callback/KakaoCallback";
-import AppleCallBack from "./pages/callback/AppleCallback";
+import AppleCallback from "./pages/callback/AppleCallback";
 
 function App() {
     return (
@@ -24,7 +24,7 @@ function App() {
             />
             <Route
                 path="/auth/apple/callback"
-                element={<AppleCallBack />}
+                element={<AppleCallback />}
             />
             <Route path="*" element={<NotFound />} />
         </Routes>

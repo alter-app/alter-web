@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-function AppleCallBack() {
+function AppleCallback() {
     const navigate = useNavigate();
     const location = useLocation();
     const { authorizationCode } = location.state || {};
@@ -29,4 +29,4 @@ function AppleCallBack() {
     return <div>Apple 로그인 진행 중...</div>;
 }
 
-export default AppleCallBack;
+export default AppleCallback;
