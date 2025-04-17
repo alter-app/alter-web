@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Redirection() {
+export default function KakaoCallback() {
     const navigate = useNavigate();
     const url = new URL(window.location.href);
     const code = url.searchParams.get("code");
@@ -10,22 +10,56 @@ export default function Redirection() {
         if (code) {
             const sendCodeToBackend = async () => {
                 try {
-                    // const response = await fetch('백엔드 URL', {
-                    //     method: 'POST',
-                    //     headers: {
-                    //         'Content-Type': 'application/json'
-                    //     },
-                    //     body: JSON.stringify({ code: code })
-                    // });
-                    // const data = await response.json();
-                    // if (data.success) {
-                    navigate("/");
-                    // }
+                    const response = await fetch(
+                        "/api/public/users/login",
+                        {
+                            method: "POST",
+                            headers: {
+                                "Content-Type":
+                                    "application/json",
+                            },
+                            body: JSON.stringify({
+                                provider: "KAKAO",
+                                authorizationCode: code,
+                            }),
+                        }
+                    );
+                    const data = await response.json();
+
+                    if (data.success) {
+                        navigate("/");
+                    } else {
+                        switch (data.code) {
+                            case "A003": {
+                                const {
+                                    name,
+                                    gender,
+                                    birthday,
+                                } = data.data || {};
+                                navigate("/phoneauth", {
+                                    state: {
+                                        name,
+                                        gender,
+                                        birthday,
+                                    },
+                                });
+                                break;
+                            }
+                            default:
+                                alert(
+                                    "알 수 없는 오류가 발생했습니다."
+                                );
+                                navigate("/error");
+                                break;
+                        }
+                    }
                 } catch (error) {
                     console.error(
                         "백엔드로 code 전송 실패:",
                         error
                     );
+                    alert("네트워크 오류가 발생했습니다.");
+                    navigate("/error");
                 }
             };
 

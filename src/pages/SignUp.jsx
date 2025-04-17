@@ -1,18 +1,30 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import AuthInput from "../components/auth/AuthInput";
 import AuthButton from "../components/auth/AuthButton";
 import GenderSelector from "../components/auth/GenderSelector";
 
 const SignUp = () => {
+    const location = useLocation();
+
     // 단계 관리
     const [step, setStep] = useState(1);
 
     // 1단계 state
-    const [name, setName] = useState("");
-    const [gender, setGender] = useState("남");
-    const [phone, setPhone] = useState("");
-    const [birth, setBirth] = useState("");
+    const [name, setName] = useState(
+        location.state?.name || ""
+    );
+    const [phone, setPhone] = useState(
+        location.state?.phone || ""
+    );
+    const [birth, setBirth] = useState(
+        location.state?.birthday || ""
+    );
+    const [gender, setGender] = useState(
+        location.state?.gender === "GENDER_MALE"
+            ? "남"
+            : "여"
+    );
 
     // 2단계 state
     const [nickname, setNickname] = useState("");
