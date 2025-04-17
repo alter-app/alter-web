@@ -12,24 +12,24 @@ const GenderSelector = ({ value, onChange }) => {
             <AuthButton
                 type="button"
                 onClick={() => onChange("남")}
-                font_size="18px"
+                $fontSize="18px"
                 width="61px"
-                background={
+                $background={
                     value === "남" ? "#2DE283" : "#cbcbcb"
                 }
-                border_radius="8px 0 0 8px"
+                $borderRadius="8px 0 0 8px"
             >
                 남
             </AuthButton>
             <AuthButton
                 type="button"
                 onClick={() => onChange("여")}
-                font_size="18px"
+                $fontSize="18px"
                 width="61px"
-                background={
+                $background={
                     value === "여" ? "#2DE283" : "#cbcbcb"
                 }
-                border_radius="0 8px 8px 0"
+                $borderRadius="0 8px 8px 0"
             >
                 여
             </AuthButton>

@@ -14,14 +14,14 @@ const StyledButton = styled.button`
     width: 100%;
     height: 100%;
     border: none;
-    background: ${({ background }) =>
-        background || "#2DE283"};
+    background: ${({ $background }) =>
+        $background || "#2DE283"};
     color: #ffffff;
-    font-size: ${({ font_size }) => font_size || "16px"};
+    font-size: ${({ $fontSize }) => $fontSize || "16px"};
     font-family: "Pretendard";
     font-weight: 400;
-    border-radius: ${({ border_radius }) =>
-        border_radius || "8px"};
+    border-radius: ${({ $borderRadius }) =>
+        $borderRadius || "8px"};
     cursor: pointer;
 
     &:disabled {

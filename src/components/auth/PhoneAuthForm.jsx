@@ -113,7 +113,7 @@ const PhoneAuthForm = () => {
                     type="button"
                     onClick={handleSendCode}
                     disabled={loading || !recaptchaVerified}
-                    font_size="18px"
+                    $font_size="18px"
                     width="129px"
                 >
                     {loading
