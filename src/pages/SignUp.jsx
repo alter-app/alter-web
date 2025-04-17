@@ -108,6 +108,8 @@ const SignUp = () => {
                                 setNicknameChecked(true)
                             }
                             disabled={!nickname}
+                            font_size="18px"
+                            width="98px"
                         >
                             중복 확인
                         </AuthButton>

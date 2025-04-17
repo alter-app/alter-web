@@ -4,7 +4,7 @@ const InputContainer = styled.div`
     width: ${({ width }) => width || "420px"};
     height: 58px;
     background: #f6f6f6;
-    border-radius: 12px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     padding: 0 24px;
@@ -15,7 +15,6 @@ const StyledInput = styled.input`
     width: 100%;
     height: 100%;
     border: none;
-    border-radius: 8px;
     background: transparent;
     font-size: 18px;
     color: #111111;
