@@ -55,6 +55,28 @@ const SignUp = () => {
         return "";
     };
 
+    const checkNicknameDuplicate = async (nickname) => {
+        try {
+            const response = await fetch(
+                "/api/public/users/exists/nickname",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ nickname }),
+                }
+            );
+            const data = await response.json();
+            return data.data.duplicated === false;
+        } catch (error) {
+            alert(
+                "닉네임 중복 검사 중 오류가 발생했습니다."
+            );
+            return false;
+        }
+    };
+
     const handleSignUp = async () => {
         try {
             const response = await fetch(
@@ -173,9 +195,28 @@ const SignUp = () => {
                         />
                         <AuthButton
                             type="button"
-                            onClick={() =>
-                                setNicknameChecked(true)
-                            }
+                            onClick={async () => {
+                                if (!nickname) return;
+                                const isAvailable =
+                                    await checkNicknameDuplicate(
+                                        nickname
+                                    );
+                                if (isAvailable) {
+                                    setNicknameChecked(
+                                        true
+                                    );
+                                    alert(
+                                        "사용 가능한 닉네임입니다!"
+                                    );
+                                } else {
+                                    setNicknameChecked(
+                                        false
+                                    );
+                                    alert(
+                                        "이미 사용 중인 닉네임입니다."
+                                    );
+                                }
+                            }}
                             disabled={!nickname}
                             $font_size="18px"
                             width="98px"
