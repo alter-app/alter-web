@@ -26,7 +26,7 @@ export default function KakaoCallback() {
                     );
                     const data = await response.json();
 
-                    if (data.success) {
+                    if (response.ok) {
                         navigate("/");
                     } else {
                         switch (data.code) {
