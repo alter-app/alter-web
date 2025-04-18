@@ -7,20 +7,12 @@ import NotFound from "./pages/NotFound";
 import PhoneAuthPage from "./pages/PhoneAuth";
 import KakaoCallback from "./pages/callback/KakaoCallback";
 import AppleCallback from "./pages/callback/AppleCallback";
-import styled from "styled-components";
-
-const Background = styled.div`
-    min-height: 100%;
-    min-width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-`;
+import MainLayout from "./layouts/MainLayout";
 
 function App() {
     return (
-        <Background>
-            <Routes>
+        <Routes>
+            <Route element={<MainLayout />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route
@@ -40,8 +32,8 @@ function App() {
                     element={<AppleCallback />}
                 />
                 <Route path="*" element={<NotFound />} />
-            </Routes>
-        </Background>
+            </Route>
+        </Routes>
     );
 }
 

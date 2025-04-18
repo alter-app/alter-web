@@ -1,0 +1,24 @@
+body {
+    min-height: 100vh;
+    margin: 0;
+    background: #f4f4f4;
+}
+
+header {
+    height: 80px;
+    background: #f4f4f4;
+}
+
+footer {
+    height: 80px;
+    background: #f4f4f4;
+}
+
+main {
+    min-height: calc(
+        100vh - 160px
+    ); /* header+footer 높이 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
