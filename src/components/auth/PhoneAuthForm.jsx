@@ -15,17 +15,16 @@ const PhoneAuthForm = () => {
     const [verificationId, setVerificationId] =
         useState("");
     const [loading, setLoading] = useState(false);
-    const [recaptchaVerified, setRecaptchaVerified] =
-        useState(false);
     const [phoneNumber, setPhoneNumber] = useState("");
     const [verificationCode, setVerificationCode] =
         useState("");
 
-    // reCAPTCHA 초기화
+    // reCAPTCHA 초기화 - 이제 recaptchaVerified 상태가 필요 없음
     useEffect(() => {
-        initializeRecaptcha("recaptcha-container", () =>
-            setRecaptchaVerified(true)
-        );
+        initializeRecaptcha("recaptcha-container", () => {
+            // 인증 성공 시 콜백은 유지하되 상태 업데이트는 필요 없음
+            console.log("reCAPTCHA verified");
+        });
         return clearRecaptcha;
     }, []);
 
@@ -36,16 +35,17 @@ const PhoneAuthForm = () => {
     // 인증번호 전송
     const handleSendCode = async (e) => {
         e.preventDefault();
-        if (!recaptchaVerified)
-            return alert("reCAPTCHA 검증이 필요합니다.");
+
         const formatted = phoneNumber.replace(/[-\s]/g, "");
         if (!isValidPhoneNumber(formatted)) {
             return alert(
                 "국가코드(+82)와 함께 올바른 전화번호를 입력하세요. 예: +821012345678"
             );
         }
+
         setLoading(true);
         try {
+            // reCAPTCHA 확인은 sendPhoneVerification 내부에서 처리됨
             const vId = await sendPhoneVerification(
                 formatted
             );
@@ -53,16 +53,14 @@ const PhoneAuthForm = () => {
             alert("인증번호가 전송되었습니다.");
         } catch (error) {
             clearRecaptcha();
-            initializeRecaptcha("recaptcha-container", () =>
-                setRecaptchaVerified(true)
-            );
+            initializeRecaptcha("recaptcha-container");
             alert(error.message || "인증번호 전송 실패");
         } finally {
             setLoading(false);
         }
     };
 
-    // 인증번호 검증
+    // 인증번호 검증 (변경 없음)
     const handleVerifyCode = async (e) => {
         e.preventDefault();
         if (verificationCode.length !== 6) {
@@ -106,7 +104,7 @@ const PhoneAuthForm = () => {
                 <AuthButton
                     type="button"
                     onClick={handleSendCode}
-                    disabled={loading || !recaptchaVerified}
+                    disabled={loading}
                     $font_size="18px"
                     width="129px"
                 >
@@ -136,6 +134,36 @@ const PhoneAuthForm = () => {
                     {loading ? "확인 중..." : "인증하기"}
                 </AuthButton>
             </div>
+
+            {/* Google reCAPTCHA 정책 준수를 위한 텍스트 */}
+            <p
+                style={{
+                    fontSize: "12px",
+                    color: "#666",
+                    marginTop: "10px",
+                }}
+            >
+                이 사이트는 Google reCAPTCHA로 보호되며,
+                Google의
+                <a
+                    href="https://policies.google.com/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    {" "}
+                    개인정보처리방침
+                </a>{" "}
+                및
+                <a
+                    href="https://policies.google.com/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    {" "}
+                    서비스 약관
+                </a>
+                이 적용됩니다.
+            </p>
         </div>
     );
 };

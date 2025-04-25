@@ -16,7 +16,7 @@ export function initializeRecaptcha(
             auth,
             containerId,
             {
-                size: "normal",
+                size: "invisible",
                 callback: () => {
                     if (onVerified) onVerified();
                 },
@@ -46,12 +46,12 @@ export function clearRecaptcha() {
 
 // reCAPTCHA 인증번호 전송
 export async function sendPhoneVerification(phoneNumber) {
-    const verifier = window.recaptchaVerifier;
-    if (!verifier)
+    if (!window.recaptchaVerifier)
         throw new Error(
             "reCAPTCHA가 초기화되지 않았습니다."
         );
     try {
+        const verifier = window.recaptchaVerifier;
         const confirmationResult =
             await signInWithPhoneNumber(
                 auth,
