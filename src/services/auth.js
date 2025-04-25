@@ -159,3 +159,60 @@ export const signUp = async (userData) => {
         throw error;
     }
 };
+
+export const loginWithProvider = async (
+    provider,
+    authorizationCode,
+    setAuth,
+    navigate
+) => {
+    try {
+        const response = await fetch(
+            "/api/public/users/login",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    provider: provider,
+                    authorizationCode: authorizationCode,
+                }),
+            }
+        );
+        const data = await response.json();
+
+        if (response.ok) {
+            const authData = data.data;
+            setAuth({
+                accessToken: authData.accessToken,
+                refreshToken: authData.refreshToken,
+                authorizationId: authData.authorizationId,
+                scope: authData.scope,
+            });
+            navigate("/");
+        } else {
+            switch (data.code) {
+                case "A003": {
+                    const allData = data.data || {};
+                    navigate("/phoneauth", {
+                        state: {
+                            ...allData,
+                        },
+                    });
+                    break;
+                }
+                default:
+                    alert(
+                        "알 수 없는 오류가 발생했습니다."
+                    );
+                    navigate("/error");
+                    break;
+            }
+        }
+    } catch (error) {
+        console.error("백엔드로 code 전송 실패:", error);
+        alert("네트워크 오류가 발생했습니다.");
+        navigate("/error");
+    }
+};

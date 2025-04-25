@@ -1,30 +1,24 @@
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import useAuthStore from "../../store/authStore";
+import { loginWithProvider } from "../../services/auth";
 
 function AppleCallback() {
     const navigate = useNavigate();
     const location = useLocation();
     const { authorizationCode } = location.state || {};
+    const setAuth = useAuthStore((state) => state.setAuth);
 
     useEffect(() => {
         if (authorizationCode) {
-            fetch(
-                `https://ysw123.xyz/api/oauth/login?authorizationCode=${authorizationCode}&provider=APPLE`,
-                {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }
-            ).then(() => {
-                navigate("/");
-            });
-        } else {
-            // 인증 코드가 없을 경우
-            console.error("No authorization code received");
-            navigate("/apple-login");
+            loginWithProvider(
+                "APPLE",
+                authorizationCode,
+                setAuth,
+                navigate
+            );
         }
-    }, [navigate, authorizationCode]);
+    }, [authorizationCode, navigate, setAuth]);
 
     return <div>Apple 로그인 진행 중...</div>;
 }
