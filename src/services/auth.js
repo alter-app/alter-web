@@ -160,6 +160,7 @@ export const signUp = async (userData) => {
     }
 };
 
+// 소셜 로그인 요청 로직
 export const loginWithProvider = async (
     provider,
     authorizationCode,
@@ -175,41 +176,58 @@ export const loginWithProvider = async (
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    provider: provider,
-                    authorizationCode: authorizationCode,
+                    provider,
+                    authorizationCode,
                 }),
             }
         );
+
         const data = await response.json();
 
         if (response.ok) {
-            const authData = data.data;
+            const {
+                accessToken,
+                refreshToken,
+                authorizationId,
+                scope,
+            } = data.data;
             setAuth({
-                accessToken: authData.accessToken,
-                refreshToken: authData.refreshToken,
-                authorizationId: authData.authorizationId,
-                scope: authData.scope,
+                accessToken,
+                refreshToken,
+                authorizationId,
+                scope,
             });
-            navigate("/");
-        } else {
-            switch (data.code) {
-                case "A003": {
-                    const allData = data.data || {};
-                    navigate("/phoneauth", {
-                        state: {
-                            ...allData,
-                        },
-                    });
-                    break;
-                }
-                default:
-                    alert(
-                        "알 수 없는 오류가 발생했습니다."
-                    );
-                    navigate("/error");
-                    break;
-            }
+            return navigate("/");
         }
+
+        const errorHandlers = {
+            A003: () => {
+                navigate("/phoneauth", {
+                    state: { ...(data.data || {}) },
+                });
+            },
+            A004: () => {
+                alert(
+                    "이미 다른 소셜 계정으로 가입된 이메일입니다. 해당 계정으로 로그인해 주세요."
+                );
+                navigate("/login");
+            },
+            A007: () => {
+                alert(
+                    "소셜 로그인 인증이 만료되었습니다. 다시 시도해 주세요."
+                );
+                navigate("/login");
+            },
+            default: () => {
+                alert("알 수 없는 오류가 발생했습니다.");
+                navigate("/error");
+            },
+        };
+
+        (
+            errorHandlers[data.code] ||
+            errorHandlers.default
+        )();
     } catch (error) {
         console.error("백엔드로 code 전송 실패:", error);
         alert("네트워크 오류가 발생했습니다.");
