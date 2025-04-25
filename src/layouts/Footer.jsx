@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import AlterLogo from "../assets/logos/footer.png";
+import AlterLogo from "../assets/logos/signature B(좌우).png";
 
 const FooterWrapper = styled.footer``;
 
@@ -27,7 +27,7 @@ const FooterBottom = styled.div`
 `;
 
 const Logo = styled.img`
-    height: 13px;
+    height: 15px;
     width: 42px;
     margin-right: 6px;
     vertical-align: middle;

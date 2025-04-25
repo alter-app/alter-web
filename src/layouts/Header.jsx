@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import AlterLogo from "../assets/logos/header.png";
+import AlterLogo from "../assets/logos/signature CB(좌우).png";
 
 const HeaderWrapper = styled.header`
     width: 100%;
@@ -12,7 +12,7 @@ const HeaderWrapper = styled.header`
 `;
 
 const Logo = styled.img`
-    height: 27px;
+    height: 36px;
     width: 117px;
     width: auto;
     margin-left: 40px;
