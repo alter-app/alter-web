@@ -99,3 +99,63 @@ function getFirebaseErrorMsg(code) {
             return "인증 처리 중 오류가 발생했습니다.";
     }
 }
+
+// 닉네임 중복 검사 로직
+export const checkNicknameDuplicate = async (nickname) => {
+    try {
+        const response = await fetch(
+            "/api/public/users/exists/nickname",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ nickname }),
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("서버 응답 오류");
+        }
+
+        const data = await response.json();
+        return data.data.duplicated === false;
+    } catch (error) {
+        console.error("닉네임 중복 검사 오류:", error);
+        throw new Error(
+            "닉네임 중복 검사 중 오류가 발생했습니다."
+        );
+    }
+};
+
+// 회원가입 요청을 처리하는 로직
+export const signUp = async (userData) => {
+    try {
+        const response = await fetch(
+            "/api/public/users/signup",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(userData),
+            }
+        );
+
+        if (!response.ok) {
+            const errorData = await response
+                .json()
+                .catch(() => ({}));
+
+            throw new Error(
+                errorData.message ||
+                    "회원가입에 실패했습니다."
+            );
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("회원가입 오류:", error);
+        throw error;
+    }
+};

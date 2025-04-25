@@ -2,6 +2,10 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import SignUpStep1 from "../components/auth/SignUpStep1";
 import SignUpStep2 from "../components/auth/SignUpStep2";
+import {
+    checkNicknameDuplicate,
+    signUp,
+} from "../services/auth";
 
 const SignUp = () => {
     const location = useLocation();
@@ -44,52 +48,30 @@ const SignUp = () => {
         return "";
     };
 
-    const checkNicknameDuplicate = async (nickname) => {
+    const handleCheckNickname = async (nickname) => {
         try {
-            const response = await fetch(
-                "/api/public/users/exists/nickname",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ nickname }),
-                }
-            );
-            const data = await response.json();
-            return data.data.duplicated === false;
+            const isAvailable =
+                await checkNicknameDuplicate(nickname);
+            return isAvailable;
         } catch (error) {
-            alert(
-                "닉네임 중복 검사 중 오류가 발생했습니다."
-            );
+            alert(error.message);
             return false;
         }
     };
 
     const handleSignUp = async () => {
         try {
-            const response = await fetch(
-                "/api/public/users/signup",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        name,
-                        contact: phone,
-                        birthday: birth,
-                        gender: getGenderCode(gender),
-                        nickname,
-                        signupSessionId,
-                    }),
-                }
-            );
-
-            if (!response.ok)
-                throw new Error("회원가입에 실패했습니다.");
+            const userData = {
+                name,
+                contact: phone,
+                birthday: birth,
+                gender: getGenderCode(gender),
+                nickname,
+                signupSessionId,
+            };
+            await signUp(userData);
             alert("회원가입 완료!");
-            navigate("/");
+            navigate("/login");
         } catch (error) {
             alert(
                 error.message ||
@@ -131,7 +113,7 @@ const SignUp = () => {
                     isValid={isStep2Valid}
                     onPrev={() => setStep(1)}
                     onSubmit={handleSignUp}
-                    checkNickname={checkNicknameDuplicate}
+                    checkNickname={handleCheckNickname}
                 />
             )}
         </div>
