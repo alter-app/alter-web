@@ -8,6 +8,7 @@ import {
 } from "../../services/auth";
 import AuthInput from "./AuthInput";
 import AuthButton from "./AuthButton";
+import styled from "styled-components";
 
 const PhoneAuthForm = () => {
     const location = useLocation();
@@ -87,85 +88,89 @@ const PhoneAuthForm = () => {
 
     return (
         <div>
-            <div id="recaptcha-container"></div>
             <div>
-                <AuthInput
-                    width="283px"
-                    name="phoneNumber"
-                    type="text"
-                    placeholder="전화번호(11자리)"
-                    value={phoneNumber}
-                    onChange={(e) =>
-                        setPhoneNumber(e.target.value)
-                    }
-                    required
-                    disabled={loading}
-                />
-                <AuthButton
-                    type="button"
-                    onClick={handleSendCode}
-                    disabled={loading}
-                    $font_size="18px"
-                    width="129px"
-                >
-                    {loading
-                        ? "전송 중..."
-                        : "인증번호 전송"}
-                </AuthButton>
-            </div>
-            <div>
-                <AuthInput
-                    name="verificationCode"
-                    type="text"
-                    placeholder="인증번호 입력"
-                    value={verificationCode}
-                    onChange={(e) =>
-                        setVerificationCode(e.target.value)
-                    }
-                    maxLength={6}
-                    required
-                    disabled={loading || !verificationId}
-                />
+                <div id="recaptcha-container"></div>
+                <SInputStack>
+                    <Row>
+                        <AuthInput
+                            width="283px"
+                            name="phoneNumber"
+                            type="text"
+                            placeholder="전화번호(11자리)"
+                            value={phoneNumber}
+                            onChange={(e) =>
+                                setPhoneNumber(
+                                    e.target.value
+                                )
+                            }
+                            required
+                            disabled={loading}
+                        />
+                        <AuthButton
+                            type="button"
+                            onClick={handleSendCode}
+                            disabled={loading}
+                            $font_size="18px"
+                            width="129px"
+                        >
+                            {loading
+                                ? "전송 중..."
+                                : "인증번호 전송"}
+                        </AuthButton>
+                    </Row>
+
+                    <AuthInput
+                        name="verificationCode"
+                        type="text"
+                        placeholder="인증번호 입력"
+                        value={verificationCode}
+                        onChange={(e) =>
+                            setVerificationCode(
+                                e.target.value
+                            )
+                        }
+                        maxLength={6}
+                        required
+                        disabled={
+                            loading || !verificationId
+                        }
+                    />
+                </SInputStack>
+                <InfoGuide>
+                    인증 확인이 안눌린다면 번호를 다시 확인
+                    해 주세요.
+                </InfoGuide>
                 <AuthButton
                     type="button"
                     onClick={handleVerifyCode}
                     disabled={loading || !verificationId}
                 >
-                    {loading ? "확인 중..." : "인증하기"}
+                    {loading ? "확인 중..." : "인증 확인"}
                 </AuthButton>
             </div>
-
-            {/* Google reCAPTCHA 정책 준수를 위한 텍스트 */}
-            <p
-                style={{
-                    fontSize: "12px",
-                    color: "#666",
-                    marginTop: "10px",
-                }}
-            >
-                이 사이트는 Google reCAPTCHA로 보호되며,
-                Google의
-                <a
-                    href="https://policies.google.com/privacy"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    {" "}
-                    개인정보처리방침
-                </a>{" "}
-                및
-                <a
-                    href="https://policies.google.com/terms"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    {" "}
-                    서비스 약관
-                </a>
-                이 적용됩니다.
-            </p>
         </div>
     );
 };
 
 export default PhoneAuthForm;
+
+const Row = styled.div`
+    display: flex;
+    gap: 8px;
+`;
+
+const InfoGuide = styled.div`
+    font-family: "Pretendard";
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 18px;
+    color: #767676;
+    margin-top: 174px;
+    margin-bottom: 12px;
+`;
+
+const SInputStack = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+`;
