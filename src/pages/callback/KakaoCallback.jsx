@@ -1,37 +1,24 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import useAuthStore from "../../store/authStore";
+import { loginWithProvider } from "../../services/auth";
 
-export default function Redirection() {
+export default function KakaoCallback() {
     const navigate = useNavigate();
     const url = new URL(window.location.href);
     const code = url.searchParams.get("code");
+    const setAuth = useAuthStore((state) => state.setAuth);
 
     useEffect(() => {
         if (code) {
-            const sendCodeToBackend = async () => {
-                try {
-                    // const response = await fetch('백엔드 URL', {
-                    //     method: 'POST',
-                    //     headers: {
-                    //         'Content-Type': 'application/json'
-                    //     },
-                    //     body: JSON.stringify({ code: code })
-                    // });
-                    // const data = await response.json();
-                    // if (data.success) {
-                    navigate("/");
-                    // }
-                } catch (error) {
-                    console.error(
-                        "백엔드로 code 전송 실패:",
-                        error
-                    );
-                }
-            };
-
-            sendCodeToBackend();
+            loginWithProvider(
+                "KAKAO",
+                code,
+                setAuth,
+                navigate
+            );
         }
-    }, [code, navigate]);
+    }, [code, navigate, setAuth]);
 
     return (
         <div>

@@ -16,7 +16,7 @@ export function initializeRecaptcha(
             auth,
             containerId,
             {
-                size: "normal",
+                size: "invisible",
                 callback: () => {
                     if (onVerified) onVerified();
                 },
@@ -46,12 +46,12 @@ export function clearRecaptcha() {
 
 // reCAPTCHA 인증번호 전송
 export async function sendPhoneVerification(phoneNumber) {
-    const verifier = window.recaptchaVerifier;
-    if (!verifier)
+    if (!window.recaptchaVerifier)
         throw new Error(
             "reCAPTCHA가 초기화되지 않았습니다."
         );
     try {
+        const verifier = window.recaptchaVerifier;
         const confirmationResult =
             await signInWithPhoneNumber(
                 auth,
@@ -99,3 +99,138 @@ function getFirebaseErrorMsg(code) {
             return "인증 처리 중 오류가 발생했습니다.";
     }
 }
+
+// 닉네임 중복 검사 로직
+export const checkNicknameDuplicate = async (nickname) => {
+    try {
+        const response = await fetch(
+            "/api/public/users/exists/nickname",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ nickname }),
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("서버 응답 오류");
+        }
+
+        const data = await response.json();
+        return data.data.duplicated === false;
+    } catch (error) {
+        console.error("닉네임 중복 검사 오류:", error);
+        throw new Error(
+            "닉네임 중복 검사 중 오류가 발생했습니다."
+        );
+    }
+};
+
+// 회원가입 요청을 처리하는 로직
+export const signUp = async (userData) => {
+    try {
+        const response = await fetch(
+            "/api/public/users/signup",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(userData),
+            }
+        );
+
+        if (!response.ok) {
+            const errorData = await response
+                .json()
+                .catch(() => ({}));
+
+            throw new Error(
+                errorData.message ||
+                    "회원가입에 실패했습니다."
+            );
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("회원가입 오류:", error);
+        throw error;
+    }
+};
+
+// 소셜 로그인 요청 로직
+export const loginWithProvider = async (
+    provider,
+    authorizationCode,
+    setAuth,
+    navigate
+) => {
+    try {
+        const response = await fetch(
+            "/api/public/users/login",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    provider,
+                    authorizationCode,
+                }),
+            }
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+            const {
+                accessToken,
+                refreshToken,
+                authorizationId,
+                scope,
+            } = data.data;
+            setAuth({
+                accessToken,
+                refreshToken,
+                authorizationId,
+                scope,
+            });
+            return navigate("/");
+        }
+
+        const errorHandlers = {
+            A003: () => {
+                navigate("/phoneauth", {
+                    state: { ...(data.data || {}) },
+                });
+            },
+            A004: () => {
+                alert(
+                    "이미 다른 소셜 계정으로 가입된 이메일입니다. 해당 계정으로 로그인해 주세요."
+                );
+                navigate("/login");
+            },
+            A007: () => {
+                alert(
+                    "소셜 로그인 인증이 만료되었습니다. 다시 시도해 주세요."
+                );
+                navigate("/login");
+            },
+            default: () => {
+                alert("알 수 없는 오류가 발생했습니다.");
+                navigate("/error");
+            },
+        };
+
+        (
+            errorHandlers[data.code] ||
+            errorHandlers.default
+        )();
+    } catch (error) {
+        console.error("백엔드로 code 전송 실패:", error);
+        alert("네트워크 오류가 발생했습니다.");
+        navigate("/error");
+    }
+};
