@@ -6,12 +6,12 @@ const PhoneAuthPage = () => {
         <SBackground>
             <SFormWrapper>
                 <InfoTitle>
-                    본인 확인을 위해 인증 해 주세요!
+                    본인 확인을 위해 인증해 주세요!
                 </InfoTitle>
                 <InfoDesc>
                     알터 회원가입을 위한 인증 번호를
                     <br />
-                    휴대폰 문자로 발송 해 드려요!
+                    휴대폰 문자로 발송해 드려요!
                 </InfoDesc>
                 <PhoneAuthForm />
             </SFormWrapper>
