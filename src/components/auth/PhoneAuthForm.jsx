@@ -9,6 +9,10 @@ import {
 import AuthInput from "./AuthInput";
 import AuthButton from "./AuthButton";
 import styled from "styled-components";
+import {
+    formatPhoneNumber,
+    formatPhoneNumberToE164,
+} from "../../utils/phoneUtils";
 
 const PhoneAuthForm = () => {
     const location = useLocation();
@@ -36,11 +40,15 @@ const PhoneAuthForm = () => {
     // 인증번호 전송
     const handleSendCode = async (e) => {
         e.preventDefault();
+        // 1. 현재 화면에 표시된 phoneNumber 상태를 E.164 형식으로 변환 시도
+        const formattedE164 =
+            formatPhoneNumberToE164(phoneNumber);
 
-        const formatted = phoneNumber.replace(/[-\s]/g, "");
-        if (!isValidPhoneNumber(formatted)) {
+        // 2. 변환된 E.164 형식이 유효한지 검사
+        if (!isValidPhoneNumber(formattedE164)) {
+            // 사용자에게는 익숙한 형식으로 안내하는 것이 더 좋을 수 있습니다.
             return alert(
-                "국가코드(+82)와 함께 올바른 전화번호를 입력하세요. 예: +821012345678"
+                "올바른 형식의 휴대폰 번호를 입력하세요."
             );
         }
 
@@ -48,7 +56,7 @@ const PhoneAuthForm = () => {
         try {
             // reCAPTCHA 확인은 sendPhoneVerification 내부에서 처리됨
             const vId = await sendPhoneVerification(
-                formatted
+                formattedE164
             );
             setVerificationId(vId);
             alert("인증번호가 전송되었습니다.");
@@ -95,14 +103,17 @@ const PhoneAuthForm = () => {
                         <AuthInput
                             width="283px"
                             name="phoneNumber"
-                            type="text"
-                            placeholder="전화번호(11자리)"
+                            type="tel"
+                            placeholder="010-1234-5678"
                             value={phoneNumber}
                             onChange={(e) =>
                                 setPhoneNumber(
-                                    e.target.value
+                                    formatPhoneNumber(
+                                        e.target.value
+                                    )
                                 )
                             }
+                            maxLength={13}
                             required
                             disabled={loading}
                         />
