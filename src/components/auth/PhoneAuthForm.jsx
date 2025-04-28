@@ -23,6 +23,7 @@ const PhoneAuthForm = () => {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [verificationCode, setVerificationCode] =
         useState("");
+    const [isCodeSent, setIsCodeSent] = useState(false); // 코드 전송 여부 상태만 유지
 
     // reCAPTCHA 초기화 - 이제 recaptchaVerified 상태가 필요 없음
     useEffect(() => {
@@ -59,6 +60,7 @@ const PhoneAuthForm = () => {
                 formattedE164
             );
             setVerificationId(vId);
+            setIsCodeSent(true); // 코드 전송 성공 상태로 변경
             alert("인증번호가 전송되었습니다.");
         } catch (error) {
             clearRecaptcha();
@@ -115,7 +117,7 @@ const PhoneAuthForm = () => {
                             }
                             maxLength={13}
                             required
-                            disabled={loading}
+                            disabled={isCodeSent}
                         />
                         <AuthButton
                             type="button"
@@ -126,6 +128,8 @@ const PhoneAuthForm = () => {
                         >
                             {loading
                                 ? "전송 중..."
+                                : isCodeSent // 코드가 한 번이라도 보내졌다면
+                                ? "인증번호 재전송" // 재전송 텍스트 표시
                                 : "인증번호 전송"}
                         </AuthButton>
                     </Row>
@@ -156,7 +160,7 @@ const PhoneAuthForm = () => {
                     onClick={handleVerifyCode}
                     disabled={loading || !verificationId}
                 >
-                    {loading ? "확인 중..." : "인증 확인"}
+                    인증 확인
                 </AuthButton>
             </div>
         </div>
