@@ -9,6 +9,7 @@ const InputContainer = styled.div`
     align-items: center;
     padding: 0 24px;
     box-sizing: border-box;
+    border: ${({ $borderColor }) => $borderColor || "none"};
 `;
 
 const StyledInput = styled.input`
@@ -29,8 +30,11 @@ const StyledInput = styled.input`
     }
 `;
 
-const AuthInput = ({ width, ...props }) => (
-    <InputContainer width={width}>
+const AuthInput = ({ width, borderColor, ...props }) => (
+    <InputContainer
+        width={width}
+        $borderColor={borderColor}
+    >
         <StyledInput {...props} />
     </InputContainer>
 );
