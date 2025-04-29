@@ -9,6 +9,10 @@ import {
 import AuthInput from "./AuthInput";
 import AuthButton from "./AuthButton";
 import styled from "styled-components";
+import {
+    formatPhoneNumber,
+    formatPhoneNumberToE164,
+} from "../../utils/phoneUtils";
 
 const PhoneAuthForm = () => {
     const location = useLocation();
@@ -19,55 +23,60 @@ const PhoneAuthForm = () => {
     const [phoneNumber, setPhoneNumber] = useState("");
     const [verificationCode, setVerificationCode] =
         useState("");
+    const [isCodeSent, setIsCodeSent] = useState(false);
+    const [phoneError, setPhoneError] = useState(""); // 전화번호 에러 메시지 상태
+    const [codeError, setCodeError] = useState(""); // 인증 코드 에러 메시지 상태
 
-    // reCAPTCHA 초기화 - 이제 recaptchaVerified 상태가 필요 없음
     useEffect(() => {
         initializeRecaptcha("recaptcha-container", () => {
-            // 인증 성공 시 콜백은 유지하되 상태 업데이트는 필요 없음
             console.log("reCAPTCHA verified");
         });
         return clearRecaptcha;
     }, []);
 
-    // 전화번호 형식 검증
     const isValidPhoneNumber = (number) =>
         /^\+82\d{9,10}$/.test(number);
 
-    // 인증번호 전송
     const handleSendCode = async (e) => {
         e.preventDefault();
+        const formattedE164 =
+            formatPhoneNumberToE164(phoneNumber);
 
-        const formatted = phoneNumber.replace(/[-\s]/g, "");
-        if (!isValidPhoneNumber(formatted)) {
-            return alert(
-                "국가코드(+82)와 함께 올바른 전화번호를 입력하세요. 예: +821012345678"
+        if (!isValidPhoneNumber(formattedE164)) {
+            setPhoneError(
+                "올바른 형식의 휴대폰 번호를 입력하세요."
             );
+            return;
         }
 
         setLoading(true);
+        setPhoneError(""); // 에러 메시지 초기화
         try {
-            // reCAPTCHA 확인은 sendPhoneVerification 내부에서 처리됨
             const vId = await sendPhoneVerification(
-                formatted
+                formattedE164
             );
             setVerificationId(vId);
+            setIsCodeSent(true);
             alert("인증번호가 전송되었습니다.");
         } catch (error) {
             clearRecaptcha();
             initializeRecaptcha("recaptcha-container");
-            alert(error.message || "인증번호 전송 실패");
+            setPhoneError(
+                error.message || "인증번호 전송 실패"
+            );
         } finally {
             setLoading(false);
         }
     };
 
-    // 인증번호 검증 (변경 없음)
     const handleVerifyCode = async (e) => {
         e.preventDefault();
         if (verificationCode.length !== 6) {
-            return alert("6자리 인증번호를 입력하세요.");
+            setCodeError("6자리 인증번호를 입력하세요.");
+            return;
         }
         setLoading(true);
+        setCodeError(""); // 에러 메시지 초기화
         try {
             await verifyPhoneCode(
                 verificationId,
@@ -80,7 +89,7 @@ const PhoneAuthForm = () => {
                 },
             });
         } catch (error) {
-            alert("인증 실패: " + (error.message || ""));
+            setCodeError(error.message || "");
         } finally {
             setLoading(false);
         }
@@ -95,16 +104,25 @@ const PhoneAuthForm = () => {
                         <AuthInput
                             width="283px"
                             name="phoneNumber"
-                            type="text"
-                            placeholder="전화번호(11자리)"
+                            type="tel"
+                            placeholder="010-1234-5678"
                             value={phoneNumber}
-                            onChange={(e) =>
+                            onChange={(e) => {
                                 setPhoneNumber(
-                                    e.target.value
-                                )
-                            }
+                                    formatPhoneNumber(
+                                        e.target.value
+                                    )
+                                );
+                                setPhoneError(""); // 입력 변경 시 에러 메시지 초기화
+                            }}
+                            maxLength={13}
                             required
-                            disabled={loading}
+                            disabled={isCodeSent}
+                            borderColor={
+                                phoneError
+                                    ? "1px solid #DC0000"
+                                    : undefined
+                            }
                         />
                         <AuthButton
                             type="button"
@@ -114,7 +132,9 @@ const PhoneAuthForm = () => {
                             width="129px"
                         >
                             {loading
-                                ? "전송 중..."
+                                ? "인증번호 재전송"
+                                : isCodeSent
+                                ? "인증번호 재전송"
                                 : "인증번호 전송"}
                         </AuthButton>
                     </Row>
@@ -124,28 +144,39 @@ const PhoneAuthForm = () => {
                         type="text"
                         placeholder="인증번호 입력"
                         value={verificationCode}
-                        onChange={(e) =>
+                        onChange={(e) => {
                             setVerificationCode(
                                 e.target.value
-                            )
-                        }
+                            );
+                            setCodeError(""); // 입력 변경 시 에러 메시지 초기화
+                        }}
                         maxLength={6}
                         required
                         disabled={
                             loading || !verificationId
                         }
+                        borderColor={
+                            codeError
+                                ? "1px solid #DC0000"
+                                : undefined
+                        }
                     />
                 </SInputStack>
+                {codeError || phoneError ? (
+                    <ErrorMessage>
+                        {codeError || phoneError}
+                    </ErrorMessage>
+                ) : null}
                 <InfoGuide>
-                    인증 확인이 안눌린다면 번호를 다시 확인
-                    해 주세요.
+                    인증 확인이 안눌린다면 번호를 다시
+                    확인해 주세요.
                 </InfoGuide>
                 <AuthButton
                     type="button"
                     onClick={handleVerifyCode}
                     disabled={loading || !verificationId}
                 >
-                    {loading ? "확인 중..." : "인증 확인"}
+                    인증 확인
                 </AuthButton>
             </div>
         </div>
@@ -173,4 +204,14 @@ const SInputStack = styled.div`
     display: flex;
     flex-direction: column;
     gap: 12px;
+`;
+
+const ErrorMessage = styled.div`
+    color: #dc0000;
+    font-family: "Pretendard";
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 18px;
+    margin-top: 4px;
+    margin-left: 8px;
 `;

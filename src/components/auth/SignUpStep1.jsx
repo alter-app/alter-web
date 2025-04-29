@@ -2,6 +2,7 @@ import AuthInput from "./AuthInput";
 import AuthButton from "./AuthButton";
 import GenderSelector from "./GenderSelector";
 import styled from "styled-components";
+import { formatPhoneNumber } from "../../utils/phoneUtils";
 
 const SignUpStep1 = ({
     name,
@@ -45,10 +46,15 @@ const SignUpStep1 = ({
                 </Row>
                 <AuthInput
                     type="tel"
+                    maxLength={13}
                     placeholder="010-1234-5678"
                     value={phone}
                     onChange={(e) =>
-                        setPhone(e.target.value)
+                        setPhone(
+                            formatPhoneNumber(
+                                e.target.value
+                            )
+                        )
                     }
                 />
 
