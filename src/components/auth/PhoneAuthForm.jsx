@@ -89,9 +89,7 @@ const PhoneAuthForm = () => {
                 },
             });
         } catch (error) {
-            setCodeError(
-                "인증 실패: " + (error.message || "")
-            );
+            setCodeError(error.message || "");
         } finally {
             setLoading(false);
         }
@@ -134,7 +132,7 @@ const PhoneAuthForm = () => {
                             width="129px"
                         >
                             {loading
-                                ? "전송 중..."
+                                ? "인증번호 재전송"
                                 : isCodeSent
                                 ? "인증번호 재전송"
                                 : "인증번호 전송"}
