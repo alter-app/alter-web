@@ -11,7 +11,6 @@ const FooterLinks = styled.div`
     font-weight: 400;
     font-size: 12px;
     color: #767676;
-    font-weight: 400;
     margin-bottom: 14px;
     margin-top: 84px;
 `;
@@ -23,14 +22,13 @@ const FooterBottom = styled.div`
     gap: 11px;
     font-size: 12px;
     color: #767676;
+    font-family: "Pretendard";
     font-weight: 400;
 `;
 
 const Logo = styled.img`
-    height: 15px;
+    height: 20px;
     width: 42px;
-    margin-right: 6px;
-    vertical-align: middle;
 `;
 
 const Bold = styled.span`
