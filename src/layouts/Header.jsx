@@ -31,7 +31,7 @@ function Header() {
         <HeaderWrapper>
             <Logo src={AlterLogo} alt="알터 로고" />
             <Description>
-                일터에서 시작되는 알바의 변화!
+                알터에서 시작되는 알바의 변화!
             </Description>
         </HeaderWrapper>
     );
