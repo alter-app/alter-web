@@ -7,8 +7,10 @@ const Login = () => {
     return (
         <SBackground>
             <Logo src={AlterLogo} alt="알터 로고" />
-            <KakaoLoginButton />
-            <AppleLoginButton />
+            <Row>
+                <KakaoLoginButton />
+                <AppleLoginButton />
+            </Row>
         </SBackground>
     );
 };
@@ -33,4 +35,10 @@ const SBackground = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+`;
+
+const Row = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
 `;
