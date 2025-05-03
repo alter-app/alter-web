@@ -62,6 +62,7 @@ const SignUpStep1 = ({
                     type="text"
                     placeholder="19450815"
                     value={birth}
+                    maxLength={8}
                     onChange={(e) =>
                         setBirth(e.target.value)
                     }

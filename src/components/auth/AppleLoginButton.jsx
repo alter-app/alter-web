@@ -28,6 +28,13 @@ const AppleLoginButton = () => {
             onError={(error) => {
                 console.error(error);
             }}
+            style={{
+                minWidth: "420px",
+                height: "63px",
+                borderRadius: "12px",
+                fontSize: "18px",
+            }}
+            buttonExtraChildren="Apple 로그인"
         />
     );
 };

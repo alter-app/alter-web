@@ -57,7 +57,6 @@ const PhoneAuthForm = () => {
             );
             setVerificationId(vId);
             setIsCodeSent(true);
-            alert("인증번호가 전송되었습니다.");
         } catch (error) {
             clearRecaptcha();
             initializeRecaptcha("recaptcha-container");
@@ -162,11 +161,9 @@ const PhoneAuthForm = () => {
                         }
                     />
                 </SInputStack>
-                {codeError || phoneError ? (
-                    <ErrorMessage>
-                        {codeError || phoneError}
-                    </ErrorMessage>
-                ) : null}
+                <ErrorMessage>
+                    {codeError || phoneError || "\u00A0"}
+                </ErrorMessage>
                 <InfoGuide>
                     인증 확인이 안눌린다면 번호를 다시
                     확인해 주세요.
@@ -196,7 +193,7 @@ const InfoGuide = styled.div`
     font-size: 12px;
     line-height: 18px;
     color: #767676;
-    margin-top: 174px;
+    margin-top: 152px;
     margin-bottom: 12px;
 `;
 

@@ -35,6 +35,8 @@ const SignUp = () => {
     const [nickname, setNickname] = useState("");
     const [nicknameChecked, setNicknameChecked] =
         useState(false);
+    const [nicknameCheckMessage, setNicknameCheckMessage] =
+        useState("");
     const [agreed, setAgreed] = useState(false);
     const [adAgreed, setAdAgreed] = useState(false);
 
@@ -105,6 +107,8 @@ const SignUp = () => {
                         setNickname,
                         nicknameChecked,
                         setNicknameChecked,
+                        nicknameCheckMessage,
+                        setNicknameCheckMessage,
                         agreed,
                         setAgreed,
                         adAgreed,

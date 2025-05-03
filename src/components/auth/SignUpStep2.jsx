@@ -7,6 +7,8 @@ const SignUpStep2 = ({
     nickname,
     setNickname,
     setNicknameChecked,
+    nicknameCheckMessage,
+    setNicknameCheckMessage,
     agreed,
     setAgreed,
     adAgreed,
@@ -14,6 +16,7 @@ const SignUpStep2 = ({
     isValid,
     onSubmit,
     checkNickname,
+    nicknameChecked,
 }) => (
     <SBackground>
         <SFormWrapper>
@@ -34,7 +37,15 @@ const SignUpStep2 = ({
                     onChange={(e) => {
                         setNickname(e.target.value);
                         setNicknameChecked(false);
+                        setNicknameCheckMessage(""); // 입력 변경 시 메시지 초기화
                     }}
+                    borderColor={
+                        nicknameChecked
+                            ? "1px solid #2DE283"
+                            : nicknameCheckMessage
+                            ? "1px solid #DC0000"
+                            : undefined
+                    }
                 />
                 <AuthButton
                     type="button"
@@ -44,12 +55,12 @@ const SignUpStep2 = ({
                             await checkNickname(nickname);
                         if (isAvailable) {
                             setNicknameChecked(true);
-                            alert(
+                            setNicknameCheckMessage(
                                 "사용 가능한 닉네임입니다!"
                             );
                         } else {
                             setNicknameChecked(false);
-                            alert(
+                            setNicknameCheckMessage(
                                 "이미 사용 중인 닉네임입니다."
                             );
                         }
@@ -62,10 +73,15 @@ const SignUpStep2 = ({
                 </AuthButton>
             </Row>
 
-            <InfoGuide>
-                부정적이거나, 타인을 공격하는 메시지의
-                이름은 쓸 수 없어요!
-            </InfoGuide>
+            <NicknameGuide
+                style={{
+                    color: nicknameChecked
+                        ? "#2DE283"
+                        : "#DC0000",
+                }}
+            >
+                {nicknameCheckMessage || "\u00A0"}
+            </NicknameGuide>
             <CheckboxDiv>
                 <OptionalLabel>
                     <CustomCheckbox
@@ -130,7 +146,7 @@ const InfoDesc = styled.div`
     margin-bottom: 36px;
 `;
 
-const InfoGuide = styled.div`
+const NicknameGuide = styled.div`
     font-family: "Pretendard";
     font-weight: 400;
     font-size: 12px;
