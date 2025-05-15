@@ -1,22 +1,31 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import dropdown from "../../../assets/icons/dropdown.svg";
+import { useState } from "react";
 
 const WorkLocation = () => {
+    const [modal, setModal] = useState(false);
+
     return (
         <WorkLocationBox>
             <WorkLocationLabel>근무 위치</WorkLocationLabel>
             <WorkLocationRow>
                 <WorkLocationAddress>
                     경기 무슨시 무슨구 무슨동 무슨로00번길
-                    00 글자수 최대로
+                    00 글자수 최대로 여기저기 요리조리
                 </WorkLocationAddress>
-                <img
+                <Dropdown
+                    onClick={() => setModal((e) => !e)}
+                    open={modal}
                     src={dropdown}
                     alt="주소"
-                    width={20}
-                    height={20}
                 />
             </WorkLocationRow>
+            {modal && (
+                <Modal>
+                    경기 무슨시 무슨구 무슨동 무슨로00번길
+                    00 글자수 최대로 여기저기 요리조리
+                </Modal>
+            )}
             <WorkLocationRow>
                 <SubwayLineChip>1</SubwayLineChip>
                 <SubwayLineChip>수인분당선</SubwayLineChip>
@@ -86,4 +95,36 @@ const SubwayStationText = styled.div`
     font-weight: 600;
     font-size: 14px;
     line-height: 24px;
+`;
+
+const Modal = styled.div`
+    position: absolute;
+    margin-top: 56px;
+    width: 350px;
+    height: 48px;
+    background-color: #ffffff;
+    box-sizing: border-box;
+    border-radius: 8px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 12px;
+    padding-right: 4px;
+    font-family: "Pretendard";
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: #767676;
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.25);
+`;
+
+const Dropdown = styled.img`
+    width: 20px;
+    height: 20px;
+    display: "flex";
+    cursor: pointer;
+    ${({ open }) =>
+        open &&
+        css`
+            transform: rotate(180deg);
+        `}
 `;
