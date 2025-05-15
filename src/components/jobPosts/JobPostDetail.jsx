@@ -59,9 +59,7 @@ const Container = styled.div`
     left: 50%;
     transform: translateX(-50%);
     width: 90vw;
-    height: calc(
-        100vh - 100px
-    ); /* 90px(top) + 10px(bottom) */
+    height: calc(100vh - 110px);
     max-width: 390px;
     max-height: 700px;
     min-height: 400px;
