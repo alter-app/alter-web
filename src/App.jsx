@@ -8,11 +8,14 @@ import PhoneAuthPage from "./pages/PhoneAuth";
 import KakaoCallback from "./pages/callback/KakaoCallback";
 import AppleCallback from "./pages/callback/AppleCallback";
 import MainLayout from "./layouts/MainLayout";
+import FooterLayout from "./layouts/FooterLayout";
+import Test from "./pages/Test";
+import JobLookupMap from "./pages/JobLookupMap";
 
 function App() {
     return (
         <Routes>
-            <Route element={<MainLayout />}>
+            <Route element={<FooterLayout />}>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route
@@ -32,6 +35,14 @@ function App() {
                     element={<AppleCallback />}
                 />
                 <Route path="*" element={<NotFound />} />
+            </Route>
+
+            <Route element={<MainLayout />}>
+                <Route path="test" element={<Test />} />
+                <Route
+                    path="job-lookup-map"
+                    element={<JobLookupMap />}
+                />
             </Route>
         </Routes>
     );

@@ -30,7 +30,7 @@ export default JobPostList;
 
 const Container = styled.div`
     width: 390px;
-    height: 100vh; /* 화면 전체 높이 */
+    height: calc(100vh - 80px); /* 화면 전체 높이 */
     background-color: #ffffff;
     display: flex;
     flex-direction: column;

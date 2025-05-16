@@ -29,7 +29,7 @@ function NaverMap() {
     return (
         <div
             ref={mapRef}
-            style={{ width: "100px", height: "600px" }}
+            style={{ width: "100%", height: "100%" }}
         />
     );
 }

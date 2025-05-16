@@ -56,12 +56,10 @@ const Container = styled.div`
     position: fixed;
     top: 90px;
     bottom: 10px;
-    left: 50%;
-    transform: translateX(-50%);
     width: 90vw;
     height: calc(100vh - 110px);
     max-width: 390px;
-    max-height: 700px;
+    max-height: 1000px;
     min-height: 400px;
     background: #f6f6f6;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
