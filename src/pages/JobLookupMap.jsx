@@ -33,7 +33,7 @@ const MapContainer = styled.div`
 const StyledNaverMap = styled.div`
     position: absolute;
     top: 0;
-    left: 0;
+    left: 390px;
     right: 0;
     bottom: 0;
     width: 100%;
