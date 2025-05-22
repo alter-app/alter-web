@@ -1,20 +1,22 @@
 import styled from "styled-components";
+import { timeAgo } from "../../../utils/timeAgo";
 
-function JobPostTitleBox() {
+function JobPostTitleBox({ title, createdAt, keywords }) {
     return (
         <TitleBox>
             <Row>
                 <CompanyName>
                     상호야! 너 이름적고가!
                 </CompanyName>
-                <PostTime>12시간 전</PostTime>
+                <PostTime>{timeAgo(createdAt)}</PostTime>
             </Row>
-            <Title>
-                공고이름최대글자수를쭉쭉써내려가공고이름최대글자수를쭉쭉써내려가
-            </Title>
+            <Title>{title}</Title>
             <JobTagWrapper>
-                <JobTagList>카페</JobTagList>
-                <JobTagList>음식점</JobTagList>
+                {keywords.map((keywords) => (
+                    <JobTagList key={keywords.id}>
+                        {keywords.name}
+                    </JobTagList>
+                ))}
             </JobTagWrapper>
         </TitleBox>
     );

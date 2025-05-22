@@ -1,12 +1,18 @@
 import styled from "styled-components";
+import { paymentTypeToKorean } from "../../../utils/paymentTypeToKorean";
+import { formatNumber } from "../../../utils/formatNumber";
 
-const JobPostWorkInfo = () => {
+const JobPostWorkInfo = ({ paymentType, payAmount }) => {
     return (
         <WorkInfoBox>
             <WorkInfoLabel>근무 정보</WorkInfoLabel>
             <WorkPayRow>
-                <PayChip>시급</PayChip>
-                <WorkPayValue>10,030 원</WorkPayValue>
+                <PayChip>
+                    {paymentTypeToKorean(paymentType)}
+                </PayChip>
+                <WorkPayValue>
+                    {formatNumber(payAmount)} 원
+                </WorkPayValue>
             </WorkPayRow>
             <Row>
                 <WorkDayLabel>요일</WorkDayLabel>

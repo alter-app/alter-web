@@ -2,13 +2,14 @@ import styled from "styled-components";
 import Bookmark from "../Bookmark";
 import { useState } from "react";
 
-const JobDetailFooter = () => {
+const JobDetailFooter = ({ id }) => {
     const [checked, setChecked] = useState(false);
 
     return (
         <ApplyButtonBar>
             <BookmarkButton>
                 <Bookmark
+                    id={`bookmark-toggle-${id}`}
                     checked={checked}
                     onChange={() =>
                         setChecked((prev) => !prev)

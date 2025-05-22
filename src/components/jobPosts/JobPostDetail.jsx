@@ -4,11 +4,25 @@ import JobPostWorkInfo from "./jobPostDetail/JobPostWorkInfo";
 import WorkLocation from "./jobPostDetail/WorkLocation";
 import DetailSection from "./jobPostDetail/DetailSection";
 import JobDetailFooter from "./jobPostDetail/JobDetailFooter";
+import { getPostDetail } from "../../services/post";
+import { useState, useEffect } from "react";
 
-function JobPostDetail({ children }) {
+function JobPostDetail({ children, onClose, id }) {
+    const [detail, setDetail] = useState(null);
+
+    useEffect(() => {
+        getPostDetail(id).then((res) =>
+            setDetail(res.data)
+        );
+    }, [id]);
+
+    if (!detail) return <div>로딩 중...</div>;
+
+    console.log(detail);
     return (
         <Shadow>
             <Container>
+                <button onClick={onClose}>닫기</button>
                 <PhotoBox>
                     <PhotoImg
                         src="사진주소.jpg"
@@ -16,13 +30,20 @@ function JobPostDetail({ children }) {
                     />
                 </PhotoBox>
                 <Gap>
-                    <JobPostTitleBox />
-                    <JobPostWorkInfo />
+                    <JobPostTitleBox
+                        title={detail.title}
+                        createdAt={detail.createdAt}
+                        keywords={detail.keywords}
+                    />
+                    <JobPostWorkInfo
+                        paymentType={detail.paymentType}
+                        payAmount={detail.payAmount}
+                    />
                     <WorkLocation />
                     <DetailSection />
                 </Gap>
             </Container>
-            <JobDetailFooter />
+            <JobDetailFooter id={detail.id} />
         </Shadow>
     );
 }

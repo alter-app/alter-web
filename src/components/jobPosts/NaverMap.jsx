@@ -65,7 +65,7 @@ function NaverMap() {
         // 네이버 지도 API 스크립트 동적 추가
         const script = document.createElement("script");
         script.id = "naver-map-script";
-        script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${NAVER_MAP_CLIENT_ID}`;
+        script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${NAVER_MAP_CLIENT_ID}&submodules=geocoder`;
         script.async = true;
         script.onload = () => {
             const map = new window.naver.maps.Map(

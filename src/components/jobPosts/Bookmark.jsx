@@ -30,11 +30,7 @@ const Icon = styled.svg`
     transition: fill 0.2s, transform 0.1s;
 `;
 
-const BookmarkButton = ({
-    checked,
-    onChange,
-    id = "bookmark-toggle",
-}) => (
+const BookmarkButton = ({ checked, onChange, id }) => (
     <BookmarkCheckbox>
         <CheckboxInput
             type="checkbox"

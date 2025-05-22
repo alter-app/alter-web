@@ -2,8 +2,11 @@ import styled from "styled-components";
 import JobPostDetail from "../components/jobPosts/JobPostDetail";
 import JobPostList from "../components/jobPosts/JobPostList";
 import NaverMap from "../components/jobPosts/NaverMap";
+import { useState } from "react";
 
 const JobLookupMap = () => {
+    const [selectedId, setSelectedId] = useState(null);
+
     return (
         <MapContainer>
             <StyledNaverMap>
@@ -11,11 +14,22 @@ const JobLookupMap = () => {
             </StyledNaverMap>
             <JobPost>
                 <List>
-                    <JobPostList />
+                    <JobPostList
+                        onSelect={(post) =>
+                            setSelectedId(post.id)
+                        }
+                    />
                 </List>
-                <Detail>
-                    <JobPostDetail />
-                </Detail>
+                {selectedId && (
+                    <Detail>
+                        <JobPostDetail
+                            id={selectedId}
+                            onClose={() =>
+                                setSelectedId(null)
+                            }
+                        />
+                    </Detail>
+                )}
             </JobPost>
         </MapContainer>
     );
@@ -40,13 +54,11 @@ const StyledNaverMap = styled.div`
     height: 100%;
     z-index: 1;
 `;
-
 const JobPost = styled.div`
     position: absolute;
     top: 0;
     left: 0;
     height: 100vh;
-    width: 810px;
     display: flex;
     z-index: 2;
     gap: 12px;
