@@ -3,10 +3,10 @@ import useAuthStore from "../store/authStore";
 const accessToken = useAuthStore.getState().accessToken;
 
 // 공고 리스트 조회 로직
-export const getPostList = async () => {
+export const getPostList = async ({ cursorInfo }) => {
     try {
         const response = await fetch(
-            `/backend-api/app/postings?pageSize=10`,
+            `/backend-api/app/postings?cursor=${cursorInfo}&pageSize=10`,
             {
                 method: "GET",
                 headers: {

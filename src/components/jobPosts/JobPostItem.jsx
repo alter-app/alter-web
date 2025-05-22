@@ -3,22 +3,29 @@ import clock from "../../assets/icons/clock.svg";
 import calendar from "../../assets/icons/calendar.svg";
 import BookmarkButton from "./Bookmark";
 import { useState } from "react";
+import { timeAgo } from "../../utils/timeAgo";
+import { paymentTypeToKorean } from "../../utils/paymentTypeToKorean";
+import { formatNumber } from "../../utils/formatNumber";
 
-const JobPostItem = () => {
+const JobPostItem = ({
+    title,
+    createdAt,
+    paymentType,
+    payAmount,
+    onClick,
+    id,
+}) => {
     const [checked, setChecked] = useState(false);
 
     return (
-        <InfoContainer>
+        <InfoContainer onClick={onClick}>
             <CompanyName>
                 상호야! 너 이름적고가!
             </CompanyName>
             <TopRow>
-                <Title>
-                    글자 수가 많으면 넘어간다~ 글자 수가
-                    많으면 넘어간다~ 글자 수가 많으면
-                    넘어간다~
-                </Title>
+                <Title>{title}</Title>
                 <BookmarkButton
+                    id={`bookmark-toggle-${id}`}
                     checked={checked}
                     onChange={() =>
                         setChecked((prev) => !prev)
@@ -26,8 +33,11 @@ const JobPostItem = () => {
                 />
             </TopRow>
             <Description>
-                시급 <WageHighlight>10,030</WageHighlight>{" "}
-                원 · 업무내용없네용 · 1일 전
+                {paymentTypeToKorean(paymentType)}{" "}
+                <WageHighlight>
+                    {formatNumber(payAmount)}
+                </WageHighlight>
+                원 · 업무내용없네용 · {timeAgo(createdAt)}
             </Description>
             <InfoRow>
                 <InfoGroup>

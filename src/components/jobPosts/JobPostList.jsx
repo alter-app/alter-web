@@ -1,26 +1,63 @@
 import JobPostItem from "./JobPostItem";
 import styled from "styled-components";
 import SearchBar from "./SearchBar";
+import { getPostList } from "../../services/post";
+import { useEffect, useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
+import Loader from "../Loader";
 
-const jobs = [
-    { id: 1 },
-    { id: 2 },
-    { id: 3 },
-    { id: 4 },
-    { id: 5 },
-    { id: 6 },
-];
+const JobPostList = ({ onSelect }) => {
+    const [posts, setPosts] = useState([]);
+    const [cursorInfo, setCursorInfo] = useState("");
+    const [totalCount, setTotalCount] = useState(0);
 
-const JobPostList = () => {
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        try {
+            const result = await getPostList({
+                cursorInfo,
+            });
+            setPosts((prev) => [...prev, ...result.data]);
+            setCursorInfo(result.page.cursor);
+            setTotalCount(result.page.totalCount);
+        } catch (error) {
+            console.error("공고 리스트 조회 오류:", error);
+        }
+    };
+
     return (
         <Container>
             <SearchBar />
             <Divider />
-            <ListArea>
+            <ListArea id="scrollableListArea">
                 <Address>서울 구로구 경인로 445</Address>
-                {jobs.map((job) => (
-                    <JobPostItem key={job.id} />
-                ))}
+                <InfiniteScroll
+                    dataLength={posts.length}
+                    next={fetchData}
+                    hasMore={posts.length < totalCount}
+                    loader={
+                        <CenteredDiv>
+                            <Loader />
+                        </CenteredDiv>
+                    }
+                    endMessage={
+                        <CenteredDiv>
+                            더 이상 공고가 없습니다.
+                        </CenteredDiv>
+                    }
+                    scrollableTarget="scrollableListArea"
+                >
+                    {posts.map((post) => (
+                        <JobPostItem
+                            key={post.id}
+                            {...post}
+                            onClick={() => onSelect(post)}
+                        />
+                    ))}
+                </InfiniteScroll>
             </ListArea>
         </Container>
     );
@@ -56,4 +93,10 @@ const Divider = styled.div`
     height: 1px;
     background: #f6f6f6;
     margin: 25px 0 16px 0;
+`;
+
+const CenteredDiv = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
 `;
