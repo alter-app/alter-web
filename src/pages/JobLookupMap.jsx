@@ -1,8 +1,8 @@
-import styled from "styled-components";
-import JobPostDetail from "../components/jobPosts/JobPostDetail";
-import JobPostList from "../components/jobPosts/JobPostList";
-import NaverMap from "../components/jobPosts/NaverMap";
-import { useState } from "react";
+import styled from 'styled-components';
+import JobPostDetail from '../components/jobPosts/JobPostDetail';
+import JobPostList from '../components/jobPosts/JobPostList';
+import NaverMap from '../components/jobPosts/NaverMap';
+import { useState } from 'react';
 
 const JobLookupMap = () => {
     const [selectedId, setSelectedId] = useState(null);
@@ -40,7 +40,7 @@ export default JobLookupMap;
 const MapContainer = styled.div`
     position: relative;
     width: 100vw;
-    height: 100vh;
+    min-height: calc(100dvh - 80px);
     overflow: hidden;
 `;
 
@@ -74,7 +74,8 @@ const List = styled.div`
 
 const Detail = styled.div`
     height: 100vh;
-    background: #fff;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
     z-index: 3;
+    background: transparent;
+    padding-top: 10px;
 `;

@@ -1,11 +1,11 @@
-import styled from "styled-components";
-import JobPostTitleBox from "./jobPostDetail/JobPostTitleBox";
-import JobPostWorkInfo from "./jobPostDetail/JobPostWorkInfo";
-import WorkLocation from "./jobPostDetail/WorkLocation";
-import DetailSection from "./jobPostDetail/DetailSection";
-import JobDetailFooter from "./jobPostDetail/JobDetailFooter";
-import { getPostDetail } from "../../services/post";
-import { useState, useEffect } from "react";
+import styled from 'styled-components';
+import JobPostTitleBox from './jobPostDetail/JobPostTitleBox';
+import JobPostWorkInfo from './jobPostDetail/JobPostWorkInfo';
+import WorkLocation from './jobPostDetail/WorkLocation';
+import DetailSection from './jobPostDetail/DetailSection';
+import JobDetailFooter from './jobPostDetail/JobDetailFooter';
+import { getPostDetail } from '../../services/post';
+import { useState, useEffect } from 'react';
 
 function JobPostDetail({ children, onClose, id }) {
     const [detail, setDetail] = useState(null);
@@ -25,8 +25,8 @@ function JobPostDetail({ children, onClose, id }) {
                 <button onClick={onClose}>닫기</button>
                 <PhotoBox>
                     <PhotoImg
-                        src="사진주소.jpg"
-                        alt="알바 사진 들어올 곳"
+                        src='사진주소.jpg'
+                        alt='알바 사진 들어올 곳'
                     />
                 </PhotoBox>
                 <Gap>
@@ -43,7 +43,9 @@ function JobPostDetail({ children, onClose, id }) {
                     <DetailSection />
                 </Gap>
             </Container>
-            <JobDetailFooter id={detail.id} />
+            <StickyFooter>
+                <JobDetailFooter id={detail.id} />
+            </StickyFooter>
         </Shadow>
     );
 }
@@ -74,14 +76,9 @@ const Gap = styled.div`
 `;
 
 const Container = styled.div`
-    position: fixed;
-    top: 90px;
-    bottom: 10px;
     width: 90vw;
     height: calc(100vh - 110px);
     max-width: 390px;
-    max-height: 1000px;
-    min-height: 400px;
     background: #f6f6f6;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
     box-sizing: border-box;
@@ -93,4 +90,14 @@ const Container = styled.div`
 
 const Shadow = styled.div`
     box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.25);
+`;
+
+const StickyFooter = styled.div`
+    position: sticky;
+    left: 0;
+    bottom: 10px;
+    background: transparent; /* 투명 배경 */
+    width: 100%;
+    z-index: 10;
+    background: #fff; /* 필요시 배경색 추가 */
 `;
