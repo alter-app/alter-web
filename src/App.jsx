@@ -9,15 +9,12 @@ import KakaoCallback from './pages/callback/KakaoCallback';
 import AppleCallback from './pages/callback/AppleCallback';
 import MainLayout from './layouts/MainLayout';
 import FooterLayout from './layouts/FooterLayout';
-import Test from './pages/Test';
 import JobLookupMap from './pages/JobLookupMap';
-import TokenRefresher from './components/auth/TokenRefresher';
 import JobPosting from './pages/JobPosting';
 
 function App() {
     return (
         <>
-            <TokenRefresher />
             <Routes>
                 <Route element={<FooterLayout />}>
                     <Route path='/' element={<Home />} />
@@ -48,7 +45,6 @@ function App() {
                 </Route>
 
                 <Route element={<MainLayout />}>
-                    <Route path='test' element={<Test />} />
                     <Route
                         path='job-lookup-map'
                         element={<JobLookupMap />}
