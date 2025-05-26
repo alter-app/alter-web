@@ -10,7 +10,7 @@ import AppleCallback from './pages/callback/AppleCallback';
 import MainLayout from './layouts/MainLayout';
 import FooterLayout from './layouts/FooterLayout';
 import JobLookupMap from './pages/JobLookupMap';
-import JobPosting from './pages/JobPosting';
+// import JobPosting from './pages/JobPosting';
 
 function App() {
     return (
@@ -49,10 +49,10 @@ function App() {
                         path='job-lookup-map'
                         element={<JobLookupMap />}
                     />
-                    <Route
+                    {/* <Route
                         path='posting'
                         element={<JobPosting />}
-                    />
+                    /> */}
                 </Route>
             </Routes>
         </>
