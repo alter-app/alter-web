@@ -1,6 +1,6 @@
-import styled, { css } from "styled-components";
-import dropdown from "../../../assets/icons/dropdown.svg";
-import { useState } from "react";
+import styled, { css } from 'styled-components';
+import dropdown from '../../../assets/icons/dropdown.svg';
+import { useState } from 'react';
 
 const WorkLocation = () => {
     const [modal, setModal] = useState(false);
@@ -13,19 +13,22 @@ const WorkLocation = () => {
                     경기 무슨시 무슨구 무슨동 무슨로00번길
                     00 글자수 최대로 여기저기 요리조리
                 </WorkLocationAddress>
-                <Dropdown
-                    onClick={() => setModal((e) => !e)}
-                    open={modal}
-                    src={dropdown}
-                    alt="주소"
-                />
+                <DropdownWrapper>
+                    <Dropdown
+                        onClick={() => setModal((e) => !e)}
+                        open={modal}
+                        src={dropdown}
+                        alt='주소'
+                    />
+                    {modal && (
+                        <Modal>
+                            경기 무슨시 무슨구 무슨동
+                            무슨로00번길 00 글자수 최대로
+                            여기저기 요리조리
+                        </Modal>
+                    )}
+                </DropdownWrapper>
             </WorkLocationRow>
-            {modal && (
-                <Modal>
-                    경기 무슨시 무슨구 무슨동 무슨로00번길
-                    00 글자수 최대로 여기저기 요리조리
-                </Modal>
-            )}
             <WorkLocationRow>
                 <SubwayLineChip>1</SubwayLineChip>
                 <SubwayLineChip>수인분당선</SubwayLineChip>
@@ -52,7 +55,7 @@ const WorkLocationBox = styled.div`
 
 const WorkLocationLabel = styled.div`
     color: #999999;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 600;
     font-size: 14px;
     line-height: 20px;
@@ -61,7 +64,7 @@ const WorkLocationLabel = styled.div`
 const WorkLocationAddress = styled.div`
     width: 324px;
     color: #111111;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
@@ -83,7 +86,7 @@ const SubwayLineChip = styled.div`
     background-color: #f1cf69;
     border-radius: 12px;
     color: #f4f4f4;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
     font-size: 12px;
     line-height: 18px;
@@ -91,15 +94,19 @@ const SubwayLineChip = styled.div`
 
 const SubwayStationText = styled.div`
     color: #767676;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 600;
     font-size: 14px;
     line-height: 24px;
 `;
 
+const DropdownWrapper = styled.div`
+    position: relative;
+    display: flex;
+    align-items: center;
+`;
+
 const Modal = styled.div`
-    position: absolute;
-    margin-top: 56px;
     width: 350px;
     height: 48px;
     background-color: #ffffff;
@@ -109,18 +116,23 @@ const Modal = styled.div`
     padding-bottom: 4px;
     padding-left: 12px;
     padding-right: 4px;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
     color: #767676;
     box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.25);
+    position: absolute;
+    top: 100%; /* 드롭다운 바로 아래 */
+    right: 0; /* 드롭다운 오른쪽 정렬 */
+    margin-top: 4px; /* 약간의 간격 */
+    z-index: 10;
 `;
 
 const Dropdown = styled.img`
     width: 20px;
     height: 20px;
-    display: "flex";
+    display: flex;
     cursor: pointer;
     ${({ open }) =>
         open &&
