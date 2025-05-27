@@ -58,3 +58,32 @@ export const getPostDetail = async (id) => {
         );
     }
 };
+
+// 공고 등록 로직
+export const postJobPosting = async (inputs) => {
+    try {
+        const response = await fetch(
+            '/backend-api/app/postings',
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify(inputs),
+            }
+        );
+        console.log(inputs);
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+
+        const data = await response.json();
+        return data.data.duplicated === false;
+    } catch (error) {
+        console.error('공고 작성 중 오류:', error);
+        throw new Error(
+            '공고 작성 중 오류가 발생했습니다.'
+        );
+    }
+};
