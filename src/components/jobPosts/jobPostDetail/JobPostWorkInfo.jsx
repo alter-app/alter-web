@@ -1,8 +1,32 @@
-import styled from "styled-components";
-import { paymentTypeToKorean } from "../../../utils/paymentTypeToKorean";
-import { formatNumber } from "../../../utils/formatNumber";
+import styled from 'styled-components';
+import { paymentTypeToKorean } from '../../../utils/paymentTypeToKorean';
+import { formatNumber } from '../../../utils/formatNumber';
+import {
+    formatTimeToHHMM,
+    getWorkDuration,
+} from '../../../utils/timeUtil';
 
-const JobPostWorkInfo = ({ paymentType, payAmount }) => {
+const JobPostWorkInfo = ({
+    paymentType,
+    payAmount,
+    schedules,
+}) => {
+    const WEEKDAYS_KOR = [
+        { key: 'MONDAY', label: '월' },
+        { key: 'TUESDAY', label: '화' },
+        { key: 'WEDNESDAY', label: '수' },
+        { key: 'THURSDAY', label: '목' },
+        { key: 'FRIDAY', label: '금' },
+        { key: 'SATURDAY', label: '토' },
+        { key: 'SUNDAY', label: '일' },
+    ];
+
+    const startTime = formatTimeToHHMM(
+        schedules[0].startTime
+    );
+    const endTime = formatTimeToHHMM(schedules[0].endTime);
+    const duration = getWorkDuration(startTime, endTime);
+
     return (
         <WorkInfoBox>
             <WorkInfoLabel>근무 정보</WorkInfoLabel>
@@ -18,13 +42,16 @@ const JobPostWorkInfo = ({ paymentType, payAmount }) => {
                 <WorkDayLabel>요일</WorkDayLabel>
                 <WorkRow>
                     <WorkDayList>
-                        <WorkDayItem>월</WorkDayItem>
-                        <WorkDayItem>화</WorkDayItem>
-                        <WorkDayItem>수</WorkDayItem>
-                        <WorkDayItem>목</WorkDayItem>
-                        <WorkDayItem>금</WorkDayItem>
-                        <WorkDayItem>토</WorkDayItem>
-                        <WorkDayItem>일</WorkDayItem>
+                        {WEEKDAYS_KOR.map((item) => (
+                            <WorkDayItem
+                                key={item.key}
+                                selected={schedules[0].workingDays.includes(
+                                    item.key
+                                )}
+                            >
+                                {item.label}
+                            </WorkDayItem>
+                        ))}
                     </WorkDayList>
                     <NegotiableTag>협의 가능</NegotiableTag>
                 </WorkRow>
@@ -34,9 +61,11 @@ const JobPostWorkInfo = ({ paymentType, payAmount }) => {
                 <WorkRow>
                     <WorkTimeRow>
                         <WorkTimeValue>
-                            09:00 ~ 18:00
+                            {startTime} ~ {endTime}
                         </WorkTimeValue>
-                        <WorkTimeSub>(9시간)</WorkTimeSub>
+                        <WorkTimeSub>
+                            {duration}
+                        </WorkTimeSub>
                     </WorkTimeRow>
                     <NegotiableTag>협의 가능</NegotiableTag>
                 </WorkRow>
@@ -60,7 +89,7 @@ const WorkInfoBox = styled.div`
 
 const WorkInfoLabel = styled.div`
     color: #999999;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 600;
     font-size: 14px;
     line-height: 20px;
@@ -77,7 +106,7 @@ const PayChip = styled.div`
     align-items: center;
     justify-content: center;
     color: #f4f4f4;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
@@ -86,7 +115,7 @@ const PayChip = styled.div`
 
 const WorkPayValue = styled.div`
     color: #767676;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 600;
     font-size: 16px;
     line-height: 24px;
@@ -98,7 +127,7 @@ const WorkPayRow = styled.div`
 `;
 
 const WorkDayLabel = styled.div`
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
@@ -112,13 +141,15 @@ const WorkDayList = styled.div`
 `;
 
 const WorkDayItem = styled.div`
-    font-family: "Pretendard";
-    font-weight: 400;
+    font-family: 'Pretendard';
     font-size: 14px;
     line-height: 20px;
     color: #999999;
-    // 선택된 글자
-    // 글자색 111111, bold
+    // 선택된 경우
+    font-weight: ${({ selected }) =>
+        selected ? 600 : 400};
+    color: ${({ selected }) =>
+        selected ? '#111111' : '#999999'};
 `;
 
 const NegotiableTag = styled.div`
@@ -127,7 +158,7 @@ const NegotiableTag = styled.div`
     border-radius: 4px;
     background: #f6f6f6;
     color: #767676;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
     font-size: 12px;
     line-height: 20px;
@@ -145,7 +176,7 @@ const WorkRow = styled.div`
 `;
 
 const WorkTimeLabel = styled.div`
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
@@ -154,7 +185,7 @@ const WorkTimeLabel = styled.div`
 `;
 
 const WorkTimeValue = styled.div`
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 600;
     font-size: 14px;
     line-height: 20px;
@@ -162,7 +193,7 @@ const WorkTimeValue = styled.div`
 `;
 
 const WorkTimeSub = styled.div`
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;

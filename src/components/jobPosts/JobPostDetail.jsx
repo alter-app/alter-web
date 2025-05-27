@@ -38,6 +38,7 @@ function JobPostDetail({ children, onClose, id }) {
                     <JobPostWorkInfo
                         paymentType={detail.paymentType}
                         payAmount={detail.payAmount}
+                        schedules={detail.schedules}
                     />
                     <WorkLocation />
                     <DetailSection />
