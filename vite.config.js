@@ -7,11 +7,11 @@ export default defineConfig(({ mode }) => {
         plugins: [react()],
         server: {
             proxy: {
-                "/api": {
+                "/backend-api": {
                     target: env.VITE_API_URL,
                     changeOrigin: true,
                     rewrite: (path) =>
-                        path.replace(/^\/api/, ""),
+                        path.replace(/^\/backend-api/, ""),
                 },
             },
         },

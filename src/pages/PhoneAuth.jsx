@@ -40,6 +40,7 @@ const InfoTitle = styled.span`
 `;
 
 const SBackground = styled.div`
+    margin-top: 60px;
     width: 560px;
     height: 720px;
     max-height: 720px;

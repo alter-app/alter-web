@@ -104,7 +104,7 @@ function getFirebaseErrorMsg(code) {
 export const checkNicknameDuplicate = async (nickname) => {
     try {
         const response = await fetch(
-            "/api/public/users/exists/nickname",
+            "/backend-api/public/users/exists/nickname",
             {
                 method: "POST",
                 headers: {
@@ -132,7 +132,7 @@ export const checkNicknameDuplicate = async (nickname) => {
 export const signUp = async (userData) => {
     try {
         const response = await fetch(
-            "/api/public/users/signup",
+            "/backend-api/public/users/signup",
             {
                 method: "POST",
                 headers: {
@@ -169,7 +169,7 @@ export const loginWithProvider = async (
 ) => {
     try {
         const response = await fetch(
-            "/api/public/users/login",
+            "/backend-api/public/users/login",
             {
                 method: "POST",
                 headers: {

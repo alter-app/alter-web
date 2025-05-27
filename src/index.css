@@ -1,5 +1,5 @@
 body {
-    min-height: 100vh;
+    min-height: 100dvh;
     margin: 0;
     background: #f4f4f4;
 }
@@ -16,7 +16,7 @@ footer {
 
 main {
     min-height: calc(
-        100vh - 160px
+        100dvh - 160px
     ); /* header+footer 높이 */
     display: flex;
     justify-content: center;
