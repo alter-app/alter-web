@@ -3,12 +3,14 @@ import {
     RecaptchaVerifier,
     signInWithPhoneNumber,
     signInWithCredential,
-} from "firebase/auth";
-import { auth } from "../firebase.config";
+} from 'firebase/auth';
+import { auth } from '../firebase.config';
+
+const backend = import.meta.env.VITE_API_URL;
 
 // reCAPTCHA 초기화
 export function initializeRecaptcha(
-    containerId = "recaptcha-container",
+    containerId = 'recaptcha-container',
     onVerified
 ) {
     if (!window.recaptchaVerifier) {
@@ -16,17 +18,17 @@ export function initializeRecaptcha(
             auth,
             containerId,
             {
-                size: "invisible",
+                size: 'invisible',
                 callback: () => {
                     if (onVerified) onVerified();
                 },
-                "expired-callback": () => {
+                'expired-callback': () => {
                     if (window.recaptchaVerifier) {
                         window.recaptchaVerifier.clear();
                         delete window.recaptchaVerifier;
                     }
                     alert(
-                        "reCAPTCHA가 만료되었습니다. 다시 시도해주세요."
+                        'reCAPTCHA가 만료되었습니다. 다시 시도해주세요.'
                     );
                 },
             }
@@ -48,7 +50,7 @@ export function clearRecaptcha() {
 export async function sendPhoneVerification(phoneNumber) {
     if (!window.recaptchaVerifier)
         throw new Error(
-            "reCAPTCHA가 초기화되지 않았습니다."
+            'reCAPTCHA가 초기화되지 않았습니다.'
         );
     try {
         const verifier = window.recaptchaVerifier;
@@ -87,16 +89,16 @@ export async function verifyPhoneCode(
 // Firebase 에러 메시지 매핑
 function getFirebaseErrorMsg(code) {
     switch (code) {
-        case "auth/invalid-phone-number":
-            return "잘못된 전화번호 형식입니다.";
-        case "auth/too-many-requests":
-            return "요청이 너무 많습니다. 잠시 후 다시 시도해주세요.";
-        case "auth/code-expired":
-            return "인증번호가 만료되었습니다. 다시 요청해주세요.";
-        case "auth/invalid-verification-code":
-            return "잘못된 인증번호입니다.";
+        case 'auth/invalid-phone-number':
+            return '잘못된 전화번호 형식입니다.';
+        case 'auth/too-many-requests':
+            return '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.';
+        case 'auth/code-expired':
+            return '인증번호가 만료되었습니다. 다시 요청해주세요.';
+        case 'auth/invalid-verification-code':
+            return '잘못된 인증번호입니다.';
         default:
-            return "인증 처리 중 오류가 발생했습니다.";
+            return '인증 처리 중 오류가 발생했습니다.';
     }
 }
 
@@ -104,26 +106,26 @@ function getFirebaseErrorMsg(code) {
 export const checkNicknameDuplicate = async (nickname) => {
     try {
         const response = await fetch(
-            "/backend-api/public/users/exists/nickname",
+            `${backend}/public/users/exists/nickname`,
             {
-                method: "POST",
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ nickname }),
             }
         );
 
         if (!response.ok) {
-            throw new Error("서버 응답 오류");
+            throw new Error('서버 응답 오류');
         }
 
         const data = await response.json();
         return data.data.duplicated === false;
     } catch (error) {
-        console.error("닉네임 중복 검사 오류:", error);
+        console.error('닉네임 중복 검사 오류:', error);
         throw new Error(
-            "닉네임 중복 검사 중 오류가 발생했습니다."
+            '닉네임 중복 검사 중 오류가 발생했습니다.'
         );
     }
 };
@@ -132,11 +134,11 @@ export const checkNicknameDuplicate = async (nickname) => {
 export const signUp = async (userData) => {
     try {
         const response = await fetch(
-            "/backend-api/public/users/signup",
+            `${backend}/public/users/signup`,
             {
-                method: "POST",
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(userData),
             }
@@ -149,13 +151,13 @@ export const signUp = async (userData) => {
 
             throw new Error(
                 errorData.message ||
-                    "회원가입에 실패했습니다."
+                    '회원가입에 실패했습니다.'
             );
         }
 
         return await response.json();
     } catch (error) {
-        console.error("회원가입 오류:", error);
+        console.error('회원가입 오류:', error);
         throw error;
     }
 };
@@ -169,11 +171,11 @@ export const loginWithProvider = async (
 ) => {
     try {
         const response = await fetch(
-            "/backend-api/public/users/login",
+            `${backend}/public/users/login`,
             {
-                method: "POST",
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                     provider,
@@ -197,30 +199,30 @@ export const loginWithProvider = async (
                 authorizationId,
                 scope,
             });
-            return navigate("/");
+            return navigate('/');
         }
 
         const errorHandlers = {
             A003: () => {
-                navigate("/phoneauth", {
+                navigate('/phoneauth', {
                     state: { ...(data.data || {}) },
                 });
             },
             A004: () => {
                 alert(
-                    "이미 다른 소셜 계정으로 가입된 이메일입니다. 해당 계정으로 로그인해 주세요."
+                    '이미 다른 소셜 계정으로 가입된 이메일입니다. 해당 계정으로 로그인해 주세요.'
                 );
-                navigate("/login");
+                navigate('/login');
             },
             A007: () => {
                 alert(
-                    "소셜 로그인 인증이 만료되었습니다. 다시 시도해 주세요."
+                    '소셜 로그인 인증이 만료되었습니다. 다시 시도해 주세요.'
                 );
-                navigate("/login");
+                navigate('/login');
             },
             default: () => {
-                alert("알 수 없는 오류가 발생했습니다.");
-                navigate("/error");
+                alert('알 수 없는 오류가 발생했습니다.');
+                navigate('/error');
             },
         };
 
@@ -229,8 +231,8 @@ export const loginWithProvider = async (
             errorHandlers.default
         )();
     } catch (error) {
-        console.error("백엔드로 code 전송 실패:", error);
-        alert("네트워크 오류가 발생했습니다.");
-        navigate("/error");
+        console.error('백엔드로 code 전송 실패:', error);
+        alert('네트워크 오류가 발생했습니다.');
+        navigate('/error');
     }
 };
