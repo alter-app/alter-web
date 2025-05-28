@@ -20,7 +20,7 @@ function JobPostDetail({ children, onClose, id }) {
 
     console.log(detail);
     return (
-        <Shadow>
+        <>
             <Container>
                 <button onClick={onClose}>닫기</button>
                 <PhotoBox>
@@ -47,7 +47,7 @@ function JobPostDetail({ children, onClose, id }) {
             <StickyFooter>
                 <JobDetailFooter id={detail.id} />
             </StickyFooter>
-        </Shadow>
+        </>
     );
 }
 
@@ -81,16 +81,12 @@ const Container = styled.div`
     height: calc(100vh - 110px);
     max-width: 390px;
     background: #f6f6f6;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16);
+    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.25);
     box-sizing: border-box;
     overflow: auto;
     display: flex;
     flex-direction: column;
     padding-bottom: 64px;
-`;
-
-const Shadow = styled.div`
-    box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.25);
 `;
 
 const StickyFooter = styled.div`
