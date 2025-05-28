@@ -63,7 +63,7 @@ export const getPostDetail = async (id) => {
 export const postJobPosting = async (inputs) => {
     try {
         const response = await fetch(
-            '/backend-api/app/postings',
+            `${backend}/app/postings`,
             {
                 method: 'POST',
                 headers: {
