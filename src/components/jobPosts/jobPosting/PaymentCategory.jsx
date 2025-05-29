@@ -4,7 +4,6 @@ const PaymentCategory = ({ onChange }) => {
         { value: 'DAILY', label: '일급' },
         { value: 'WEEKLY', label: '주급' },
         { value: 'MONTHLY', label: '월급' },
-        { value: 'YEARLY', label: '연봉' },
     ];
 
     const handleSelect = (e) => {

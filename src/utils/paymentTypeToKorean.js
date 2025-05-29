@@ -5,16 +5,14 @@
  */
 export function paymentTypeToKorean(type) {
     switch (type) {
-        case "HOURLY":
-            return "시급";
-        case "DAILY":
-            return "일급";
-        case "WEEKLY":
-            return "주급";
-        case "MONTHLY":
-            return "월급";
-        case "YEARLY":
-            return "연봉";
+        case 'HOURLY':
+            return '시급';
+        case 'DAILY':
+            return '일급';
+        case 'WEEKLY':
+            return '주급';
+        case 'MONTHLY':
+            return '월급';
         default:
             return type; // 알 수 없는 값은 그대로 반환
     }
