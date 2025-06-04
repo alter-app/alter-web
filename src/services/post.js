@@ -79,11 +79,39 @@ export const postJobPosting = async (inputs) => {
         }
 
         const data = await response.json();
-        return data.data.duplicated === false;
+        return data;
     } catch (error) {
         console.error('공고 작성 중 오류:', error);
         throw new Error(
             '공고 작성 중 오류가 발생했습니다.'
+        );
+    }
+};
+
+// 공고 키워드 리스트 조회 로직
+export const getAvailableKeywords = async () => {
+    try {
+        const response = await fetch(
+            `${backend}/app/postings/available-keywords`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('공고 키워드 조회 오류:', error);
+        throw new Error(
+            '공고 키워드 조회 중 오류가 발생했습니다.'
         );
     }
 };
