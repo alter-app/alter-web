@@ -61,3 +61,22 @@ export function timeAgo(isoString) {
         return `${Math.floor(diff / 86400)}일 전`;
     }
 }
+
+export function autoInsertColon(value) {
+    // 숫자만 추출
+    let numbers = value.replace(/\D/g, '').slice(0, 4);
+
+    // 아무것도 없으면 빈 문자열
+    if (!numbers) return '';
+
+    // 3~4자리면 HH:MM 형태
+    if (numbers.length > 2) {
+        let hour = numbers.slice(0, 2);
+        let minute = numbers.slice(2, 4);
+
+        // 시간, 분 범위 제한 (입력 중에는 제한하지 않음, 제출 시 검증 추천)
+        return `${hour}:${minute}`;
+    }
+    // 1~2자리면 그냥 시(hour)만
+    return numbers;
+}
