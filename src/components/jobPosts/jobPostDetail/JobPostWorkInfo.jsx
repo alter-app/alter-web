@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { paymentTypeToKorean } from '../../../utils/paymentTypeToKorean';
+import { paymentTypeToKorean } from '../../../utils/paymentUtils';
 import { formatNumber } from '../../../utils/formatNumber';
 import {
     formatTimeToHHMM,

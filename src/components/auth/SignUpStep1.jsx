@@ -1,8 +1,8 @@
-import AuthInput from "./AuthInput";
-import AuthButton from "./AuthButton";
-import GenderSelector from "./GenderSelector";
-import styled from "styled-components";
-import { formatPhoneNumber } from "../../utils/phoneUtils";
+import AuthInput from './AuthInput';
+import AuthButton from './AuthButton';
+import GenderSelector from './GenderSelector';
+import styled from 'styled-components';
+import { formatPhoneNumber } from '../../utils/phoneUtils';
 
 const SignUpStep1 = ({
     name,
@@ -30,9 +30,9 @@ const SignUpStep1 = ({
             <SInputStack>
                 <Row>
                     <AuthInput
-                        width="290px"
-                        type="text"
-                        placeholder="박알바"
+                        width='290px'
+                        type='text'
+                        placeholder='박알바'
                         value={name}
                         onChange={(e) =>
                             setName(e.target.value)
@@ -45,9 +45,9 @@ const SignUpStep1 = ({
                     />
                 </Row>
                 <AuthInput
-                    type="tel"
+                    type='tel'
                     maxLength={13}
-                    placeholder="010-1234-5678"
+                    placeholder='010-1234-5678'
                     value={phone}
                     onChange={(e) =>
                         setPhone(
@@ -59,8 +59,8 @@ const SignUpStep1 = ({
                 />
 
                 <AuthInput
-                    type="text"
-                    placeholder="19450815"
+                    type='text'
+                    placeholder='19450815'
                     value={birth}
                     maxLength={8}
                     onChange={(e) =>
@@ -86,7 +86,7 @@ const SignUpStep1 = ({
 export default SignUpStep1;
 
 const InfoTitle = styled.span`
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 600;
     font-size: 28px;
     line-height: 38px;
@@ -94,7 +94,7 @@ const InfoTitle = styled.span`
 `;
 
 const InfoDesc = styled.div`
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
     font-size: 15px;
     line-height: 22px;
@@ -104,7 +104,7 @@ const InfoDesc = styled.div`
 `;
 
 const InfoGuide = styled.div`
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
     font-size: 12px;
     line-height: 18px;

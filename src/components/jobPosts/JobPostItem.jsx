@@ -3,7 +3,7 @@ import clock from '../../assets/icons/clock.svg';
 import calendar from '../../assets/icons/calendar.svg';
 import BookmarkButton from './Bookmark';
 import { useState } from 'react';
-import { paymentTypeToKorean } from '../../utils/paymentTypeToKorean';
+import { paymentTypeToKorean } from '../../utils/paymentUtils';
 import { formatNumber } from '../../utils/formatNumber';
 import { getKoreanDays } from '../../utils/weekUtil';
 import {
