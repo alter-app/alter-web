@@ -6,6 +6,7 @@ import DetailSection from './jobPostDetail/DetailSection';
 import JobDetailFooter from './jobPostDetail/JobDetailFooter';
 import { getPostDetail } from '../../services/post';
 import { useState, useEffect } from 'react';
+import closeIcon from '../../assets/icons/closeIcon.svg';
 
 function JobPostDetail({ children, onClose, id }) {
     const [detail, setDetail] = useState(null);
@@ -22,7 +23,13 @@ function JobPostDetail({ children, onClose, id }) {
     return (
         <>
             <Container>
-                <button onClick={onClose}>닫기</button>
+                <CloseButtonDiv>
+                    <CloseButton
+                        src={closeIcon}
+                        alt='닫기'
+                        onClick={onClose}
+                    />
+                </CloseButtonDiv>
                 <PhotoBox>
                     <PhotoImg
                         src='사진주소.jpg'
@@ -97,4 +104,17 @@ const StickyFooter = styled.div`
     width: 100%;
     z-index: 10;
     background: #fff; /* 필요시 배경색 추가 */
+`;
+
+const CloseButtonDiv = styled.div`
+    display: flex;
+    justify-content: end;
+`;
+const CloseButton = styled.img`
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    position: absolute;
+    margin-top: 10px;
+    margin-right: 10px;
 `;
