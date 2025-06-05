@@ -10,6 +10,7 @@ import Dropdown from '../components/Dropdown';
 import WorkScheduleItem from '../components/jobPosts/jobPosting/WorkScheduleItem';
 import AddScheduleButton from '../components/jobPosts/jobPosting/AddScheduleButton';
 import WageInputField from '../components/jobPosts/jobPosting/WageInputField';
+import DetailInputField from '../components/jobPosts/jobPosting/DetailInputField';
 
 const JobPosting = () => {
     const navigate = useNavigate();
@@ -211,6 +212,7 @@ const JobPosting = () => {
                 payType={inputs.paymentType}
                 onPayTypeChange={handlePaymentTypeChange}
             />
+            <DetailInputField />
             <StyledButton onClick={handleJobPosting}>
                 작성
             </StyledButton>
