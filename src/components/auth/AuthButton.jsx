@@ -1,7 +1,7 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 const ButtonContainer = styled.div`
-    width: ${({ width }) => width || "420px"};
+    width: ${({ width }) => width || '420px'};
     height: 58px;
     display: flex;
     align-items: center;
@@ -15,13 +15,13 @@ const StyledButton = styled.button`
     height: 100%;
     border: none;
     background: ${({ $background }) =>
-        $background || "#2DE283"};
+        $background || '#2DE283'};
     color: #ffffff;
-    font-size: ${({ $fontSize }) => $fontSize || "16px"};
-    font-family: "Pretendard";
+    font-size: ${({ $fontSize }) => $fontSize || '16px'};
+    font-family: 'Pretendard';
     font-weight: 400;
     border-radius: ${({ $borderRadius }) =>
-        $borderRadius || "8px"};
+        $borderRadius || '8px'};
     cursor: pointer;
 
     &:disabled {

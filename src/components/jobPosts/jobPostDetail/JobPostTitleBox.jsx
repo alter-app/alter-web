@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import { timeAgo } from "../../../utils/timeAgo";
+import styled from 'styled-components';
+import { timeAgo } from '../../../utils/timeUtil';
 
 function JobPostTitleBox({ title, createdAt, keywords }) {
     return (
@@ -42,7 +42,7 @@ const Row = styled.div`
 
 const CompanyName = styled.div`
     color: #767676;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
@@ -54,7 +54,7 @@ const PostTime = styled.div`
     border-radius: 4px;
     background: #f6f6f6;
     color: #399982;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
     font-size: 12px;
     line-height: 20px;
@@ -63,7 +63,7 @@ const PostTime = styled.div`
 const Title = styled.div`
     width: 350px;
     color: #111111;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 600;
     font-size: 24px;
     line-height: 34px;
@@ -85,7 +85,7 @@ const JobTagList = styled.div`
     border-radius: 4px;
     background: #f6f6f6;
     color: #767676;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
     font-size: 12px;
     line-height: 20px;

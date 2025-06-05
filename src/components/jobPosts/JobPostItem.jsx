@@ -1,11 +1,15 @@
-import styled from "styled-components";
-import clock from "../../assets/icons/clock.svg";
-import calendar from "../../assets/icons/calendar.svg";
-import BookmarkButton from "./Bookmark";
-import { useState } from "react";
-import { timeAgo } from "../../utils/timeAgo";
-import { paymentTypeToKorean } from "../../utils/paymentTypeToKorean";
-import { formatNumber } from "../../utils/formatNumber";
+import styled from 'styled-components';
+import clock from '../../assets/icons/clock.svg';
+import calendar from '../../assets/icons/calendar.svg';
+import BookmarkButton from './Bookmark';
+import { useState } from 'react';
+import { paymentTypeToKorean } from '../../utils/paymentUtils';
+import { formatNumber } from '../../utils/formatNumber';
+import { getKoreanDays } from '../../utils/weekUtil';
+import {
+    formatTimeToHHMM,
+    timeAgo,
+} from '../../utils/timeUtil';
 
 const JobPostItem = ({
     title,
@@ -14,8 +18,14 @@ const JobPostItem = ({
     payAmount,
     onClick,
     id,
+    schedules,
 }) => {
     const [checked, setChecked] = useState(false);
+
+    const startTime = formatTimeToHHMM(
+        schedules[0].startTime
+    );
+    const endTime = formatTimeToHHMM(schedules[0].endTime);
 
     return (
         <InfoContainer onClick={onClick}>
@@ -33,7 +43,7 @@ const JobPostItem = ({
                 />
             </TopRow>
             <Description>
-                {paymentTypeToKorean(paymentType)}{" "}
+                {paymentTypeToKorean(paymentType)}{' '}
                 <WageHighlight>
                     {formatNumber(payAmount)}
                 </WageHighlight>
@@ -41,12 +51,18 @@ const JobPostItem = ({
             </Description>
             <InfoRow>
                 <InfoGroup>
-                    <img src={clock} alt="근무 시간" />
-                    <InfoText>12:00 ~ 18:00</InfoText>
+                    <img src={clock} alt='근무 시간' />
+                    <InfoText>
+                        {startTime} ~ {endTime}
+                    </InfoText>
                 </InfoGroup>
                 <InfoGroup>
-                    <img src={calendar} alt="근무 요일" />
-                    <InfoText>월, 수, 토, 일</InfoText>
+                    <img src={calendar} alt='근무 요일' />
+                    <InfoText>
+                        {getKoreanDays(
+                            schedules[0].workingDays
+                        )}
+                    </InfoText>
                 </InfoGroup>
             </InfoRow>
         </InfoContainer>
@@ -68,7 +84,7 @@ const InfoContainer = styled.div`
 const Title = styled.div`
     width: 300px;
     color: #111111;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 600;
     font-size: 16px;
     line-height: 24px;
@@ -86,7 +102,7 @@ const TopRow = styled.div`
 
 const CompanyName = styled.div`
     color: #767676;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
@@ -94,7 +110,7 @@ const CompanyName = styled.div`
 
 const Description = styled.div`
     color: #767676;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
@@ -102,7 +118,7 @@ const Description = styled.div`
 
 const WageHighlight = styled.span`
     color: #399982;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 600;
     font-size: 14px;
     line-height: 20px;
@@ -122,7 +138,7 @@ const InfoGroup = styled.div`
 
 const InfoText = styled.div`
     color: #767676;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
