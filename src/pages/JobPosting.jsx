@@ -71,6 +71,7 @@ const JobPosting = () => {
                 [name]: value,
             };
         });
+        console.log(inputs.description);
     };
 
     // 키워드 선택 핸들러
@@ -212,7 +213,11 @@ const JobPosting = () => {
                 payType={inputs.paymentType}
                 onPayTypeChange={handlePaymentTypeChange}
             />
-            <DetailInputField />
+            <DetailInputField
+                name='description'
+                value={inputs.description}
+                onChange={handleInputChange}
+            />
             <StyledButton onClick={handleJobPosting}>
                 작성
             </StyledButton>

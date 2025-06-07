@@ -48,7 +48,9 @@ function JobPostDetail({ children, onClose, id }) {
                         schedules={detail.schedules}
                     />
                     <WorkLocation />
-                    <DetailSection />
+                    <DetailSection
+                        description={detail.description}
+                    />
                 </Gap>
             </Container>
             <StickyFooter>

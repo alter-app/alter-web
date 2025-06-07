@@ -1,17 +1,14 @@
 import styled from 'styled-components';
-import { useState } from 'react';
 
-const DetailInputField = () => {
-    const [value, setValue] = useState('');
-    console.log(value);
-
+const DetailInputField = ({ name, value, onChange }) => {
     return (
         <Container>
             <Title>상세내용</Title>
             <DetailTextArea
                 id='detail'
+                name={name}
                 value={value}
-                onChange={(e) => setValue(e.target.value)}
+                onChange={onChange}
                 placeholder=''
             />
         </Container>
