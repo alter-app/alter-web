@@ -41,6 +41,7 @@ function JobPostDetail({ children, onClose, id }) {
                         title={detail.title}
                         createdAt={detail.createdAt}
                         keywords={detail.keywords}
+                        workspace={detail.workspace}
                     />
                     <JobPostWorkInfo
                         paymentType={detail.paymentType}
