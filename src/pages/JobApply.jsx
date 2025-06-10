@@ -30,6 +30,15 @@ const JobApply = () => {
     }, [postingId]);
     console.log(selectedSchedule);
 
+    useEffect(() => {
+        if (
+            detail?.schedules &&
+            detail.schedules.length > 0
+        ) {
+            setSelectedSchedule(detail.schedules[0].id);
+        }
+    }, [detail]);
+
     const handleApply = async () => {
         try {
             await postingApply({
