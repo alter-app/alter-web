@@ -1,10 +1,16 @@
 import styled from 'styled-components';
 import Bookmark from '../Bookmark';
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+    addPostingScrap,
+    deletePostingScrap,
+} from '../../../services/post';
 
-const JobDetailFooter = ({ id }) => {
-    const [checked, setChecked] = useState(false);
+const JobDetailFooter = ({
+    id,
+    checked,
+    onScrapChange,
+}) => {
     const navigate = useNavigate();
 
     const handleApply = () => {
@@ -13,17 +19,34 @@ const JobDetailFooter = ({ id }) => {
         });
     };
 
+    const handleBookmark = async (e) => {
+        e.stopPropagation();
+        const nextChecked = !checked;
+        onScrapChange(nextChecked);
+
+        try {
+            if (nextChecked) {
+                await addPostingScrap({ postingId: id });
+            } else {
+                await deletePostingScrap({
+                    favoritePostingId: id,
+                });
+            }
+        } catch (error) {
+            alert('스크랩 실패');
+            onScrapChange(checked);
+        }
+    };
+
     return (
         <ApplyButtonBar>
-            <BookmarkButton>
+            <BookmarkButtonWrapper>
                 <Bookmark
                     id={`bookmark-toggle-${id}`}
                     checked={checked}
-                    onChange={() =>
-                        setChecked((prev) => !prev)
-                    }
+                    onChange={handleBookmark}
                 />
-            </BookmarkButton>
+            </BookmarkButtonWrapper>
             <ApplyButton onClick={handleApply}>
                 지원하기
             </ApplyButton>
@@ -42,7 +65,7 @@ const ApplyButtonBar = styled.div`
     box-shadow: 0px -1px 4px 0px rgba(0, 0, 0, 0.25);
 `;
 
-const BookmarkButton = styled.div`
+const BookmarkButtonWrapper = styled.div`
     width: 64px;
     height: 64px;
     background-color: #ffffff;

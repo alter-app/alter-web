@@ -8,7 +8,12 @@ import { getPostDetail } from '../../services/post';
 import { useState, useEffect } from 'react';
 import closeIcon from '../../assets/icons/closeIcon.svg';
 
-function JobPostDetail({ children, onClose, id }) {
+function JobPostDetail({
+    onClose,
+    id,
+    scrapMap,
+    onScrapChange,
+}) {
     const [detail, setDetail] = useState(null);
 
     useEffect(() => {
@@ -19,7 +24,6 @@ function JobPostDetail({ children, onClose, id }) {
 
     if (!detail) return <div>로딩 중...</div>;
 
-    console.log(detail);
     return (
         <>
             <Container>
@@ -55,7 +59,16 @@ function JobPostDetail({ children, onClose, id }) {
                 </Gap>
             </Container>
             <StickyFooter>
-                <JobDetailFooter id={detail.id} />
+                <JobDetailFooter
+                    id={detail.id}
+                    checked={
+                        scrapMap[detail.id] ??
+                        detail.scrapped
+                    }
+                    onScrapChange={(value) =>
+                        onScrapChange(detail.id, value)
+                    }
+                />
             </StickyFooter>
         </>
     );

@@ -10,6 +10,10 @@ import {
     formatTimeToHHMM,
     timeAgo,
 } from '../../utils/timeUtil';
+import {
+    addPostingScrap,
+    deletePostingScrap,
+} from '../../services/post';
 
 const JobPostItem = ({
     title,
@@ -19,27 +23,46 @@ const JobPostItem = ({
     onClick,
     id,
     schedules,
+    workspace,
+    scrapped,
+    checked,
+    onScrapChange,
 }) => {
-    const [checked, setChecked] = useState(false);
-
     const startTime = formatTimeToHHMM(
         schedules[0].startTime
     );
     const endTime = formatTimeToHHMM(schedules[0].endTime);
 
+    const handleBookmark = async (e) => {
+        e.stopPropagation();
+        const nextChecked = !checked;
+        onScrapChange(nextChecked);
+
+        try {
+            if (nextChecked) {
+                await addPostingScrap({ postingId: id });
+            } else {
+                await deletePostingScrap({
+                    favoritePostingId: id,
+                });
+            }
+        } catch (err) {
+            alert('스크랩 실패');
+            onScrapChange(checked);
+        }
+    };
+
     return (
         <InfoContainer onClick={onClick}>
             <CompanyName>
-                상호야! 너 이름적고가!
+                {workspace.businessName}
             </CompanyName>
             <TopRow>
                 <Title>{title}</Title>
                 <BookmarkButton
                     id={`bookmark-toggle-${id}`}
                     checked={checked}
-                    onChange={() =>
-                        setChecked((prev) => !prev)
-                    }
+                    onChange={handleBookmark}
                 />
             </TopRow>
             <Description>
@@ -79,6 +102,7 @@ const InfoContainer = styled.div`
     box-sizing: border-box;
     gap: 5px;
     border-bottom: 1px solid #f6f6f6;
+    cursor: pointer;
 `;
 
 const Title = styled.div`

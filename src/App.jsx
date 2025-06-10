@@ -11,6 +11,7 @@ import MainLayout from './layouts/MainLayout';
 import FooterLayout from './layouts/FooterLayout';
 import JobLookupMap from './pages/JobLookupMap';
 import JobPosting from './pages/JobPosting';
+import JobApply from './pages/JobApply';
 
 function App() {
     return (
@@ -46,12 +47,16 @@ function App() {
 
                 <Route element={<MainLayout />}>
                     <Route
-                        path='job-lookup-map'
+                        path='/job-lookup-map'
                         element={<JobLookupMap />}
                     />
                     <Route
-                        path='posting'
+                        path='/posting'
                         element={<JobPosting />}
+                    />
+                    <Route
+                        path='/apply'
+                        element={<JobApply />}
                     />
                 </Route>
             </Routes>

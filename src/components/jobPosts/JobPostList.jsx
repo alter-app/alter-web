@@ -1,14 +1,18 @@
-import JobPostItem from "./JobPostItem";
-import styled from "styled-components";
-import SearchBar from "./SearchBar";
-import { getPostList } from "../../services/post";
-import { useEffect, useState } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
-import Loader from "../Loader";
+import JobPostItem from './JobPostItem';
+import styled from 'styled-components';
+import SearchBar from './SearchBar';
+import { getPostList } from '../../services/post';
+import { useEffect, useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import Loader from '../Loader';
 
-const JobPostList = ({ onSelect }) => {
+const JobPostList = ({
+    onSelect,
+    scrapMap,
+    onScrapChange,
+}) => {
     const [posts, setPosts] = useState([]);
-    const [cursorInfo, setCursorInfo] = useState("");
+    const [cursorInfo, setCursorInfo] = useState('');
     const [totalCount, setTotalCount] = useState(0);
 
     useEffect(() => {
@@ -24,7 +28,7 @@ const JobPostList = ({ onSelect }) => {
             setCursorInfo(result.page.cursor);
             setTotalCount(result.page.totalCount);
         } catch (error) {
-            console.error("공고 리스트 조회 오류:", error);
+            console.error('공고 리스트 조회 오류:', error);
         }
     };
 
@@ -32,7 +36,7 @@ const JobPostList = ({ onSelect }) => {
         <Container>
             <SearchBar />
             <Divider />
-            <ListArea id="scrollableListArea">
+            <ListArea id='scrollableListArea'>
                 <Address>서울 구로구 경인로 445</Address>
                 <InfiniteScroll
                     dataLength={posts.length}
@@ -48,13 +52,23 @@ const JobPostList = ({ onSelect }) => {
                             더 이상 공고가 없습니다.
                         </CenteredDiv>
                     }
-                    scrollableTarget="scrollableListArea"
+                    scrollableTarget='scrollableListArea'
                 >
                     {posts.map((post) => (
                         <JobPostItem
                             key={post.id}
                             {...post}
                             onClick={() => onSelect(post)}
+                            checked={
+                                scrapMap[post.id] ??
+                                post.scrapped
+                            }
+                            onScrapChange={(value) =>
+                                onScrapChange(
+                                    post.id,
+                                    value
+                                )
+                            }
                         />
                     ))}
                 </InfiniteScroll>
@@ -80,7 +94,7 @@ const ListArea = styled.div`
 `;
 
 const Address = styled.div`
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 600;
     font-size: 24px;
     line-height: 34px;
