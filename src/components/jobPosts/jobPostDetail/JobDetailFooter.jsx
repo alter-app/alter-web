@@ -1,9 +1,17 @@
 import styled from 'styled-components';
 import Bookmark from '../Bookmark';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const JobDetailFooter = ({ id }) => {
     const [checked, setChecked] = useState(false);
+    const navigate = useNavigate();
+
+    const handleApply = () => {
+        navigate('/apply', {
+            state: { id: id },
+        });
+    };
 
     return (
         <ApplyButtonBar>
@@ -16,7 +24,9 @@ const JobDetailFooter = ({ id }) => {
                     }
                 />
             </BookmarkButton>
-            <ApplyButton>지원하기</ApplyButton>
+            <ApplyButton onClick={handleApply}>
+                지원하기
+            </ApplyButton>
         </ApplyButtonBar>
     );
 };
@@ -51,4 +61,5 @@ const ApplyButton = styled.button`
     font-weight: 600;
     font-size: 20px;
     line-height: 28px;
+    cursor: pointer;
 `;
