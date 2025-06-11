@@ -67,65 +67,69 @@ const JobApply = () => {
                     <SubTitle>공고제목</SubTitle>
                     <WorkInfo>{detail?.title}</WorkInfo>
                 </Row>
-                <SubTitle>근무시간</SubTitle>
-                {detail?.schedules && (
-                    <RadioGroup>
-                        {detail.schedules.map((sch) => (
-                            <RadioLabel
-                                key={sch.id}
-                                selected={
-                                    selectedSchedule ===
-                                    sch.id
-                                }
-                            >
-                                <RadioInput
-                                    type='radio'
-                                    name='schedule'
-                                    value={sch.id}
-                                    checked={
+                <Column>
+                    <SubTitle>근무시간</SubTitle>
+                    {detail?.schedules && (
+                        <RadioGroup>
+                            {detail.schedules.map((sch) => (
+                                <RadioLabel
+                                    key={sch.id}
+                                    selected={
                                         selectedSchedule ===
                                         sch.id
                                     }
-                                    onChange={() =>
-                                        setSelectedSchedule(
+                                >
+                                    <RadioInput
+                                        type='radio'
+                                        name='schedule'
+                                        value={sch.id}
+                                        checked={
+                                            selectedSchedule ===
                                             sch.id
-                                        )
-                                    }
-                                />
-                                <ScheduleText>
-                                    <span>
-                                        {sch.workingDays
-                                            .map(
-                                                (day) =>
-                                                    WEEKDAYS_KOR[
-                                                        day
-                                                    ]
+                                        }
+                                        onChange={() =>
+                                            setSelectedSchedule(
+                                                sch.id
                                             )
-                                            .join(', ')}
-                                    </span>
-                                    <span>
-                                        {formatTimeToHHMM(
-                                            sch.startTime
-                                        )}
-                                        ~
-                                        {formatTimeToHHMM(
-                                            sch.endTime
-                                        )}
-                                    </span>
-                                </ScheduleText>
-                            </RadioLabel>
-                        ))}
-                    </RadioGroup>
-                )}
-                <SubTitle>자기소개</SubTitle>
-                <DetailTextArea
-                    id='detail'
-                    placeholder='본인을 어필할 수 있는 내용(경험, 성격, 목표 등)을 자유롭게 작성해 주세요.'
-                    value={description}
-                    onChange={(e) =>
-                        setDescription(e.target.value)
-                    }
-                />
+                                        }
+                                    />
+                                    <ScheduleText>
+                                        <span>
+                                            {sch.workingDays
+                                                .map(
+                                                    (day) =>
+                                                        WEEKDAYS_KOR[
+                                                            day
+                                                        ]
+                                                )
+                                                .join(', ')}
+                                        </span>
+                                        <span>
+                                            {formatTimeToHHMM(
+                                                sch.startTime
+                                            )}
+                                            ~
+                                            {formatTimeToHHMM(
+                                                sch.endTime
+                                            )}
+                                        </span>
+                                    </ScheduleText>
+                                </RadioLabel>
+                            ))}
+                        </RadioGroup>
+                    )}
+                </Column>
+                <Column>
+                    <SubTitle>자기소개</SubTitle>
+                    <DetailTextArea
+                        id='detail'
+                        placeholder='본인을 어필할 수 있는 내용(경험, 성격, 목표 등)을 자유롭게 작성해 주세요.'
+                        value={description}
+                        onChange={(e) =>
+                            setDescription(e.target.value)
+                        }
+                    />
+                </Column>
                 <StyledButton
                     onClick={handleApply}
                     disabled={selectedSchedule === null}
@@ -148,16 +152,17 @@ const Row = styled.div`
 const Column = styled.div`
     display: flex;
     flex-direction: column;
+    gap: 10px;
 `;
 const Container = styled.div`
     width: 820px;
     margin-top: 20px;
     background-color: #ffffff;
     border-radius: 4px;
-    padding: 20px;
+    padding: 40px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 40px;
     box-sizing: border-box;
 `;
 
@@ -177,7 +182,7 @@ const DetailTextArea = styled.textarea`
     border-radius: 4px;
     resize: none;
     outline: none;
-    padding: 10px;
+    padding: 15px;
     box-sizing: border-box;
     font-family: 'Pretendard';
     font-weight: 400;
@@ -185,6 +190,9 @@ const DetailTextArea = styled.textarea`
     line-height: 22px;
     &:focus {
         border: 1px solid #2de283;
+    }
+    &::placeholder {
+        color: #999999;
     }
 `;
 

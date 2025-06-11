@@ -52,4 +52,8 @@ const DetailTextArea = styled.textarea`
     &:focus {
         border: 1px solid #2de283;
     }
+
+    &::placeholder {
+        color: #999999;
+    }
 `;
