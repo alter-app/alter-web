@@ -28,7 +28,7 @@ const JobPosting = () => {
 
     // 스케줄, 키워드 등 모든 입력값 상태
     const [inputs, setInputs] = useState({
-        workspaceId: 1,
+        workspaceId: 3,
         title: '',
         description: '',
         payAmount: '',
@@ -71,7 +71,6 @@ const JobPosting = () => {
                 [name]: value,
             };
         });
-        console.log(inputs.description);
     };
 
     // 키워드 선택 핸들러
