@@ -1,7 +1,8 @@
-import { useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import useAuthStore from "../../store/authStore";
-import { loginWithProvider } from "../../services/auth";
+import { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import useAuthStore from '../../store/authStore';
+import { loginWithProvider } from '../../services/auth';
+import Loader from '../../components/Loader';
 
 function AppleCallback() {
     const navigate = useNavigate();
@@ -12,7 +13,7 @@ function AppleCallback() {
     useEffect(() => {
         if (authorizationCode) {
             loginWithProvider(
-                "APPLE",
+                'APPLE',
                 authorizationCode,
                 setAuth,
                 navigate
@@ -20,7 +21,11 @@ function AppleCallback() {
         }
     }, [authorizationCode, navigate, setAuth]);
 
-    return <div>Apple 로그인 진행 중...</div>;
+    return (
+        <div>
+            <Loader />
+        </div>
+    );
 }
 
 export default AppleCallback;

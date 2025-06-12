@@ -1,18 +1,18 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import useAuthStore from "../../store/authStore";
-import { loginWithProvider } from "../../services/auth";
-
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import useAuthStore from '../../store/authStore';
+import { loginWithProvider } from '../../services/auth';
+import Loader from '../../components/Loader';
 export default function KakaoCallback() {
     const navigate = useNavigate();
     const url = new URL(window.location.href);
-    const code = url.searchParams.get("code");
+    const code = url.searchParams.get('code');
     const setAuth = useAuthStore((state) => state.setAuth);
 
     useEffect(() => {
         if (code) {
             loginWithProvider(
-                "KAKAO",
+                'KAKAO',
                 code,
                 setAuth,
                 navigate
@@ -22,8 +22,7 @@ export default function KakaoCallback() {
 
     return (
         <div>
-            <h2>로그인 중입니다...</h2>
-            <p>잠시만 기다려주세요.</p>
+            <Loader />
         </div>
     );
 }
