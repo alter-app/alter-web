@@ -96,3 +96,31 @@ export const cancelApplication = async ({
         );
     }
 };
+
+// 사용자 정보 조회 로직
+export const getUserInfo = async () => {
+    try {
+        const response = await fetch(
+            `${backend}/app/users/me`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('사용자 정보 조회 오류:', error);
+        throw new Error(
+            '사용자 정보 조회 중 오류가 발생했습니다.'
+        );
+    }
+};
