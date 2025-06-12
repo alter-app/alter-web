@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import ApplicationItem from './ApplicationItem';
 import { getApplicationList } from '../../services/mypage';
 import styled from 'styled-components';
+import Loader from '../Loader';
+import dropdown from '../../assets/icons/dropdown.svg';
 
 const ApplicationList = () => {
     const [applications, setApplications] = useState([]);
@@ -40,7 +42,11 @@ const ApplicationList = () => {
     }, [pageInfo.page, pageInfo.pageSize]);
 
     if (loading)
-        return <CenteredDiv>로딩 중...</CenteredDiv>;
+        return (
+            <CenteredDiv>
+                <Loader />
+            </CenteredDiv>
+        );
     if (error)
         return <CenteredDiv>에러: {error}</CenteredDiv>;
     if (applications.length === 0)
@@ -60,7 +66,7 @@ const ApplicationList = () => {
                 ))}
             </ListArea>
             <PaginationArea>
-                <button
+                <Previous
                     disabled={pageInfo.page === 1}
                     onClick={() =>
                         setPageInfo((prev) => ({
@@ -68,13 +74,13 @@ const ApplicationList = () => {
                             page: prev.page - 1,
                         }))
                     }
-                >
-                    이전
-                </button>
-                <span>
+                    src={dropdown}
+                    alt='이전'
+                />
+                <PageInfoText>
                     {pageInfo.page} / {pageInfo.totalPage}
-                </span>
-                <button
+                </PageInfoText>
+                <Next
                     disabled={
                         pageInfo.page === pageInfo.totalPage
                     }
@@ -84,9 +90,9 @@ const ApplicationList = () => {
                             page: prev.page + 1,
                         }))
                     }
-                >
-                    다음
-                </button>
+                    src={dropdown}
+                    alt='다음'
+                />
             </PaginationArea>
         </Container>
     );
@@ -126,4 +132,28 @@ const PaginationArea = styled.div`
         opacity: 0.5;
         cursor: not-allowed;
     }
+`;
+
+const Next = styled.img`
+    width: 20px;
+    height: 20px;
+    display: flex;
+    cursor: pointer;
+    transform: rotate(-90deg);
+`;
+
+const Previous = styled.img`
+    width: 20px;
+    height: 20px;
+    display: flex;
+    cursor: pointer;
+    transform: rotate(90deg);
+`;
+
+const PageInfoText = styled.span`
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 20px;
+    color: #767676;
 `;
