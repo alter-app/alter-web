@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { getScrapPostList } from '../../services/mypage';
+import { getScrapPostList } from '../../services/myPage';
 import { useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Loader from '../Loader';

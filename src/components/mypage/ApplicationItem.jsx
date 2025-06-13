@@ -13,7 +13,7 @@ import {
     statusToKorean,
     statusToStyle,
 } from '../../utils/statusUtils';
-import { cancelApplication } from '../../services/mypage';
+import { cancelApplication } from '../../services/myPage';
 import closeIcon from '../../assets/icons/closeIcon.svg';
 
 const ApplicationItem = ({

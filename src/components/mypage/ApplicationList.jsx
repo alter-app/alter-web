@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import ApplicationItem from './ApplicationItem';
-import { getApplicationList } from '../../services/mypage';
+import { getApplicationList } from '../../services/myPage';
 import styled from 'styled-components';
 import Loader from '../Loader';
 import dropdown from '../../assets/icons/dropdown.svg';
