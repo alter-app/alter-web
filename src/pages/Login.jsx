@@ -3,17 +3,29 @@ import AppleLoginButton from '../components/auth/AppleLoginButton';
 import AlterLogo from '../assets/logos/signature CB(상하).png';
 import styled from 'styled-components';
 import ManagerKakaoLoginButton from '../components/manager/ManagerKakaoLoginButton';
+import ManagerAppleLoginButton from '../components/manager/ManagerAppleLoginButton';
 
 const Login = () => {
     return (
         <SBackground>
             <Logo src={AlterLogo} alt='알터 로고' />
-            <Row>
-                <KakaoLoginButton />
-                <AppleLoginButton />
+            <Column>
+                <Row>
+                    <Title>일반 회원</Title>
+                    <Column>
+                        <KakaoLoginButton />
+                        <AppleLoginButton />
+                    </Column>
+                </Row>
                 <Divider />
-                <ManagerKakaoLoginButton />
-            </Row>
+                <Row>
+                    <Title>기업 회원</Title>
+                    <Column>
+                        <ManagerKakaoLoginButton />
+                        <ManagerAppleLoginButton />
+                    </Column>
+                </Row>
+            </Column>
         </SBackground>
     );
 };
@@ -24,14 +36,12 @@ const Logo = styled.img`
     height: 300px;
     width: 560px;
     width: auto;
-    margin-top: 110px;
-    margin-bottom: 52px;
 `;
 
 const SBackground = styled.div`
     margin-top: 60px;
-    width: 560px;
-    height: 720px;
+    padding: 40px;
+    box-sizing: border-box;
     max-height: 720px;
     border-radius: 16px;
     background: #ffffff;
@@ -41,9 +51,15 @@ const SBackground = styled.div`
     align-items: center;
 `;
 
-const Row = styled.div`
+const Column = styled.div`
     display: flex;
     flex-direction: column;
+    gap: 9px;
+`;
+
+const Row = styled.div`
+    display: flex;
+    align-items: center;
     gap: 9px;
 `;
 
@@ -51,4 +67,12 @@ const Divider = styled.div`
     width: 100%;
     height: 1px;
     background: #d9d9d9;
+`;
+
+const Title = styled.div`
+    color: #111111;
+    font-family: 'Pretendard';
+    font-weight: 600;
+    font-size: 20px;
+    line-height: 32px;
 `;

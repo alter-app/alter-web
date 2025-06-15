@@ -7,19 +7,21 @@ import Loader from '../../components/Loader';
 function AppleCallback() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { authorizationCode } = location.state || {};
+    const { authorizationCode, userType } =
+        location.state || {};
     const setAuth = useAuthStore((state) => state.setAuth);
 
     useEffect(() => {
-        if (authorizationCode) {
+        if (authorizationCode && userType) {
             loginWithProvider(
                 'APPLE',
                 authorizationCode,
                 setAuth,
-                navigate
+                navigate,
+                userType
             );
         }
-    }, [authorizationCode, navigate, setAuth]);
+    }, [authorizationCode, navigate, setAuth, userType]);
 
     return (
         <div>
