@@ -68,10 +68,11 @@ const ScrappedPostList = () => {
 export default ScrappedPostList;
 
 const Container = styled.div`
-    width: 390px;
+    width: 50vw;
     height: calc(100vh - 80px); /* 화면 전체 높이 */
     background-color: #ffffff;
     display: flex;
+    border-radius: 8px;
     flex-direction: column;
 `;
 

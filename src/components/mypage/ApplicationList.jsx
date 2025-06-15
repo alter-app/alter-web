@@ -102,11 +102,12 @@ export default ApplicationList;
 
 // 스타일 컴포넌트 추가
 const Container = styled.div`
-    width: 390px;
+    width: 50vw;
     height: calc(100vh - 80px);
     background-color: #ffffff;
     display: flex;
     flex-direction: column;
+    border-radius: 8px;
 `;
 
 const ListArea = styled.div`

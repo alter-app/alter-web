@@ -39,7 +39,7 @@ export default ScrappedPostItem;
 const InfoContainer = styled.div`
     display: flex;
     flex-direction: column;
-    width: 390px;
+    width: 100%;
     padding: 16px 20px;
     box-sizing: border-box;
     gap: 5px;
