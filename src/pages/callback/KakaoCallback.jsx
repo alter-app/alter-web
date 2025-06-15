@@ -7,15 +7,17 @@ export default function KakaoCallback() {
     const navigate = useNavigate();
     const url = new URL(window.location.href);
     const code = url.searchParams.get('code');
+    const state = url.searchParams.get('state'); // "managers" 또는 "users"
     const setAuth = useAuthStore((state) => state.setAuth);
 
     useEffect(() => {
-        if (code) {
+        if (code && state) {
             loginWithProvider(
                 'KAKAO',
                 code,
                 setAuth,
-                navigate
+                navigate,
+                state
             );
         }
     }, [code, navigate, setAuth]);

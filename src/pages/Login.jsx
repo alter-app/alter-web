@@ -1,15 +1,18 @@
-import KakaoLoginButton from "../components/auth/KakaoLoginButton";
-import AppleLoginButton from "../components/auth/AppleLoginButton";
-import AlterLogo from "../assets/logos/signature CB(상하).png";
-import styled from "styled-components";
+import KakaoLoginButton from '../components/auth/KakaoLoginButton';
+import AppleLoginButton from '../components/auth/AppleLoginButton';
+import AlterLogo from '../assets/logos/signature CB(상하).png';
+import styled from 'styled-components';
+import ManagerKakaoLoginButton from '../components/manager/ManagerKakaoLoginButton';
 
 const Login = () => {
     return (
         <SBackground>
-            <Logo src={AlterLogo} alt="알터 로고" />
+            <Logo src={AlterLogo} alt='알터 로고' />
             <Row>
                 <KakaoLoginButton />
                 <AppleLoginButton />
+                <Divider />
+                <ManagerKakaoLoginButton />
             </Row>
         </SBackground>
     );
@@ -42,4 +45,10 @@ const Row = styled.div`
     display: flex;
     flex-direction: column;
     gap: 9px;
+`;
+
+const Divider = styled.div`
+    width: 100%;
+    height: 1px;
+    background: #d9d9d9;
 `;
