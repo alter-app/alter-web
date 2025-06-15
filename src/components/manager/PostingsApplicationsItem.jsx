@@ -17,6 +17,7 @@ import {
     getPostingsApplicationDetail,
     updateApplicationStatus,
 } from '../../services/managerPage';
+import ConfirmModal from './ConfirmModal';
 
 const PostingsApplicationsItem = ({
     id,
@@ -37,6 +38,13 @@ const PostingsApplicationsItem = ({
 
     const startTime = formatTimeToHHMM(schedule.startTime);
     const endTime = formatTimeToHHMM(schedule.endTime);
+
+    // 모달 상태 관리
+    const [showConfirmModal, setShowConfirmModal] =
+        useState(false);
+    // 'ACCEPTED' | 'REJECTED'
+    const [pendingStatus, setPendingStatus] =
+        useState(null);
 
     const fetchApplicationDetail = async () => {
         try {
@@ -60,6 +68,7 @@ const PostingsApplicationsItem = ({
                 status: nextStatus,
             });
             setCurrentStatus(nextStatus);
+            window.location.reload();
             console.log(
                 `지원자가 ${
                     nextStatus === 'ACCEPTED'
@@ -230,25 +239,40 @@ const PostingsApplicationsItem = ({
                     )}
                     <ButtonRow>
                         <AcceptButton
-                            onClick={() =>
-                                handleUpdateStatus(
+                            onClick={() => {
+                                setPendingStatus(
                                     'ACCEPTED'
-                                )
-                            }
+                                );
+                                setShowConfirmModal(true);
+                            }}
                         >
                             수락
                         </AcceptButton>
                         <RejectButton
-                            onClick={() =>
-                                handleUpdateStatus(
+                            onClick={() => {
+                                setPendingStatus(
                                     'REJECTED'
-                                )
-                            }
+                                );
+                                setShowConfirmModal(true);
+                            }}
                         >
                             거절
                         </RejectButton>
                     </ButtonRow>
                 </>
+            )}
+            {showConfirmModal && (
+                <ConfirmModal
+                    status={pendingStatus}
+                    onConfirm={() => {
+                        handleUpdateStatus(pendingStatus);
+                        setShowConfirmModal(false);
+                    }}
+                    onCancel={() => {
+                        setShowConfirmModal(false);
+                        setPendingStatus(null);
+                    }}
+                />
             )}
         </InfoContainer>
     );
