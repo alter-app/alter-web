@@ -28,7 +28,7 @@ const JobPosting = () => {
 
     // 스케줄, 키워드 등 모든 입력값 상태
     const [inputs, setInputs] = useState({
-        workspaceId: 3,
+        workspaceId: 4,
         title: '',
         description: '',
         payAmount: '',
