@@ -47,7 +47,7 @@ const ScrappedPostList = () => {
                     }
                     endMessage={
                         <CenteredDiv>
-                            더 이상 공고가 없습니다.
+                            스크랩한 공고가 없습니다.
                         </CenteredDiv>
                     }
                     scrollableTarget='scrollableListArea'

@@ -51,11 +51,6 @@ const PostingsApplicationsList = () => {
                             <Loader />
                         </CenteredDiv>
                     }
-                    endMessage={
-                        <CenteredDiv>
-                            더 이상 지원자가 없습니다.
-                        </CenteredDiv>
-                    }
                     scrollableTarget='scrollableListArea'
                 >
                     {postingsApplications.map((post) => (

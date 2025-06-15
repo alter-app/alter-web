@@ -37,7 +37,7 @@ const JobPostList = ({
             <SearchBar />
             <Divider />
             <ListArea id='scrollableListArea'>
-                <Address>서울 구로구 경인로 445</Address>
+                {/* <Address>서울 구로구 경인로 445</Address> */}
                 <InfiniteScroll
                     dataLength={posts.length}
                     next={fetchData}
@@ -45,11 +45,6 @@ const JobPostList = ({
                     loader={
                         <CenteredDiv>
                             <Loader />
-                        </CenteredDiv>
-                    }
-                    endMessage={
-                        <CenteredDiv>
-                            더 이상 공고가 없습니다.
                         </CenteredDiv>
                     }
                     scrollableTarget='scrollableListArea'
