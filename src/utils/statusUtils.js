@@ -16,6 +16,11 @@ export const statusToStyle = (status) => {
                 color: '#ffffff',
                 background: '#2de283',
             };
+        case 'REJECTED':
+            return {
+                color: '#dc0000',
+                background: '#ffffff',
+            };
         case 'CANCELLED':
             return {
                 color: '#999999',
@@ -49,6 +54,8 @@ export const statusToKorean = (status) => {
             return '서류합격';
         case 'ACCEPTED':
             return '최종합격';
+        case 'REJECTED':
+            return '불합격';
         case 'CANCELLED':
             return '지원취소';
         case 'EXPIRED':

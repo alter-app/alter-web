@@ -53,3 +53,12 @@ export function formatDateInput(value) {
         v.slice(6, 8)
     );
 }
+
+// 날짜에 . 추가
+export const formatBirthday = (birthday) => {
+    if (!birthday || birthday.length !== 8) return '-';
+    return `${birthday.slice(0, 4)}.${birthday.slice(
+        4,
+        6
+    )}.${birthday.slice(6, 8)}.`;
+};
