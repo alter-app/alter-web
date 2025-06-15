@@ -37,3 +37,28 @@ export function getKoreanDays(englishDays) {
         .map((day) => DAY_KOR_MAP[day] || day)
         .join(', ');
 }
+
+// 날짜 입력 시 하이폰 추가
+export function formatDateInput(value) {
+    // 숫자만 남기고 하이픈 추가 (YYYY-MM-DD)
+    const v = value.replace(/\D/g, '').slice(0, 8);
+    if (v.length < 5) return v;
+    if (v.length < 7)
+        return v.slice(0, 4) + '-' + v.slice(4);
+    return (
+        v.slice(0, 4) +
+        '-' +
+        v.slice(4, 6) +
+        '-' +
+        v.slice(6, 8)
+    );
+}
+
+// 날짜에 . 추가
+export const formatBirthday = (birthday) => {
+    if (!birthday || birthday.length !== 8) return '-';
+    return `${birthday.slice(0, 4)}.${birthday.slice(
+        4,
+        6
+    )}.${birthday.slice(6, 8)}.`;
+};

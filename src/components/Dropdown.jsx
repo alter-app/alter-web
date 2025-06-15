@@ -5,14 +5,12 @@ import ArrowDownIcon from '../assets/icons/dropdown.svg';
 const Dropdown = ({ keywords = [], onChange }) => {
     const list = keywords;
     const selectRef = useRef(null);
-    const [currentValue, setCurrentValue] = useState(
-        list[0] || null
-    );
+    const [currentValue, setCurrentValue] = useState(null);
     const [showOptions, setShowOptions] = useState(false);
 
     // keywords가 바뀔 때마다 currentValue도 갱신
     useEffect(() => {
-        setCurrentValue(list[0] || null);
+        setCurrentValue(null);
     }, [list]);
 
     // 외부 클릭 감지되면 드롭다운 닫음

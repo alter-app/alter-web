@@ -1,17 +1,13 @@
-import JobPostItem from './JobPostItem';
 import styled from 'styled-components';
-import SearchBar from './SearchBar';
-import { getPostList } from '../../services/post';
+import { getPostingsApplications } from '../../services/managerPage';
 import { useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Loader from '../Loader';
+import PostingsApplicationsItem from './PostingsApplicationsItem';
 
-const JobPostList = ({
-    onSelect,
-    scrapMap,
-    onScrapChange,
-}) => {
-    const [posts, setPosts] = useState([]);
+const PostingsApplicationsList = () => {
+    const [postingsApplications, setPostingsApplications] =
+        useState([]);
     const [cursorInfo, setCursorInfo] = useState('');
     const [totalCount, setTotalCount] = useState(0);
 
@@ -21,27 +17,35 @@ const JobPostList = ({
 
     const fetchData = async () => {
         try {
-            const result = await getPostList({
+            const result = await getPostingsApplications({
                 cursorInfo,
             });
-            setPosts((prev) => [...prev, ...result.data]);
+            console.log(result.data);
+
+            setPostingsApplications((prev) => [
+                ...prev,
+                ...result.data,
+            ]);
             setCursorInfo(result.page.cursor);
             setTotalCount(result.page.totalCount);
         } catch (error) {
-            console.error('공고 리스트 조회 오류:', error);
+            console.error(
+                '공고 지원 목록 조회 오류:',
+                error
+            );
         }
     };
 
     return (
         <Container>
-            <SearchBar />
-            <Divider />
             <ListArea id='scrollableListArea'>
-                <Address>서울 구로구 경인로 445</Address>
                 <InfiniteScroll
-                    dataLength={posts.length}
+                    dataLength={postingsApplications.length}
                     next={fetchData}
-                    hasMore={posts.length < totalCount}
+                    hasMore={
+                        postingsApplications.length <
+                        totalCount
+                    }
                     loader={
                         <CenteredDiv>
                             <Loader />
@@ -49,26 +53,21 @@ const JobPostList = ({
                     }
                     endMessage={
                         <CenteredDiv>
-                            더 이상 공고가 없습니다.
+                            더 이상 지원자가 없습니다.
                         </CenteredDiv>
                     }
                     scrollableTarget='scrollableListArea'
                 >
-                    {posts.map((post) => (
-                        <JobPostItem
+                    {postingsApplications.map((post) => (
+                        <PostingsApplicationsItem
                             key={post.id}
-                            {...post}
-                            onClick={() => onSelect(post)}
-                            checked={
-                                scrapMap[post.id] ??
-                                post.scrapped
+                            id={post.id}
+                            createdAt={post.createdAt}
+                            workspaceName={
+                                post.workspaceName
                             }
-                            onScrapChange={(value) =>
-                                onScrapChange(
-                                    post.id,
-                                    value
-                                )
-                            }
+                            status={post.status}
+                            schedule={post.schedule}
                         />
                     ))}
                 </InfiniteScroll>
@@ -77,13 +76,14 @@ const JobPostList = ({
     );
 };
 
-export default JobPostList;
+export default PostingsApplicationsList;
 
 const Container = styled.div`
-    width: 390px;
+    width: 50vw;
     height: calc(100vh - 80px); /* 화면 전체 높이 */
     background-color: #ffffff;
     display: flex;
+    border-radius: 8px;
     flex-direction: column;
 `;
 
@@ -91,22 +91,6 @@ const ListArea = styled.div`
     flex: 1;
     overflow-y: auto;
     min-height: 0; /* flexbox에서 overflow 작동 위해 필요 */
-`;
-
-const Address = styled.div`
-    font-family: 'Pretendard';
-    font-weight: 600;
-    font-size: 24px;
-    line-height: 34px;
-    margin-left: 20px;
-`;
-
-const Divider = styled.div`
-    width: 100%;
-    max-width: 390px;
-    height: 1px;
-    background: #f6f6f6;
-    margin: 25px 0 16px 0;
 `;
 
 const CenteredDiv = styled.div`

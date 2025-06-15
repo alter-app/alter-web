@@ -1,13 +1,16 @@
 import styled from 'styled-components';
 import { timeAgo } from '../../../utils/timeUtil';
 
-function JobPostTitleBox({ title, createdAt, keywords }) {
+function JobPostTitleBox({
+    title,
+    createdAt,
+    keywords,
+    workspace,
+}) {
     return (
         <TitleBox>
             <Row>
-                <CompanyName>
-                    상호야! 너 이름적고가!
-                </CompanyName>
+                <CompanyName>{workspace.name}</CompanyName>
                 <PostTime>{timeAgo(createdAt)}</PostTime>
             </Row>
             <Title>{title}</Title>

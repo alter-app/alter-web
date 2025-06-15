@@ -162,16 +162,17 @@ export const signUp = async (userData) => {
     }
 };
 
-// 소셜 로그인 요청 로직
+// 사용자 소셜 로그인 요청 로직
 export const loginWithProvider = async (
     provider,
     authorizationCode,
     setAuth,
-    navigate
+    navigate,
+    state // "manager" or "user"
 ) => {
     try {
         const response = await fetch(
-            `${backend}/public/users/login`,
+            `${backend}/public/${state}/login`,
             {
                 method: 'POST',
                 headers: {
@@ -199,7 +200,7 @@ export const loginWithProvider = async (
                 authorizationId,
                 scope,
             });
-            return navigate('/');
+            return navigate('/job-lookup-map');
         }
 
         const errorHandlers = {

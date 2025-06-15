@@ -80,3 +80,17 @@ export function autoInsertColon(value) {
     // 1~2자리면 그냥 시(hour)만
     return numbers;
 }
+
+// 가입일자 변환 함수
+export function formatJoinDate(isoString) {
+    // 소수점 이하(마이크로초) 제거 및 Date 객체 생성
+    const date = new Date(isoString.split('.')[0]);
+    const year = date.getFullYear();
+    // 월과 일은 두 자리로 맞춤
+    const month = String(date.getMonth() + 1).padStart(
+        2,
+        '0'
+    );
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}

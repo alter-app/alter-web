@@ -1,17 +1,20 @@
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import JobPostDetail from '../components/jobPosts/JobPostDetail';
 import JobPostList from '../components/jobPosts/JobPostList';
 import NaverMap from '../components/jobPosts/NaverMap';
-import { useState, useEffect } from 'react';
 
 const JobLookupMap = () => {
     const [selectedId, setSelectedId] = useState(null);
+    const [scrapMap, setScrapMap] = useState({});
+
+    const handleScrapChange = (id, value) => {
+        setScrapMap((prev) => ({ ...prev, [id]: value }));
+    };
 
     useEffect(() => {
-        // body 스크롤 막기
         document.body.style.overflow = 'hidden';
         return () => {
-            // 페이지 나갈 때 복구
             document.body.style.overflow = '';
         };
     }, []);
@@ -27,6 +30,8 @@ const JobLookupMap = () => {
                         onSelect={(post) =>
                             setSelectedId(post.id)
                         }
+                        scrapMap={scrapMap}
+                        onScrapChange={handleScrapChange}
                     />
                 </List>
                 {selectedId && (
@@ -35,6 +40,10 @@ const JobLookupMap = () => {
                             id={selectedId}
                             onClose={() =>
                                 setSelectedId(null)
+                            }
+                            scrapMap={scrapMap}
+                            onScrapChange={
+                                handleScrapChange
                             }
                         />
                     </Detail>

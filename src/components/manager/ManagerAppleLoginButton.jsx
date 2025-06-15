@@ -1,7 +1,7 @@
 import AppleSignin from 'react-apple-signin-auth';
 import { useNavigate } from 'react-router-dom';
 
-const AppleLoginButton = () => {
+const ManagerAppleLoginButton = () => {
     const navigate = useNavigate();
 
     return (
@@ -24,7 +24,7 @@ const AppleLoginButton = () => {
                 navigate('/auth/apple/callback', {
                     state: {
                         authorizationCode,
-                        userType: 'users',
+                        userType: 'managers',
                     },
                 });
             }}
@@ -42,4 +42,4 @@ const AppleLoginButton = () => {
     );
 };
 
-export default AppleLoginButton;
+export default ManagerAppleLoginButton;

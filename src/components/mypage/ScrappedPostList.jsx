@@ -1,17 +1,12 @@
-import JobPostItem from './JobPostItem';
 import styled from 'styled-components';
-import SearchBar from './SearchBar';
-import { getPostList } from '../../services/post';
+import { getScrapPostList } from '../../services/myPage';
 import { useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import Loader from '../Loader';
+import ScrappedPostItem from './ScrappedPostItem';
 
-const JobPostList = ({
-    onSelect,
-    scrapMap,
-    onScrapChange,
-}) => {
-    const [posts, setPosts] = useState([]);
+const ScrappedPostList = () => {
+    const [scrappedPosts, setScrappedPosts] = useState([]);
     const [cursorInfo, setCursorInfo] = useState('');
     const [totalCount, setTotalCount] = useState(0);
 
@@ -21,12 +16,16 @@ const JobPostList = ({
 
     const fetchData = async () => {
         try {
-            const result = await getPostList({
+            const result = await getScrapPostList({
                 cursorInfo,
             });
-            setPosts((prev) => [...prev, ...result.data]);
+            setScrappedPosts((prev) => [
+                ...prev,
+                ...result.data,
+            ]);
             setCursorInfo(result.page.cursor);
             setTotalCount(result.page.totalCount);
+            console.log(result);
         } catch (error) {
             console.error('공고 리스트 조회 오류:', error);
         }
@@ -34,14 +33,13 @@ const JobPostList = ({
 
     return (
         <Container>
-            <SearchBar />
-            <Divider />
             <ListArea id='scrollableListArea'>
-                <Address>서울 구로구 경인로 445</Address>
                 <InfiniteScroll
-                    dataLength={posts.length}
+                    dataLength={scrappedPosts.length}
                     next={fetchData}
-                    hasMore={posts.length < totalCount}
+                    hasMore={
+                        scrappedPosts.length < totalCount
+                    }
                     loader={
                         <CenteredDiv>
                             <Loader />
@@ -54,21 +52,11 @@ const JobPostList = ({
                     }
                     scrollableTarget='scrollableListArea'
                 >
-                    {posts.map((post) => (
-                        <JobPostItem
+                    {scrappedPosts.map((post) => (
+                        <ScrappedPostItem
                             key={post.id}
-                            {...post}
-                            onClick={() => onSelect(post)}
-                            checked={
-                                scrapMap[post.id] ??
-                                post.scrapped
-                            }
-                            onScrapChange={(value) =>
-                                onScrapChange(
-                                    post.id,
-                                    value
-                                )
-                            }
+                            createdAt={post.createdAt}
+                            {...post.posting}
                         />
                     ))}
                 </InfiniteScroll>
@@ -77,13 +65,14 @@ const JobPostList = ({
     );
 };
 
-export default JobPostList;
+export default ScrappedPostList;
 
 const Container = styled.div`
-    width: 390px;
+    width: 50vw;
     height: calc(100vh - 80px); /* 화면 전체 높이 */
     background-color: #ffffff;
     display: flex;
+    border-radius: 8px;
     flex-direction: column;
 `;
 
@@ -91,22 +80,6 @@ const ListArea = styled.div`
     flex: 1;
     overflow-y: auto;
     min-height: 0; /* flexbox에서 overflow 작동 위해 필요 */
-`;
-
-const Address = styled.div`
-    font-family: 'Pretendard';
-    font-weight: 600;
-    font-size: 24px;
-    line-height: 34px;
-    margin-left: 20px;
-`;
-
-const Divider = styled.div`
-    width: 100%;
-    max-width: 390px;
-    height: 1px;
-    background: #f6f6f6;
-    margin: 25px 0 16px 0;
 `;
 
 const CenteredDiv = styled.div`
