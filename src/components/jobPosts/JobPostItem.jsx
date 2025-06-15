@@ -52,6 +52,8 @@ const JobPostItem = ({
         }
     };
 
+    const handleClick = (e) => e.stopPropagation();
+
     return (
         <InfoContainer onClick={onClick}>
             <CompanyName>
@@ -63,6 +65,7 @@ const JobPostItem = ({
                     id={`bookmark-toggle-${id}`}
                     checked={checked}
                     onChange={handleBookmark}
+                    onClick={handleClick}
                 />
             </TopRow>
             <Description>

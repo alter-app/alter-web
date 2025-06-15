@@ -30,20 +30,36 @@ const Icon = styled.svg`
     transition: fill 0.2s, transform 0.1s;
 `;
 
-const BookmarkButton = ({ checked, onChange, id }) => (
-    <BookmarkCheckbox>
-        <CheckboxInput
-            type='checkbox'
-            id={id}
-            checked={checked}
-            onChange={onChange}
-        />
-        <CheckboxLabel htmlFor={id}>
-            <Icon viewBox='0 0 24 24' checked={checked}>
-                <path d='M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z' />
-            </Icon>
-        </CheckboxLabel>
-    </BookmarkCheckbox>
-);
+const BookmarkButton = ({ checked, onChange, id }) => {
+    const handleClick = (e) => {
+        e.stopPropagation();
+    };
+
+    const handleChange = (e) => {
+        e.stopPropagation();
+        onChange(e);
+    };
+
+    return (
+        <>
+            <BookmarkCheckbox onClick={handleClick}>
+                <CheckboxInput
+                    type='checkbox'
+                    id={id}
+                    checked={checked}
+                    onChange={handleChange}
+                />
+                <CheckboxLabel htmlFor={id}>
+                    <Icon
+                        viewBox='0 0 24 24'
+                        checked={checked}
+                    >
+                        <path d='M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z' />
+                    </Icon>
+                </CheckboxLabel>
+            </BookmarkCheckbox>
+        </>
+    );
+};
 
 export default BookmarkButton;
