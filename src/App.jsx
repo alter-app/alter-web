@@ -13,6 +13,8 @@ import JobLookupMap from './pages/JobLookupMap';
 import JobPosting from './pages/JobPosting';
 import JobApply from './pages/JobApply';
 import MyPage from './pages/MyPage';
+import ManagerPage from './pages/ManagerPage';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
     return (
@@ -33,6 +35,14 @@ function App() {
                         element={<PhoneAuthPage />}
                     />
                     <Route
+                        path='/manager'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <ManagerPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
                         path='/oauth/kakao/callback'
                         element={<KakaoCallback />}
                     />
@@ -49,19 +59,36 @@ function App() {
                 <Route element={<MainLayout />}>
                     <Route
                         path='/mypage'
-                        element={<MyPage />}
+                        element={
+                            <ProtectedRoute>
+                                <MyPage />
+                            </ProtectedRoute>
+                        }
                     />
+
                     <Route
                         path='/job-lookup-map'
-                        element={<JobLookupMap />}
+                        element={
+                            <ProtectedRoute>
+                                <JobLookupMap />
+                            </ProtectedRoute>
+                        }
                     />
                     <Route
                         path='/posting'
-                        element={<JobPosting />}
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <JobPosting />
+                            </ProtectedRoute>
+                        }
                     />
                     <Route
                         path='/apply'
-                        element={<JobApply />}
+                        element={
+                            <ProtectedRoute>
+                                <JobApply />
+                            </ProtectedRoute>
+                        }
                     />
                 </Route>
             </Routes>
