@@ -1,10 +1,10 @@
 import useAuthStore from '../store/authStore';
 
-const accessToken = useAuthStore.getState().accessToken;
 const backend = import.meta.env.VITE_API_URL;
 
 // 공고 스크랩 리스트 목록 조회 로직
 export const getScrapPostList = async ({ cursorInfo }) => {
+    const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
             `${backend}/app/users/me/postings/favorites?cursor=${cursorInfo}&pageSize=10`,
@@ -39,6 +39,8 @@ export const getApplicationList = async ({
     page = 1,
     pageSize = 10,
 }) => {
+    const accessToken = useAuthStore.getState().accessToken;
+
     try {
         const response = await fetch(
             `${backend}/app/users/me/postings/applications?page=${page}&pageSize=${pageSize}`,
@@ -69,6 +71,8 @@ export const getApplicationList = async ({
 export const cancelApplication = async ({
     applicationId,
 }) => {
+    const accessToken = useAuthStore.getState().accessToken;
+
     try {
         const response = await fetch(
             `${backend}/app/users/me/postings/applications/${applicationId}/status`,
@@ -99,6 +103,8 @@ export const cancelApplication = async ({
 
 // 사용자 정보 조회 로직
 export const getUserInfo = async () => {
+    const accessToken = useAuthStore.getState().accessToken;
+
     try {
         const response = await fetch(
             `${backend}/app/users/me`,
@@ -127,6 +133,8 @@ export const getUserInfo = async () => {
 
 // 자격 정보 목록 조회 로직
 export const getCertificates = async () => {
+    const accessToken = useAuthStore.getState().accessToken;
+
     try {
         const response = await fetch(
             `${backend}/app/users/me/certificates`,
@@ -157,6 +165,8 @@ export const getCertificates = async () => {
 export const deleteCertificates = async ({
     certificateId,
 }) => {
+    const accessToken = useAuthStore.getState().accessToken;
+
     try {
         const response = await fetch(
             `${backend}/app/users/me/certificates/${certificateId}`,
@@ -184,6 +194,8 @@ export const deleteCertificates = async ({
 
 // 자격 정보 등록 로직
 export const addCertificates = async (addCertificate) => {
+    const accessToken = useAuthStore.getState().accessToken;
+
     try {
         const response = await fetch(
             `${backend}/app/users/me/certificates`,
@@ -218,6 +230,8 @@ export const eidtCertificates = async (
     editCertificate,
     certificateId
 ) => {
+    const accessToken = useAuthStore.getState().accessToken;
+
     try {
         const response = await fetch(
             `${backend}/app/users/me/certificates/${certificateId}`,
@@ -251,6 +265,8 @@ export const eidtCertificates = async (
 export const getCertificateDetail = async (
     certificateId
 ) => {
+    const accessToken = useAuthStore.getState().accessToken;
+
     try {
         const response = await fetch(
             `${backend}/app/users/me/certificates/${certificateId}`,

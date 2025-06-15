@@ -1,12 +1,12 @@
 import useAuthStore from '../store/authStore';
 
-const accessToken = useAuthStore.getState().accessToken;
 const backend = import.meta.env.VITE_API_URL;
 
 // 공고 지원 목록 조회 로직
 export const getPostingsApplications = async ({
     cursorInfo,
 }) => {
+    const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
             `${backend}/manager/postings/applications?cursor=${cursorInfo}&pageSize=10`,
@@ -37,6 +37,7 @@ export const getPostingsApplications = async ({
 export const getPostingsApplicationDetail = async (
     postingApplicationId
 ) => {
+    const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
             `${backend}/manager/postings/applications/${postingApplicationId}`,
@@ -68,6 +69,7 @@ export const updateApplicationStatus = async ({
     postingApplicationId,
     status,
 }) => {
+    const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
             `${backend}/manager/postings/applications/${postingApplicationId}/status`,

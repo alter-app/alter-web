@@ -1,10 +1,10 @@
 import useAuthStore from '../store/authStore';
 
-const accessToken = useAuthStore.getState().accessToken;
 const backend = import.meta.env.VITE_API_URL;
 
 // 공고 리스트 조회 로직
 export const getPostList = async ({ cursorInfo }) => {
+    const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
             `${backend}/app/postings?cursor=${cursorInfo}&pageSize=10`,
@@ -33,6 +33,7 @@ export const getPostList = async ({ cursorInfo }) => {
 
 // 공고 상세 조회 로직
 export const getPostDetail = async (id) => {
+    const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
             `${backend}/app/postings/${id}`,
@@ -61,6 +62,7 @@ export const getPostDetail = async (id) => {
 
 // 공고 등록 로직
 export const postJobPosting = async (inputs) => {
+    const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
             `${backend}/app/postings`,
@@ -90,6 +92,7 @@ export const postJobPosting = async (inputs) => {
 
 // 공고 키워드 리스트 조회 로직
 export const getAvailableKeywords = async () => {
+    const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
             `${backend}/app/postings/available-keywords`,
@@ -122,6 +125,7 @@ export const postingApply = async ({
     description,
     postingScheduleId,
 }) => {
+    const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
             `${backend}/app/postings/apply/${postingId}`,
@@ -154,6 +158,7 @@ export const postingApply = async ({
 
 // 공고 스크랩 등록 로직
 export const addPostingScrap = async ({ postingId }) => {
+    const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
             `${backend}/app/users/me/postings/favorites/${postingId}`,
@@ -183,6 +188,7 @@ export const addPostingScrap = async ({ postingId }) => {
 export const deletePostingScrap = async ({
     favoritePostingId,
 }) => {
+    const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
             `${backend}/app/users/me/postings/favorites/${favoritePostingId}`,
@@ -212,6 +218,7 @@ export const deletePostingScrap = async ({
 export const getPostingScrapList = async ({
     cursorInfo,
 }) => {
+    const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
             `${backend}/app/users/me/postings/favorites?cursor=${cursorInfo}&pageSize=10`,

@@ -1,14 +1,14 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 const useAuthStore = create(
     persist(
         (set) => ({
             // 인증 관련 상태
-            accessToken: "",
-            refreshToken: "",
-            authorizationId: "",
-            scope: "",
+            accessToken: '',
+            refreshToken: '',
+            authorizationId: '',
+            scope: '',
             isLoggedIn: false,
 
             // 로그인 액션
@@ -25,15 +25,15 @@ const useAuthStore = create(
             // 로그아웃 액션
             logout: () =>
                 set({
-                    accessToken: "",
-                    refreshToken: "",
-                    authorizationId: "",
-                    scope: "",
+                    accessToken: '',
+                    refreshToken: '',
+                    authorizationId: '',
+                    scope: '',
                     isLoggedIn: false,
                 }),
         }),
         {
-            name: "auth-storage",
+            name: 'auth-storage',
             getStorage: () => localStorage,
         }
     )
