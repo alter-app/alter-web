@@ -124,3 +124,155 @@ export const getUserInfo = async () => {
         );
     }
 };
+
+// 자격 정보 목록 조회 로직
+export const getCertificates = async () => {
+    try {
+        const response = await fetch(
+            `${backend}/app/users/me/certificates`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('자격 정보 목록 조회 오류:', error);
+        throw new Error(
+            '자격 정보 목록 조회 중 오류가 발생했습니다.'
+        );
+    }
+};
+
+// 자격 정보 삭제 로직
+export const deleteCertificates = async ({
+    certificateId,
+}) => {
+    try {
+        const response = await fetch(
+            `${backend}/app/users/me/certificates/${certificateId}`,
+            {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('자격 정보 삭제 중 오류:', error);
+        throw new Error(
+            '자격 정보 삭제 중 오류가 발생했습니다.'
+        );
+    }
+};
+
+// 자격 정보 등록 로직
+export const addCertificates = async (addCertificate) => {
+    try {
+        const response = await fetch(
+            `${backend}/app/users/me/certificates`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({
+                    type: 'CERTIFICATE',
+                    ...addCertificate,
+                }),
+            }
+        );
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('자격 정보 등록 중 오류:', error);
+        throw new Error(
+            '자격 정보 등록 중 오류가 발생했습니다.'
+        );
+    }
+};
+
+// 자격 정보 수정 로직
+export const eidtCertificates = async (
+    editCertificate,
+    certificateId
+) => {
+    try {
+        const response = await fetch(
+            `${backend}/app/users/me/certificates/${certificateId}`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({
+                    type: 'CERTIFICATE',
+                    ...editCertificate,
+                }),
+            }
+        );
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('자격 정보 수정 중 오류:', error);
+        throw new Error(
+            '자격 정보 수정 중 오류가 발생했습니다.'
+        );
+    }
+};
+
+// 자격 정보 상세 조회 로직
+export const getCertificateDetail = async (
+    certificateId
+) => {
+    try {
+        const response = await fetch(
+            `${backend}/app/users/me/certificates/${certificateId}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('자격 정보 상세 조회 오류:', error);
+        throw new Error(
+            '자격 정보 상세 조회 중 오류가 발생했습니다.'
+        );
+    }
+};
