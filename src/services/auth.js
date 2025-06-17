@@ -204,7 +204,12 @@ export const loginWithProvider = async (
         }
 
         const errorHandlers = {
+            A002: () => {
+                alert('매니저 이용자가 아닙니다.');
+                navigate('/login');
+            },
             A003: () => {
+                alert('회원가입을 진행해주세요.');
                 navigate('/phoneauth', {
                     state: { ...(data.data || {}) },
                 });
@@ -221,6 +226,11 @@ export const loginWithProvider = async (
                 );
                 navigate('/login');
             },
+            B011: () => {
+                alert('일반 사용자 가입을 진행해주세요.');
+                navigate('/login');
+            },
+
             default: () => {
                 alert('알 수 없는 오류가 발생했습니다.');
                 navigate('/error');
