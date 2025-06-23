@@ -181,6 +181,7 @@ export const loginWithProvider = async (
                 body: JSON.stringify({
                     provider,
                     authorizationCode,
+                    platformType: 'WEB',
                 }),
             }
         );
