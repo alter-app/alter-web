@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import searchSvg from "../../assets/icons/searchSvg.svg";
+import styled from 'styled-components';
+import searchSvg from '../../../assets/icons/searchSvg.svg';
 
 const SearchBarContainer = styled.div`
     width: 350px;
@@ -34,14 +34,14 @@ const SearchIcon = styled.span`
 const SearchBar = ({ value, onChange }) => (
     <SearchBarContainer>
         <SearchInput
-            type="text"
+            type='text'
             value={value}
             onChange={onChange}
         />
         <SearchIcon>
             <img
                 src={searchSvg}
-                alt="검색"
+                alt='검색'
                 width={22}
                 height={22}
             />

@@ -1,6 +1,5 @@
 import styled, { css } from 'styled-components';
-import dropdown from '../../assets/icons/dropdown.svg';
-import { useState } from 'react';
+import dropdown from '../../../assets/icons/dropdown.svg';
 
 const CertificateItem = ({
     id,

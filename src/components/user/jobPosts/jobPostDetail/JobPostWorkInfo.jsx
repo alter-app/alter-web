@@ -1,10 +1,10 @@
 import styled from 'styled-components';
-import { paymentTypeToKorean } from '../../../utils/paymentUtils';
-import { formatNumber } from '../../../utils/formatNumber';
+import { paymentTypeToKorean } from '../../../../utils/paymentUtils';
+import { formatNumber } from '../../../../utils/formatNumber';
 import {
     formatTimeToHHMM,
     getWorkDuration,
-} from '../../../utils/timeUtil';
+} from '../../../../utils/timeUtil';
 
 const JobPostWorkInfo = ({
     paymentType,

@@ -1,5 +1,5 @@
-import PostingsApplicationsList from '../components/manager/PostingsApplicationsList';
 import styled from 'styled-components';
+import PostingsApplicationsList from '../../components/owner/PostingsApplicationsList';
 
 const ManagerPage = () => {
     return (

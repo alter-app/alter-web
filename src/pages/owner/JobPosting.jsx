@@ -3,14 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import {
     getAvailableKeywords,
     postJobPosting,
-} from '../services/post';
-import JobTitleField from '../components/jobPosts/jobPosting/JobTitleField';
+} from '../../services/post';
+import JobTitleField from '../../components/owner/jobPosting/JobTitleField';
 import styled from 'styled-components';
-import Dropdown from '../components/Dropdown';
-import WorkScheduleItem from '../components/jobPosts/jobPosting/WorkScheduleItem';
-import AddScheduleButton from '../components/jobPosts/jobPosting/AddScheduleButton';
-import WageInputField from '../components/jobPosts/jobPosting/WageInputField';
-import DetailInputField from '../components/jobPosts/jobPosting/DetailInputField';
+import Dropdown from '../../components/Dropdown';
+import WorkScheduleItem from '../../components/owner/jobPosting/WorkScheduleItem';
+import AddScheduleButton from '../../components/owner/jobPosting/AddScheduleButton';
+import WageInputField from '../../components/owner/jobPosting/WageInputField';
+import DetailInputField from '../../components/owner/jobPosting/DetailInputField';
 
 const JobPosting = () => {
     const navigate = useNavigate();

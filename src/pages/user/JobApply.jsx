@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { postingApply } from '../services/post';
+import { postingApply } from '../../services/post';
 import { useState, useEffect } from 'react';
-import { getPostDetail } from '../services/post';
-import { formatTimeToHHMM } from '../utils/timeUtil';
+import { getPostDetail } from '../../services/post';
+import { formatTimeToHHMM } from '../../utils/timeUtil';
 
 const WEEKDAYS_KOR = {
     MONDAY: '월',

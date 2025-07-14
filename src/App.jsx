@@ -9,11 +9,11 @@ import KakaoCallback from './pages/callback/KakaoCallback';
 import AppleCallback from './pages/callback/AppleCallback';
 import MainLayout from './layouts/MainLayout';
 import FooterLayout from './layouts/FooterLayout';
-import JobLookupMap from './pages/JobLookupMap';
-import JobPosting from './pages/JobPosting';
-import JobApply from './pages/JobApply';
-import MyPage from './pages/MyPage';
-import ManagerPage from './pages/ManagerPage';
+import JobLookupMap from './pages/user/JobLookupMap';
+import JobPosting from './pages/owner/JobPosting';
+import JobApply from './pages/user/JobApply';
+import MyPage from './pages/user/MyPage';
+import ManagerPage from './pages/owner/ManagerPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {

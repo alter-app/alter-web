@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getUserInfo } from '../../services/myPage';
-import { formatJoinDate } from '../../utils/timeUtil';
-import userIcon from '../../assets/icons/userIcon.png';
+import { getUserInfo } from '../../../services/myPage';
+import { formatJoinDate } from '../../../utils/timeUtil';
+import userIcon from '../../../assets/icons/userIcon.png';
 import styled from 'styled-components';
 const UserProfile = () => {
     const [userInfo, setUserInfo] = useState({

@@ -1,5 +1,5 @@
 import styled, { css } from 'styled-components';
-import dropdown from '../../../assets/icons/dropdown.svg';
+import dropdown from '../../../../assets/icons/dropdown.svg';
 import { useState } from 'react';
 
 const WorkLocation = () => {

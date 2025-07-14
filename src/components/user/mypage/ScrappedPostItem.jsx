@@ -1,12 +1,7 @@
 import styled from 'styled-components';
-import BookmarkButton from '../jobPosts/Bookmark';
-import { paymentTypeToKorean } from '../../utils/paymentUtils';
-import { formatNumber } from '../../utils/formatNumber';
-import { timeAgo } from '../../utils/timeUtil';
-import {
-    addPostingScrap,
-    deletePostingScrap,
-} from '../../services/post';
+import { paymentTypeToKorean } from '../../../utils/paymentUtils';
+import { formatNumber } from '../../../utils/formatNumber';
+import { timeAgo } from '../../../utils/timeUtil';
 
 const ScrappedPostItem = ({
     title,

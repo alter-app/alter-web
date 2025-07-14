@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import JobPostDetail from '../components/jobPosts/JobPostDetail';
-import JobPostList from '../components/jobPosts/JobPostList';
-import NaverMap from '../components/jobPosts/NaverMap';
+import JobPostDetail from '../../components/user/jobPosts/JobPostDetail';
+import JobPostList from '../../components/user/jobPosts/JobPostList';
+import NaverMap from '../../components/user/jobPosts/NaverMap';
 
 const JobLookupMap = () => {
     const [selectedId, setSelectedId] = useState(null);
