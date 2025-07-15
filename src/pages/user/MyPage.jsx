@@ -1,10 +1,10 @@
-import ApplicationList from '../components/mypage/ApplicationList';
-import ScrappedPostList from '../components/mypage/ScrappedPostList';
 import styled from 'styled-components';
 import { useEffect, useState } from 'react';
-import { getUserInfo } from '../services/myPage';
-import UserProfile from '../components/mypage/UserProfile';
-import CertificateList from '../components/mypage/CertificateList';
+import { getUserInfo } from '../../services/myPage';
+import UserProfile from '../../components/user/mypage/UserProfile';
+import CertificateList from '../../components/user/mypage/CertificateList';
+import ApplicationList from '../../components/user/mypage/ApplicationList';
+import ScrappedPostList from '../../components/user/mypage/ScrappedPostList';
 
 const MyPage = () => {
     const [userInfo, setUserInfo] = useState([]);

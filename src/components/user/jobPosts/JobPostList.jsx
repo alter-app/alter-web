@@ -1,10 +1,10 @@
 import JobPostItem from './JobPostItem';
 import styled from 'styled-components';
 import SearchBar from './SearchBar';
-import { getPostList } from '../../services/post';
+import { getPostList } from '../../../services/post';
 import { useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import Loader from '../Loader';
+import Loader from '../../Loader';
 
 const JobPostList = ({
     onSelect,

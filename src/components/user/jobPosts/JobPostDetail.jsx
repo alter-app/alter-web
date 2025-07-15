@@ -4,9 +4,9 @@ import JobPostWorkInfo from './jobPostDetail/JobPostWorkInfo';
 import WorkLocation from './jobPostDetail/WorkLocation';
 import DetailSection from './jobPostDetail/DetailSection';
 import JobDetailFooter from './jobPostDetail/JobDetailFooter';
-import { getPostDetail } from '../../services/post';
+import { getPostDetail } from '../../../services/post';
 import { useState, useEffect } from 'react';
-import closeIcon from '../../assets/icons/closeIcon.svg';
+import closeIcon from '../../../assets/icons/closeIcon.svg';
 
 function JobPostDetail({
     onClose,

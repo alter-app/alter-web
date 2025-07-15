@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import KakaoLoginButton from '../components/auth/KakaoLoginButton';
-import AppleLoginButton from '../components/auth/AppleLoginButton';
+import { useState } from 'react';
+import KakaoLoginButton from '../components/user/KakaoLoginButton';
+import AppleLoginButton from '../components/user/AppleLoginButton';
 import AlterLogo from '../assets/logos/signature CB(상하).png';
 import styled from 'styled-components';
-import ManagerKakaoLoginButton from '../components/manager/ManagerKakaoLoginButton';
-import ManagerAppleLoginButton from '../components/manager/ManagerAppleLoginButton';
+import ManagerKakaoLoginButton from '../components/owner/ManagerKakaoLoginButton';
+import ManagerAppleLoginButton from '../components/owner/ManagerAppleLoginButton';
 
 const Login = () => {
-    const [isManager, setIsManager] = useState(false); // false: 일반 회원, true: 기업 회원
+    const [isManager, setIsManager] = useState(true); // false: 일반 회원, true: 기업 회원
 
     return (
         <SBackground>
             <Logo src={AlterLogo} alt='알터 로고' />
 
-            <ToggleWrapper>
+            {/* <ToggleWrapper>
                 <ToggleButton
                     $active={!isManager}
                     onClick={() => setIsManager(false)}
@@ -26,7 +26,7 @@ const Login = () => {
                 >
                     기업 회원
                 </ToggleButton>
-            </ToggleWrapper>
+            </ToggleWrapper> */}
 
             {isManager ? (
                 <Column>

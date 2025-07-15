@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { timeAgo } from '../../../utils/timeUtil';
+import { timeAgo } from '../../../../utils/timeUtil';
 
 function JobPostTitleBox({
     title,

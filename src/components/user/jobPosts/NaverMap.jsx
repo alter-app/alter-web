@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import marker from "../../assets/icons/marker.svg";
+import { useEffect, useRef, useState } from 'react';
+import marker from '../../../assets/icons/marker.svg';
 
 const NAVER_MAP_CLIENT_ID = import.meta.env
     .VITE_NAVER_MAP_CLIENT_ID;
@@ -20,7 +20,7 @@ function NaverMap() {
                 }
             );
         } else {
-            alert("현재 위치를 알 수 없습니다.");
+            alert('현재 위치를 알 수 없습니다.');
         }
     }, []);
 
@@ -28,7 +28,7 @@ function NaverMap() {
         if (!myLocation) return;
 
         // 이미 스크립트가 있으면 중복 추가 방지
-        if (document.getElementById("naver-map-script")) {
+        if (document.getElementById('naver-map-script')) {
             if (window.naver && window.naver.maps) {
                 const map = new window.naver.maps.Map(
                     mapRef.current,
@@ -63,8 +63,8 @@ function NaverMap() {
         }
 
         // 네이버 지도 API 스크립트 동적 추가
-        const script = document.createElement("script");
-        script.id = "naver-map-script";
+        const script = document.createElement('script');
+        script.id = 'naver-map-script';
         script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${NAVER_MAP_CLIENT_ID}&submodules=geocoder`;
         script.async = true;
         script.onload = () => {
@@ -103,7 +103,7 @@ function NaverMap() {
     return (
         <div
             ref={mapRef}
-            style={{ width: "100%", height: "100%" }}
+            style={{ width: '100%', height: '100%' }}
         />
     );
 }

@@ -7,10 +7,10 @@ import {
     addCertificates,
     eidtCertificates,
     getCertificateDetail,
-} from '../../services/myPage';
-import { formatDateInput } from '../../utils/weekUtil';
+} from '../../../services/myPage';
+import { formatDateInput } from '../../../utils/weekUtil';
 import CertificateInputForm from './CertificateInputForm';
-import Loader from '../Loader';
+import Loader from '../../Loader';
 
 const CertificateList = () => {
     const [certificates, setCertificates] = useState([]);

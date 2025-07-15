@@ -1,19 +1,18 @@
 import styled from 'styled-components';
-import clock from '../../assets/icons/clock.svg';
-import calendar from '../../assets/icons/calendar.svg';
+import clock from '../../../assets/icons/clock.svg';
+import calendar from '../../../assets/icons/calendar.svg';
 import BookmarkButton from './Bookmark';
-import { useState } from 'react';
-import { paymentTypeToKorean } from '../../utils/paymentUtils';
-import { formatNumber } from '../../utils/formatNumber';
-import { getKoreanDays } from '../../utils/weekUtil';
+import { paymentTypeToKorean } from '../../../utils/paymentUtils';
+import { formatNumber } from '../../../utils/formatNumber';
+import { getKoreanDays } from '../../../utils/weekUtil';
 import {
     formatTimeToHHMM,
     timeAgo,
-} from '../../utils/timeUtil';
+} from '../../../utils/timeUtil';
 import {
     addPostingScrap,
     deletePostingScrap,
-} from '../../services/post';
+} from '../../../services/post';
 
 const JobPostItem = ({
     title,

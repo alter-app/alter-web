@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import {
     addPostingScrap,
     deletePostingScrap,
-} from '../../../services/post';
+} from '../../../../services/post';
 
 const JobDetailFooter = ({
     id,
