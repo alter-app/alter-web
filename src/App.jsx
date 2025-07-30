@@ -15,6 +15,7 @@ import JobApply from './pages/user/JobApply';
 import MyPage from './pages/user/MyPage';
 import ManagerPage from './pages/owner/ManagerPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import Main from './pages/owner/Main';
 
 function App() {
     return (
@@ -79,6 +80,14 @@ function App() {
                         element={
                             <ProtectedRoute requiredScope='MANAGER'>
                                 <JobPosting />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/main'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <Main />
                             </ProtectedRoute>
                         }
                     />

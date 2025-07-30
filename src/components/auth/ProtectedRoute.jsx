@@ -14,11 +14,11 @@ const ProtectedRoute = ({ children, requiredScope }) => {
     // 매니저인데 허용된 경로 외 접근 시 -> /manager
     if (
         scope === 'MANAGER' &&
-        !['/manager', '/posting'].includes(
+        !['/manager', '/posting', '/main'].includes(
             location.pathname
         )
     ) {
-        return <Navigate to='/manager' replace />;
+        return <Navigate to='/main' replace />;
     }
 
     // APP 권한 체크 (예: requiredScope가 있는 경우)

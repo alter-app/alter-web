@@ -7,7 +7,7 @@ function Header() {
     const navigate = useNavigate();
     const { isLoggedIn, scope } = useAuthStore();
 
-    const goToHome = () => navigate('/job-lookup-map');
+    const goToHome = () => navigate('/main');
     const goToMyPage = () => navigate('/mypage');
     const goToManager = () => navigate('/manager');
     const goToPosting = () => navigate('/posting');
