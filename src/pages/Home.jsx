@@ -21,6 +21,7 @@ const Home = () => {
 export default Home;
 
 const Container = styled.div`
+    height: calc(100vh - 81px);
     display: flex;
     flex-direction: column;
     justify-content: center;

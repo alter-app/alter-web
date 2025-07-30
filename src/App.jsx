@@ -22,7 +22,6 @@ function App() {
         <>
             <Routes>
                 <Route element={<FooterLayout />}>
-                    <Route path='/' element={<Home />} />
                     <Route
                         path='/login'
                         element={<Login />}
@@ -58,6 +57,7 @@ function App() {
                 </Route>
 
                 <Route element={<MainLayout />}>
+                    <Route path='/' element={<Home />} />
                     <Route
                         path='/mypage'
                         element={
