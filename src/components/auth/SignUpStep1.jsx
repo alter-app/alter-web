@@ -16,71 +16,74 @@ const SignUpStep1 = ({
     isValid,
     onNext,
 }) => (
-    <SBackground>
-        <SFormWrapper>
-            <InfoTitle>
-                회원님의 정보를 알려주세요!
-            </InfoTitle>
-            <InfoDesc>
-                알터가 회원님이 동의해 주신 내용을 바탕으로
-                작성했어요.
-                <br />
-                틀리거나 빈 정보가 있다면 알려주시겠어요?
-            </InfoDesc>
-            <SInputStack>
-                <Row>
+    <Container>
+        <SBackground>
+            <SFormWrapper>
+                <InfoTitle>
+                    회원님의 정보를 알려주세요!
+                </InfoTitle>
+                <InfoDesc>
+                    알터가 회원님이 동의해 주신 내용을
+                    바탕으로 작성했어요.
+                    <br />
+                    틀리거나 빈 정보가 있다면
+                    알려주시겠어요?
+                </InfoDesc>
+                <SInputStack>
+                    <Row>
+                        <AuthInput
+                            width='290px'
+                            type='text'
+                            placeholder='박알바'
+                            value={name}
+                            onChange={(e) =>
+                                setName(e.target.value)
+                            }
+                        />
+
+                        <GenderSelector
+                            value={gender}
+                            onChange={setGender}
+                        />
+                    </Row>
                     <AuthInput
-                        width='290px'
-                        type='text'
-                        placeholder='박알바'
-                        value={name}
+                        type='tel'
+                        maxLength={13}
+                        placeholder='010-1234-5678'
+                        value={phone}
                         onChange={(e) =>
-                            setName(e.target.value)
+                            setPhone(
+                                formatPhoneNumber(
+                                    e.target.value
+                                )
+                            )
                         }
                     />
 
-                    <GenderSelector
-                        value={gender}
-                        onChange={setGender}
+                    <AuthInput
+                        type='text'
+                        placeholder='19450815'
+                        value={birth}
+                        maxLength={8}
+                        onChange={(e) =>
+                            setBirth(e.target.value)
+                        }
                     />
-                </Row>
-                <AuthInput
-                    type='tel'
-                    maxLength={13}
-                    placeholder='010-1234-5678'
-                    value={phone}
-                    onChange={(e) =>
-                        setPhone(
-                            formatPhoneNumber(
-                                e.target.value
-                            )
-                        )
-                    }
-                />
+                </SInputStack>
+                <InfoGuide>
+                    만약 내용이 없다면 모든 내용을 기입해
+                    주세요!
+                </InfoGuide>
 
-                <AuthInput
-                    type='text'
-                    placeholder='19450815'
-                    value={birth}
-                    maxLength={8}
-                    onChange={(e) =>
-                        setBirth(e.target.value)
-                    }
-                />
-            </SInputStack>
-            <InfoGuide>
-                만약 내용이 없다면 모든 내용을 기입해
-                주세요!
-            </InfoGuide>
-
-            <AuthButton
-                disabled={!isValid}
-                onClick={onNext}
-            >
-                다 했어요.
-            </AuthButton>
-        </SFormWrapper>
-    </SBackground>
+                <AuthButton
+                    disabled={!isValid}
+                    onClick={onNext}
+                >
+                    다 했어요.
+                </AuthButton>
+            </SFormWrapper>
+        </SBackground>
+    </Container>
 );
 
 export default SignUpStep1;
@@ -139,3 +142,9 @@ const SBackground = styled.div`
 `;
 
 const SFormWrapper = styled.div``;
+
+const Container = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+`;

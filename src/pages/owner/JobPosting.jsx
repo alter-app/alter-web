@@ -229,6 +229,7 @@ export default JobPosting;
 const Container = styled.div`
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 20px;
 `;
 
@@ -309,7 +310,7 @@ const WorkScheduleGroup = styled.div`
 `;
 
 const StyledButton = styled.button`
-    width: 100%;
+    width: 820px;
     height: 48px;
     border: none;
     background: #2de283;
