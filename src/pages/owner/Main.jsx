@@ -1,6 +1,6 @@
 import ApplicantList from '../../components/owner/applicant/ApplicantList';
 import ReputationNotificationList from '../../components/owner/reputation/ReputationNotificationList';
-import WorkplaceList from '../../components/owner/workplace/workplaceList';
+import WorkplaceList from '../../components/owner/workplace/WorkplaceList';
 import styled from 'styled-components';
 
 const Main = () => {
