@@ -1,4 +1,4 @@
-import WorkplaceItem from './workplaceItem';
+import WorkplaceItem from './WorkplaceItem';
 import styled from 'styled-components';
 import { useEffect, useState, useRef } from 'react';
 import { getWorkplaceList } from '../../../services/mainPageService';
