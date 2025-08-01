@@ -2,6 +2,7 @@ import WorkplaceItem from './WorkplaceItem';
 import styled from 'styled-components';
 import { useEffect, useState, useRef } from 'react';
 import { getWorkplaceList } from '../../../services/mainPageService';
+import Arrow from '../../../assets/icons/Arrow.svg';
 
 const WorkplaceList = () => {
     const [workplaceData, setWorkplaceData] = useState([]);
@@ -47,12 +48,16 @@ const WorkplaceList = () => {
                         업장 목록
                     </WorkplaceTitle>
                     <TopRow>
-                        <ArrowBtn onClick={slideLeft}>
-                            &lt;
-                        </ArrowBtn>
-                        <ArrowBtn onClick={slideRight}>
-                            &gt;
-                        </ArrowBtn>
+                        <ArrowLeftIcon
+                            src={Arrow}
+                            alt='왼쪽 버튼'
+                            onClick={slideLeft}
+                        />
+                        <ArrowRightIcon
+                            src={Arrow}
+                            alt='오른쪽 버튼'
+                            onClick={slideRight}
+                        />
                     </TopRow>
                 </TopBetween>
                 <ContentRow>
@@ -105,23 +110,22 @@ const TopBetween = styled.div`
 
 const TopRow = styled.div`
     display: flex;
-    gap: 10px;
+    gap: 15px;
     padding-right: 20px;
+    align-items: center;
 `;
 
-const ArrowBtn = styled.button`
-    background: #fff;
-    border: 1px solid #2de283;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-size: 32px;
-    color: #2de283;
+const ArrowRightIcon = styled.img`
+    width: 35px;
+    height: 35px;
     cursor: pointer;
-    opacity: 0.7;
-    &:hover {
-        background: #f3fff7;
-    }
+`;
+
+const ArrowLeftIcon = styled.img`
+    width: 35px;
+    height: 35px;
+    transform: scaleX(-1);
+    cursor: pointer;
 `;
 
 const ScrollableRow = styled.div`
