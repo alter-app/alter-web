@@ -18,7 +18,7 @@ main {
     min-height: calc(
         100dvh - 160px
     ); /* header+footer 높이 */
-    display: flex;
+    /* display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: center; */
 }

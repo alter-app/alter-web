@@ -201,7 +201,7 @@ export const loginWithProvider = async (
                 authorizationId,
                 scope,
             });
-            return navigate('/job-lookup-map');
+            return navigate('/main');
         }
 
         const errorHandlers = {

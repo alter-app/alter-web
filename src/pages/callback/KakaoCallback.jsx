@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 import { loginWithProvider } from '../../services/auth';
 import Loader from '../../components/Loader';
+import styled from 'styled-components';
+
 export default function KakaoCallback() {
     const navigate = useNavigate();
     const url = new URL(window.location.href);
@@ -23,8 +25,16 @@ export default function KakaoCallback() {
     }, [code, navigate, setAuth]);
 
     return (
-        <div>
+        <Container>
             <Loader />
-        </div>
+        </Container>
     );
 }
+
+const Container = styled.div`
+    height: calc(100vh - 81px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+`;

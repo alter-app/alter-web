@@ -10,10 +10,11 @@ const Login = () => {
     const [isManager, setIsManager] = useState(true); // false: 일반 회원, true: 기업 회원
 
     return (
-        <SBackground>
-            <Logo src={AlterLogo} alt='알터 로고' />
+        <Container>
+            <SBackground>
+                <Logo src={AlterLogo} alt='알터 로고' />
 
-            {/* <ToggleWrapper>
+                {/* <ToggleWrapper>
                 <ToggleButton
                     $active={!isManager}
                     onClick={() => setIsManager(false)}
@@ -28,18 +29,19 @@ const Login = () => {
                 </ToggleButton>
             </ToggleWrapper> */}
 
-            {isManager ? (
-                <Column>
-                    <ManagerKakaoLoginButton />
-                    <ManagerAppleLoginButton />
-                </Column>
-            ) : (
-                <Column>
-                    <KakaoLoginButton />
-                    <AppleLoginButton />
-                </Column>
-            )}
-        </SBackground>
+                {isManager ? (
+                    <Column>
+                        <ManagerKakaoLoginButton />
+                        <ManagerAppleLoginButton />
+                    </Column>
+                ) : (
+                    <Column>
+                        <KakaoLoginButton />
+                        <AppleLoginButton />
+                    </Column>
+                )}
+            </SBackground>
+        </Container>
     );
 };
 
@@ -68,6 +70,12 @@ const Column = styled.div`
     flex-direction: column;
     gap: 9px;
     margin-top: 24px;
+`;
+
+const Container = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 `;
 
 const ToggleWrapper = styled.div`
