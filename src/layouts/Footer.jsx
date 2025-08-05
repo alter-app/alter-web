@@ -1,5 +1,5 @@
-import styled from "styled-components";
-import AlterLogo from "../assets/logos/signature B(좌우).png";
+import styled from 'styled-components';
+import AlterLogo from '../assets/logos/signature B(좌우).png';
 
 const FooterWrapper = styled.footer``;
 
@@ -7,12 +7,11 @@ const FooterLinks = styled.div`
     display: flex;
     justify-content: center;
     gap: 6px;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
     font-size: 12px;
     color: #767676;
     margin-bottom: 14px;
-    margin-top: 84px;
 `;
 
 const FooterBottom = styled.div`
@@ -22,7 +21,7 @@ const FooterBottom = styled.div`
     gap: 11px;
     font-size: 12px;
     color: #767676;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
 `;
 
@@ -53,7 +52,7 @@ function Footer() {
                 <span>회원정보 고객센터</span>
             </FooterLinks>
             <FooterBottom>
-                <Logo src={AlterLogo} alt="알터 로고" />
+                <Logo src={AlterLogo} alt='알터 로고' />
                 <span>Copyright</span>
                 <span>|</span>
                 <Color>

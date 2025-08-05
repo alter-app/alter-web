@@ -55,7 +55,7 @@ const ApplicantList = () => {
                         <ViewAllButton
                             onClick={goToApplicantList}
                         >
-                            전체 보기
+                            전체보기
                         </ViewAllButton>
                     </TopLeftRow>
                     <TopRightRow>

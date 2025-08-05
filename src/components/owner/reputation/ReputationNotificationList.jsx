@@ -34,7 +34,7 @@ const ReputationNotificationList = () => {
                             평판 알림
                         </ReputationTitle>
                         <ViewAllButton>
-                            전체 보기
+                            전체보기
                         </ViewAllButton>
                     </TopLeftRow>
                     <TopRightRow>
