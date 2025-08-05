@@ -168,19 +168,31 @@ const AllApplicantList = () => {
                         scrollableTarget='scrollableListArea'
                     >
                         {postingsApplications.map(
-                            (post) => (
-                                <AllApplicationsItem
-                                    key={post.id}
-                                    id={post.id}
-                                    createdAt={
-                                        post.createdAt
-                                    }
-                                    workspaceName={
-                                        post.workspace.name
-                                    }
-                                    status={post.status}
-                                    schedule={post.schedule}
-                                />
+                            (post, index) => (
+                                <div key={post.id}>
+                                    <AllApplicationsItem
+                                        id={post.id}
+                                        createdAt={
+                                            post.createdAt
+                                        }
+                                        workspaceName={
+                                            post.workspace
+                                                .name
+                                        }
+                                        status={post.status}
+                                        schedule={
+                                            post.schedule
+                                        }
+                                        applicant={
+                                            post.applicant
+                                        }
+                                    />
+                                    {index !==
+                                        postingsApplications.length -
+                                            1 && (
+                                        <Separator />
+                                    )}
+                                </div>
                             )
                         )}
                     </InfiniteScroll>
@@ -222,7 +234,7 @@ const TopRow = styled.div`
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    border-bottom: 1px solid #ededed;
+    border-bottom: 1px solid #d0d0d0;
 `;
 
 const TotalCountInfo = styled.div`
@@ -253,4 +265,10 @@ const EmptyMessage = styled.div`
     padding: 20px 20px;
     align-items: center;
     justify-content: center;
+`;
+
+const Separator = styled.div`
+    height: 1px;
+    background-color: #d0d0d0;
+    margin: 0 20px;
 `;
