@@ -2,15 +2,18 @@ import styled, { css } from 'styled-components';
 import { useState, useEffect, useRef } from 'react';
 import ArrowDownIcon from '../assets/icons/dropdown.svg';
 
-const Dropdown = ({ keywords = [], onChange }) => {
-    const list = keywords;
+const Dropdown = ({ options = [], onChange, width }) => {
+    const list = options;
     const selectRef = useRef(null);
-    const [currentValue, setCurrentValue] = useState(null);
+    const [currentValue, setCurrentValue] = useState();
     const [showOptions, setShowOptions] = useState(false);
 
-    // keywords가 바뀔 때마다 currentValue도 갱신
+    // options가 바뀔 때마다 currentValue도 갱신
     useEffect(() => {
-        setCurrentValue(null);
+        if (list.length > 0 && !currentValue) {
+            setCurrentValue(list[0]); // 처음 한 번만 초기 선택
+            if (onChange) onChange(list[0].id);
+        }
     }, [list]);
 
     // 외부 클릭 감지되면 드롭다운 닫음
@@ -35,9 +38,10 @@ const Dropdown = ({ keywords = [], onChange }) => {
         <SelectBox
             onClick={() => setShowOptions((prev) => !prev)}
             ref={selectRef}
+            width={width}
         >
-            <Label>
-                {currentValue ? currentValue.name : '선택'}
+            <Label width={width}>
+                {currentValue?.name}
             </Label>
             <ArrowWrapper>
                 <DropdownIcon
@@ -69,7 +73,8 @@ export default Dropdown;
 
 const SelectBox = styled.div`
     position: relative;
-    width: 250px;
+    width: ${({ width }) =>
+        width ? `${width}px` : '250px'};
     height: 48px;
     padding: 14px;
     box-sizing: border-box;
@@ -98,6 +103,12 @@ const Label = styled.div`
     font-weight: 400;
     font-size: 15px;
     line-height: 22px;
+    width: ${({ width }) =>
+        width ? `${width - 50}px` : '200px'};
+    box-sizing: border-box; /* 패딩/보더 포함한 크기 계산 */
+    overflow: hidden; /* 넘치는 내용 숨김 */
+    white-space: nowrap; /* 줄바꿈 없이 한 줄로 표시 */
+    text-overflow: ellipsis; /* 넘치면 ...으로 표시 */
 `;
 
 const SelectOptions = styled.ul`

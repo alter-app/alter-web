@@ -173,7 +173,7 @@ const JobPosting = () => {
                     {[0, 1, 2].map((idx) => (
                         <Dropdown
                             key={idx}
-                            keywords={keywords}
+                            options={keywords}
                             onChange={handleKeywordChange(
                                 idx
                             )}
