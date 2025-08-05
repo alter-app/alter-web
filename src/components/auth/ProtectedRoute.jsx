@@ -14,7 +14,7 @@ const ProtectedRoute = ({ children, requiredScope }) => {
     // 매니저인데 허용된 경로 외 접근 시 -> /manager
     if (
         scope === 'MANAGER' &&
-        !['/manager', '/posting', '/main'].includes(
+        !['/applicant', '/posting', '/main'].includes(
             location.pathname
         )
     ) {

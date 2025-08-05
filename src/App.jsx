@@ -13,7 +13,7 @@ import JobLookupMap from './pages/user/JobLookupMap';
 import JobPosting from './pages/owner/JobPosting';
 import JobApply from './pages/user/JobApply';
 import MyPage from './pages/user/MyPage';
-import ManagerPage from './pages/owner/ManagerPage';
+import ApplicantListPage from './pages/owner/ApplicantListPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Main from './pages/owner/Main';
 
@@ -35,10 +35,10 @@ function App() {
                         element={<PhoneAuthPage />}
                     />
                     <Route
-                        path='/manager'
+                        path='/applicant'
                         element={
                             <ProtectedRoute requiredScope='MANAGER'>
-                                <ManagerPage />
+                                <ApplicantListPage />
                             </ProtectedRoute>
                         }
                     />
