@@ -25,6 +25,7 @@ const AllApplicantItem = ({
     status,
     workspaceName,
     schedule,
+    applicant,
 }) => {
     const [cancelError, setCancelError] = useState('');
     const [showActions, setShowActions] = useState(false);
@@ -96,7 +97,7 @@ const AllApplicantItem = ({
             </Row>
             <Row>
                 <NameRow>
-                    <NameText>홍길동</NameText>
+                    <NameText>{applicant.name}</NameText>
                     <InfoRow>
                         <InfoGroup>
                             <img
@@ -288,7 +289,6 @@ const InfoContainer = styled.div`
     padding: 16px 20px;
     box-sizing: border-box;
     gap: 5px;
-    border-bottom: 1px solid #f6f6f6;
 `;
 
 const Row = styled.div`

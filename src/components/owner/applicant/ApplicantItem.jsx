@@ -13,6 +13,7 @@ const ApplicantItem = ({
     status,
     createdAt,
     schedule,
+    applicant,
 }) => {
     const startTime = formatTimeToHHMM(schedule.startTime);
     const endTime = formatTimeToHHMM(schedule.endTime);
@@ -34,7 +35,7 @@ const ApplicantItem = ({
             <ProfileInfoSection>
                 <InfoGroup>
                     <img src={Profile} alt='이름' />
-                    <Name>김경빈</Name>
+                    <Name>{applicant.name}</Name>
                 </InfoGroup>
                 <TimeAgo>{timeAgo(createdAt)}</TimeAgo>
             </ProfileInfoSection>
