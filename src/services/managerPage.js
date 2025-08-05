@@ -5,11 +5,13 @@ const backend = import.meta.env.VITE_API_URL;
 // 공고 지원 목록 조회 로직
 export const getPostingsApplications = async ({
     cursorInfo,
+    checkedWorkplaceId,
+    checkedStatusId,
 }) => {
     const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
-            `${backend}/manager/postings/applications?cursor=${cursorInfo}&pageSize=10`,
+            `${backend}/manager/postings/applications?cursor=${cursorInfo}&pageSize=10&workspaceId=${checkedWorkplaceId}&status=${checkedStatusId}`,
             {
                 method: 'GET',
                 headers: {

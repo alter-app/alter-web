@@ -53,7 +53,7 @@ const Logo = styled.img`
 `;
 
 const SBackground = styled.div`
-    margin-top: 60px;
+    margin: 60px 0;
     padding: 40px;
     box-sizing: border-box;
     max-height: 720px;
