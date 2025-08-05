@@ -1,25 +1,25 @@
 import styled from 'styled-components';
-import clock from '../../assets/icons/clock.svg';
-import calendar from '../../assets/icons/calendar.svg';
+import clock from '../../../assets/icons/clock.svg';
+import calendar from '../../../assets/icons/calendar.svg';
 import { useState } from 'react';
-import { getKoreanDays } from '../../utils/weekUtil';
+import { getKoreanDays } from '../../../utils/weekUtil';
 import {
     formatTimeToHHMM,
     timeAgo,
-} from '../../utils/timeUtil';
+} from '../../../utils/timeUtil';
 import {
     statusToKorean,
     statusToStyle,
-} from '../../utils/statusUtils';
-import { formatBirthday } from '../../utils/weekUtil';
-import { genderToKorean } from '../../utils/genderUtils';
+} from '../../../utils/statusUtils';
+import { formatBirthday } from '../../../utils/weekUtil';
+import { genderToKorean } from '../../../utils/genderUtils';
 import {
     getPostingsApplicationDetail,
     updateApplicationStatus,
-} from '../../services/managerPage';
-import ConfirmModal from './ConfirmModal';
+} from '../../../services/managerPage';
+import ConfirmModal from '../ConfirmModal';
 
-const PostingsApplicationsItem = ({
+const AllApplicantItem = ({
     id,
     createdAt,
     status,
@@ -86,13 +86,17 @@ const PostingsApplicationsItem = ({
     return (
         <InfoContainer>
             <Row>
-                <LeftColumn>
-                    <CompanyName>
-                        {workspaceName}
-                    </CompanyName>
-                    <InfoText>
-                        {timeAgo(createdAt)} 작성됨
-                    </InfoText>
+                <CompanyName>{workspaceName}</CompanyName>
+                <Status
+                    $color={color}
+                    $background={background}
+                >
+                    {statusToKorean(currentStatus)}
+                </Status>
+            </Row>
+            <Row>
+                <NameRow>
+                    <NameText>홍길동</NameText>
                     <InfoRow>
                         <InfoGroup>
                             <img
@@ -115,14 +119,10 @@ const PostingsApplicationsItem = ({
                             </InfoText>
                         </InfoGroup>
                     </InfoRow>
-                </LeftColumn>
-                <Status
-                    $color={color}
-                    $background={background}
-                >
-                    {statusToKorean(currentStatus)}
-                </Status>
+                </NameRow>
+                <InfoText>{timeAgo(createdAt)}</InfoText>
             </Row>
+
             <ButtonRow>
                 <DetailToggleButton
                     onClick={() => {
@@ -278,7 +278,7 @@ const PostingsApplicationsItem = ({
     );
 };
 
-export default PostingsApplicationsItem;
+export default AllApplicantItem;
 
 const InfoContainer = styled.div`
     display: flex;
@@ -287,15 +287,8 @@ const InfoContainer = styled.div`
     width: 100%;
     padding: 16px 20px;
     box-sizing: border-box;
-    gap: 10px;
-    border-bottom: 1px solid #f6f6f6;
-`;
-
-const LeftColumn = styled.div`
-    display: flex;
-    flex-direction: column;
     gap: 5px;
-    width: 100%;
+    border-bottom: 1px solid #f6f6f6;
 `;
 
 const Row = styled.div`
@@ -304,13 +297,19 @@ const Row = styled.div`
     justify-content: space-between;
 `;
 
+const NameRow = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 15px;
+`;
+
 const CompanyName = styled.div`
-    color: #111111;
+    color: #767676;
     font-family: 'Pretendard';
-    font-weight: 500;
-    font-size: 16px;
-    line-height: 22px;
-    width: 250px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    width: 400px;
     box-sizing: border-box; /* 패딩/보더 포함한 크기 계산 */
     overflow: hidden; /* 넘치는 내용 숨김 */
     white-space: nowrap; /* 줄바꿈 없이 한 줄로 표시 */
@@ -320,7 +319,7 @@ const CompanyName = styled.div`
 const InfoRow = styled.div`
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 10px;
 `;
 
 const InfoGroup = styled.div`
@@ -334,6 +333,16 @@ const InfoText = styled.div`
     font-family: 'Pretendard';
     font-weight: 400;
     font-size: 14px;
+    line-height: 20px;
+    display: flex;
+    text-align: center;
+`;
+
+const NameText = styled.div`
+    color: #111111;
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 16px;
     line-height: 20px;
     display: flex;
     text-align: center;
