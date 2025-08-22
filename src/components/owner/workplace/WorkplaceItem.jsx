@@ -2,15 +2,22 @@ import styled from 'styled-components';
 import Location from '../../../assets/icons/workplace/Location.svg';
 import Calendar from '../../../assets/icons/workplace/Calendar.svg';
 import { formatJoinDate } from '../../../utils/timeUtil';
+import { useNavigate } from 'react-router-dom';
 
 const WorkplaceItem = ({
+    id,
     businessName,
     fullAddress,
     createdAt,
     status,
 }) => {
+    const navigate = useNavigate();
+    const goToWorkplaceDetail = () => {
+        navigate(`/workplace/detail/${id}`);
+    };
+
     return (
-        <WorkplaceContainer>
+        <WorkplaceContainer onClick={goToWorkplaceDetail}>
             <TopSection>
                 <WorkplaceName>
                     {businessName}
@@ -41,6 +48,7 @@ const WorkplaceContainer = styled.div`
     background: #ffffff;
     border-radius: 25px;
     box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
 `;
 
 const WorkplaceName = styled.div`
