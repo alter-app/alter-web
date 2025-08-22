@@ -19,10 +19,6 @@ const WorkplaceSchedule = () => {
         }
     };
 
-    const handleDateClick = (arg) => {
-        console.log(arg);
-    };
-
     return (
         <Container>
             <TitleRow>
@@ -49,7 +45,6 @@ const WorkplaceSchedule = () => {
                     multiMonthMaxColumns={1}
                     weekends={true}
                     ref={calendarRef}
-                    dateClick={handleDateClick}
                     locale={'ko'}
                     dayMaxEvents={true}
                     headerToolbar={{

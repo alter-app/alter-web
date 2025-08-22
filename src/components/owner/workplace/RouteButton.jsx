@@ -30,7 +30,4 @@ const Button = styled.div`
     box-sizing: border-box;
     cursor: pointer;
     box-shadow: 0px 3px 8px 0px rgba(0, 0, 0, 0.25);
-
-    &:hover {
-    }
 `;

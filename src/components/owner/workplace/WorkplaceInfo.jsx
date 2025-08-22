@@ -43,9 +43,7 @@ const WorkplaceInfo = ({
                         <InfoRow>
                             <InfoLabel>설명</InfoLabel>
                             <MultilineValue>
-                                {description}특별한 원두
-                                블렌드와 홈메이드 베이커리를
-                                즐기실 수 있습니다.
+                                {description}
                             </MultilineValue>
                         </InfoRow>
                         <InfoRow>
