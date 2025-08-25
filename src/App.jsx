@@ -16,6 +16,7 @@ import MyPage from './pages/user/MyPage';
 import ApplicantListPage from './pages/owner/ApplicantListPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Main from './pages/owner/Main';
+import WorkplaceDetail from './components/owner/workplace/WorkplaceDetail';
 
 function App() {
     return (
@@ -88,6 +89,14 @@ function App() {
                         element={
                             <ProtectedRoute requiredScope='MANAGER'>
                                 <Main />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/workplace/detail/:id'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <WorkplaceDetail />
                             </ProtectedRoute>
                         }
                     />
