@@ -73,14 +73,20 @@ const ApplicantList = () => {
                 </TopBetween>
                 <ContentRow>
                     <AccentBar />
-                    <ScrollableRow ref={scrollRef}>
-                        {applicants.map((item) => (
-                            <ApplicantItem
-                                key={item.id}
-                                {...item}
-                            />
-                        ))}
-                    </ScrollableRow>
+                    {applicants.length > 0 ? (
+                        <ScrollableRow ref={scrollRef}>
+                            {applicants.map((item) => (
+                                <ApplicantItem
+                                    key={item.id}
+                                    {...item}
+                                />
+                            ))}
+                        </ScrollableRow>
+                    ) : (
+                        <EmptyNotification>
+                            지원자가 없습니다.
+                        </EmptyNotification>
+                    )}
                 </ContentRow>
             </Column>
         </>
@@ -173,4 +179,12 @@ const ArrowLeftIcon = styled.img`
     height: 35px;
     transform: scaleX(-1);
     cursor: pointer;
+`;
+
+const EmptyNotification = styled.div`
+    color: #767676;
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 30px;
 `;
