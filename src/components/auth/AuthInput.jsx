@@ -1,7 +1,7 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
 const InputContainer = styled.div`
-    width: ${({ width }) => width || "420px"};
+    width: ${({ width }) => width || '420px'};
     height: 58px;
     background: #f6f6f6;
     border-radius: 8px;
@@ -9,7 +9,7 @@ const InputContainer = styled.div`
     align-items: center;
     padding: 0 24px;
     box-sizing: border-box;
-    border: ${({ $borderColor }) => $borderColor || "none"};
+    border: ${({ $borderColor }) => $borderColor || 'none'};
 `;
 
 const StyledInput = styled.input`
@@ -20,12 +20,12 @@ const StyledInput = styled.input`
     font-size: 18px;
     color: #111111;
     outline: none;
-    font-family: "Pretendard";
+    font-family: 'Pretendard';
     font-weight: 400;
 
     &::placeholder {
         color: #999999;
-        font-family: "Pretendard";
+        font-family: 'Pretendard';
         font-weight: 400;
     }
 `;
