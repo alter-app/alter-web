@@ -10,7 +10,9 @@ const WorkplaceEmployeeItem = ({ status, user }) => {
                     <img src={user_icon_list} alt='이름' />
                     <Info>{user.name}</Info>
                 </IconSection>
-                <StatusBadge>{status}</StatusBadge>
+                <StatusBadge>
+                    {status.description}
+                </StatusBadge>
             </TopRow>
             <IconSection>
                 <img src={phone_icon} alt='전화번호' />
