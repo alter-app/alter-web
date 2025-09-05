@@ -18,11 +18,8 @@ const ApplicantItem = ({
     const startTime = formatTimeToHHMM(schedule.startTime);
     const endTime = formatTimeToHHMM(schedule.endTime);
 
-    const keywords = [
-        '📦 재고관리 등 특별한 업무도 잘 처리해요',
-        '🧐 꼼꼼해요',
-        '👍 추천하고 싶은 직원이에요',
-    ];
+    const keywords =
+        applicant.reputationSummary?.topKeywords || [];
 
     return (
         <ApplicantContainer>
@@ -30,7 +27,9 @@ const ApplicantItem = ({
                 <WorkplaceName>
                     {workspace.name}
                 </WorkplaceName>
-                <StatusBadge>{status}</StatusBadge>
+                <StatusBadge>
+                    {status.description}
+                </StatusBadge>
             </TopSection>
             <ProfileInfoSection>
                 <InfoGroup>
@@ -63,9 +62,10 @@ const ApplicantItem = ({
             </ScheduleInfoSection>
             <Row>
                 <KeywordArea count={keywords.length}>
-                    {keywords.map((keyword, idx) => (
-                        <KeywordTag key={idx}>
-                            {keyword}
+                    {keywords.map((keyword) => (
+                        <KeywordTag key={keyword.id}>
+                            {keyword.emoji}{' '}
+                            {keyword.description}
                         </KeywordTag>
                     ))}
                 </KeywordArea>

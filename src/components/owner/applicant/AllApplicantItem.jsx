@@ -34,8 +34,9 @@ const AllApplicantItem = ({
         useState([]);
     const [currentStatus, setCurrentStatus] =
         useState(status);
-    const { color, background, disable } =
-        statusToStyle(currentStatus);
+    const { color, background, disable } = statusToStyle(
+        currentStatus.value
+    );
 
     const startTime = formatTimeToHHMM(schedule.startTime);
     const endTime = formatTimeToHHMM(schedule.endTime);
@@ -62,17 +63,20 @@ const AllApplicantItem = ({
         }
     };
 
-    const handleUpdateStatus = async (nextStatus) => {
+    const handleUpdateStatus = async (nextStatusValue) => {
         try {
             await updateApplicationStatus({
                 postingApplicationId: id,
-                status: nextStatus,
+                status: nextStatusValue,
             });
-            setCurrentStatus(nextStatus);
+            setCurrentStatus((prev) => ({
+                ...prev,
+                value: nextStatusValue,
+            }));
             window.location.reload();
             console.log(
                 `지원자가 ${
-                    nextStatus === 'ACCEPTED'
+                    nextStatusValue === 'ACCEPTED'
                         ? '수락'
                         : '거절'
                 }되었습니다.`
@@ -88,11 +92,8 @@ const AllApplicantItem = ({
         <InfoContainer>
             <Row>
                 <CompanyName>{workspaceName}</CompanyName>
-                <Status
-                    $color={color}
-                    $background={background}
-                >
-                    {statusToKorean(currentStatus)}
+                <Status status={currentStatus.value}>
+                    {currentStatus.description}
                 </Status>
             </Row>
             <Row>
@@ -123,6 +124,24 @@ const AllApplicantItem = ({
                 </NameRow>
                 <InfoText>{timeAgo(createdAt)}</InfoText>
             </Row>
+            <KeywordArea>
+                {applicant?.reputationSummary?.topKeywords
+                    ?.length > 0
+                    ? applicant.reputationSummary.topKeywords.map(
+                          (keyword) => (
+                              <KeywordTag
+                                  key={keyword.id}
+                                  title={
+                                      keyword.description
+                                  }
+                              >
+                                  {keyword.emoji}{' '}
+                                  {keyword.description}
+                              </KeywordTag>
+                          )
+                      )
+                    : ''}
+            </KeywordArea>
 
             <ButtonRow>
                 <DetailToggleButton
@@ -200,6 +219,17 @@ const AllApplicantItem = ({
                                     {description || '없음'}
                                 </Description>
                             </ApplicantInfoBox>
+                            <Title>AI 평판 요약</Title>
+                            <AIArea>
+                                <AIBadge>AI</AIBadge>
+                                <Description>
+                                    {applicationDetail
+                                        ?.reputationSummary
+                                        ?.summaryDescription ||
+                                        '없음'}
+                                </Description>
+                            </AIArea>
+
                             <Title>자격증</Title>
                             <ApplicantInfoBox>
                                 {applicationDetail.userCertificates &&
@@ -355,9 +385,24 @@ const Status = styled.div`
     justify-content: center;
     border-radius: 12px;
     outline: 1px solid #d9d9d9;
-    background-color: ${({ $background }) =>
-        $background || '#ffffff'};
-    color: ${({ $color }) => $color || '#2de283'};
+    color: ${({ status }) => {
+        switch (status) {
+            case 'SUBMITTED':
+                return '#1a73e8';
+            case 'SHORTLISTED':
+                return '#ff9900';
+            case 'ACCEPTED':
+                return '#2de283';
+            case 'REJECTED':
+                return '#dc0000';
+            case 'CANCELLED':
+            case 'DELETED':
+            case 'EXPIRED':
+                return '#767676';
+            default:
+                return '#2de283';
+        }
+    }};
     outline-offset: -1px;
     font-family: 'Pretendard';
     font-weight: 400;
@@ -519,4 +564,48 @@ const Description = styled.div`
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
+`;
+
+const KeywordArea = styled.div`
+    display: flex;
+    gap: 7px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+`;
+
+const KeywordTag = styled.div`
+    color: #111111;
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 15px;
+    background: #ffffff;
+    border-radius: 15px;
+    border: 1px solid #2de283;
+    padding: 5px 10px;
+    width: fit-content;
+`;
+
+const AIArea = styled(ApplicantInfoBox)`
+    border: 1px solid #2de283;
+    background: #f0fff7;
+    position: relative;
+`;
+
+const AIBadge = styled.div`
+    position: absolute;
+    top: -10px;
+    right: 12px;
+    background: #2de283;
+    font-family: 'Pretendard';
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 `;
