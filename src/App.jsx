@@ -17,6 +17,7 @@ import ApplicantListPage from './pages/owner/ApplicantListPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Main from './pages/owner/Main';
 import WorkplaceDetail from './components/owner/workplace/WorkplaceDetail';
+import ReputationWrite from './pages/owner/ReputationWrite';
 
 function App() {
     return (
@@ -59,6 +60,15 @@ function App() {
 
                 <Route element={<MainLayout />}>
                     <Route path='/' element={<Home />} />
+                    <Route
+                        path='/reputation-write'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <ReputationWrite />
+                            </ProtectedRoute>
+                        }
+                    />
+
                     <Route
                         path='/mypage'
                         element={
