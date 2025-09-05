@@ -1,22 +1,49 @@
 import styled from 'styled-components';
 import Profile from '../../../assets/icons/applicant/Profile.svg';
+import { timeAgo } from '../../../utils/timeUtil';
+import { declineReputation } from '../../../services/reputationService';
+import { useNavigate } from 'react-router-dom';
 
-const ReputationNotificationItem = () => {
+const ReputationNotificationItem = ({
+    id,
+    requester,
+    target,
+    createdAt,
+}) => {
+    const navigate = useNavigate();
+
+    const handleAccept = () => {
+        navigate('/reputation-write', {
+            state: { requestId: id },
+        });
+    };
+
+    const handleDecline = async () => {
+        try {
+            await declineReputation(id);
+            alert('평판 요청이 거절되었습니다.');
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+
     return (
         <ReputationContainer>
             <TopSection>
-                <WorkplaceName>
-                    스타벅스 드림팀점
-                </WorkplaceName>
-                <TimeAgo>32분 전</TimeAgo>
+                <WorkplaceName>{target.name}</WorkplaceName>
+                <TimeAgo>{timeAgo(createdAt)}</TimeAgo>
             </TopSection>
             <InfoGroup>
                 <img src={Profile} alt='이름' />
-                <Name>김경빈</Name>
+                <Name>{requester.name}</Name>
             </InfoGroup>
             <ButtonSection>
-                <AcceptButton>수락</AcceptButton>
-                <RejectButton>거절</RejectButton>
+                <AcceptButton onClick={handleAccept}>
+                    수락
+                </AcceptButton>
+                <RejectButton onClick={handleDecline}>
+                    거절
+                </RejectButton>
             </ButtonSection>
         </ReputationContainer>
     );
