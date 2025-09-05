@@ -59,3 +59,32 @@ export const getApplicants = async () => {
         );
     }
 };
+
+// 평판 요청 목록 조회 로직
+export const getReputationRequestList = async () => {
+    const accessToken = useAuthStore.getState().accessToken;
+    try {
+        const response = await fetch(
+            `${backend}/manager/reputations/requests?pageSize=5`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('평판 요청 목록 조회 오류:', error);
+        throw new Error(
+            '평판 요청 목록 조회 중 오류가 발생했습니다.'
+        );
+    }
+};
