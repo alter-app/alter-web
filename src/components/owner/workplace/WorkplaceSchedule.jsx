@@ -19,6 +19,15 @@ const WorkplaceSchedule = () => {
         }
     };
 
+    const handleTodayClick = () => {
+        if (calendarRef.current) {
+            const calendarApi =
+                calendarRef.current.getApi();
+            const today = new Date();
+            calendarApi.gotoDate(today);
+        }
+    };
+
     return (
         <Container>
             <TitleRow>
@@ -65,13 +74,7 @@ const WorkplaceSchedule = () => {
                         },
                         today: {
                             text: '오늘',
-                            click: function () {
-                                if (calendarRef.current) {
-                                    calendarRef.current
-                                        .getApi()
-                                        .today();
-                                }
-                            },
+                            click: handleTodayClick,
                         },
                     }}
                     events={[

@@ -69,6 +69,7 @@ const AllApplicantList = () => {
                 setPostingsApplications(result.data);
                 setCursorInfo(result.page.cursor);
                 setTotalCount(result.page.totalCount);
+                console.log(result.data);
             } catch (error) {
                 console.error(
                     '공고 지원 목록 조회 오류:',
@@ -205,7 +206,7 @@ const AllApplicantList = () => {
 export default AllApplicantList;
 
 const Container = styled.div`
-    width: 50vw;
+    width: 70vw;
     background-color: #ffffff;
     display: flex;
     border-radius: 8px;

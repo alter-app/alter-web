@@ -62,14 +62,20 @@ const WorkplaceList = () => {
                 </TopBetween>
                 <ContentRow>
                     <AccentBar />
-                    <ScrollableRow ref={scrollRef}>
-                        {workplaceData.map((item) => (
-                            <WorkplaceItem
-                                key={item.id}
-                                {...item}
-                            />
-                        ))}
-                    </ScrollableRow>
+                    {workplaceData.length > 0 ? (
+                        <ScrollableRow ref={scrollRef}>
+                            {workplaceData.map((item) => (
+                                <WorkplaceItem
+                                    key={item.id}
+                                    {...item}
+                                />
+                            ))}
+                        </ScrollableRow>
+                    ) : (
+                        <EmptyNotification>
+                            등록된 업장이 없습니다.
+                        </EmptyNotification>
+                    )}
                 </ContentRow>
             </Column>
         </>
@@ -143,4 +149,12 @@ const ScrollableRow = styled.div`
     &::-webkit-scrollbar {
         display: none;
     }
+`;
+
+const EmptyNotification = styled.div`
+    color: #767676;
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 30px;
 `;

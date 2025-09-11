@@ -7,7 +7,7 @@ export const getWorkplaceEmployee = async (workspaceId) => {
     const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
-            `${backend}/manager/workspaces/${workspaceId}/workers?page=1&pageSize=5`,
+            `${backend}/manager/workspaces/${workspaceId}/workers?page=1&pageSize=5&status=ACTIVATED`,
             {
                 method: 'GET',
                 headers: {

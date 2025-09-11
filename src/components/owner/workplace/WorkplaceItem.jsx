@@ -22,7 +22,9 @@ const WorkplaceItem = ({
                 <WorkplaceName>
                     {businessName}
                 </WorkplaceName>
-                <StatusBadge>{status}</StatusBadge>
+                <StatusBadge>
+                    {status.description}
+                </StatusBadge>
             </TopSection>
             <InfoSection>
                 <img src={Location} alt='업장 주소' />

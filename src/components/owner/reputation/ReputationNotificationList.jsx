@@ -1,10 +1,12 @@
 import styled from 'styled-components';
 import ReputationNotificationItem from './ReputationNotificationItem';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Arrow from '../../../assets/icons/Arrow.svg';
+import { getReputationRequestList } from '../../../services/mainPageService';
 
 const ReputationNotificationList = () => {
-    const [reputation, setReputation] = useState([]);
+    const [reputationRequest, setReputationRequest] =
+        useState([]);
     const scrollRef = useRef();
 
     // 버튼 클릭시 스크롤 이동
@@ -22,6 +24,23 @@ const ReputationNotificationList = () => {
                 left: 400,
                 behavior: 'smooth',
             });
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        try {
+            const result = await getReputationRequestList();
+            setReputationRequest(result.data);
+            console.log(result.data);
+        } catch (error) {
+            console.error(
+                '평판 요청 목록 조회 오류:',
+                error
+            );
         }
     };
 
@@ -52,15 +71,22 @@ const ReputationNotificationList = () => {
                 </TopBetween>
                 <ContentRow>
                     <AccentBar />
-                    <ScrollableRow ref={scrollRef}>
-                        {reputation.map((item) => (
-                            <ReputationNotificationItem
-                                key={item.id}
-                                {...item}
-                            />
-                        ))}
-                        <ReputationNotificationItem />
-                    </ScrollableRow>
+                    {reputationRequest.length > 0 ? (
+                        <ScrollableRow ref={scrollRef}>
+                            {reputationRequest.map(
+                                (item) => (
+                                    <ReputationNotificationItem
+                                        key={item.id}
+                                        {...item}
+                                    />
+                                )
+                            )}
+                        </ScrollableRow>
+                    ) : (
+                        <EmptyNotification>
+                            알림이 없습니다.
+                        </EmptyNotification>
+                    )}
                 </ContentRow>
             </Column>
         </>
@@ -153,4 +179,12 @@ const ArrowLeftIcon = styled.img`
     height: 35px;
     transform: scaleX(-1);
     cursor: pointer;
+`;
+
+const EmptyNotification = styled.div`
+    color: #767676;
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 30px;
 `;
