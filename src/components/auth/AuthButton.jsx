@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 const ButtonContainer = styled.div`
     width: ${({ width }) => width || '420px'};
-    height: 58px;
+    height: ${({ height }) => height || '58px'};
     display: flex;
     align-items: center;
     justify-content: center;
@@ -30,8 +30,13 @@ const StyledButton = styled.button`
     }
 `;
 
-const AuthButton = ({ width, children, ...props }) => (
-    <ButtonContainer width={width}>
+const AuthButton = ({
+    width,
+    height,
+    children,
+    ...props
+}) => (
+    <ButtonContainer width={width} height={height}>
         <StyledButton {...props}>{children}</StyledButton>
     </ButtonContainer>
 );
