@@ -25,18 +25,6 @@ function App() {
             <Routes>
                 <Route element={<FooterLayout />}>
                     <Route
-                        path='/login'
-                        element={<Login />}
-                    />
-                    <Route
-                        path='/signup'
-                        element={<SignUp />}
-                    />
-                    <Route
-                        path='/phoneauth'
-                        element={<PhoneAuthPage />}
-                    />
-                    <Route
                         path='/applicant'
                         element={
                             <ProtectedRoute requiredScope='MANAGER'>
@@ -60,6 +48,18 @@ function App() {
 
                 <Route element={<MainLayout />}>
                     <Route path='/' element={<Home />} />
+                    <Route
+                        path='/login'
+                        element={<Login />}
+                    />
+                    <Route
+                        path='/signup'
+                        element={<SignUp />}
+                    />
+                    <Route
+                        path='/phoneauth'
+                        element={<PhoneAuthPage />}
+                    />
                     <Route
                         path='/reputation-write'
                         element={

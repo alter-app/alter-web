@@ -1,13 +1,22 @@
-import Header from "./Header";
-import { Outlet } from "react-router-dom";
+import Header from './Header';
+import { Outlet, useLocation } from 'react-router-dom';
 
-const MainLayout = () => (
-    <div>
-        <Header />
-        <main>
-            <Outlet />
-        </main>
-    </div>
-);
+const MainLayout = () => {
+    const location = useLocation();
+    const isAuthPage = ['/login', '/signup', '/phoneauth'].includes(location.pathname);
+
+    if (isAuthPage) {
+        return <Outlet />;
+    }
+
+    return (
+        <div>
+            <Header />
+            <main>
+                <Outlet />
+            </main>
+        </div>
+    );
+};
 
 export default MainLayout;

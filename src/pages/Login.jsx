@@ -3,44 +3,84 @@ import KakaoLoginButton from '../components/user/KakaoLoginButton';
 import AppleLoginButton from '../components/user/AppleLoginButton';
 import AlterLogo from '../assets/logos/signature CB(상하).png';
 import styled from 'styled-components';
-import ManagerKakaoLoginButton from '../components/owner/ManagerKakaoLoginButton';
-import ManagerAppleLoginButton from '../components/owner/ManagerAppleLoginButton';
+import AuthInput from '../components/auth/AuthInput';
+import AuthButton from '../components/auth/AuthButton';
+import { loginIDPW } from '../services/auth';
+import useAuthStore from '../store/authStore';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-    const [isManager, setIsManager] = useState(true); // false: 일반 회원, true: 기업 회원
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const setAuth = useAuthStore((state) => state.setAuth);
+    const navigate = useNavigate();
+
+    const handleLogin = async () => {
+        try {
+            const data = await loginIDPW(
+                { email, password },
+                setAuth,
+                navigate
+            );
+            console.log('로그인 성공:', data);
+        } catch (error) {
+            alert(error.message);
+        }
+    };
+
+    const goToSignup = () => {
+        navigate('/phoneauth');
+    };
 
     return (
         <Container>
-            <SBackground>
-                <Logo src={AlterLogo} alt='알터 로고' />
-
-                {/* <ToggleWrapper>
-                <ToggleButton
-                    $active={!isManager}
-                    onClick={() => setIsManager(false)}
-                >
-                    일반 회원
-                </ToggleButton>
-                <ToggleButton
-                    $active={isManager}
-                    onClick={() => setIsManager(true)}
-                >
-                    기업 회원
-                </ToggleButton>
-            </ToggleWrapper> */}
-
-                {isManager ? (
-                    <Column>
-                        <ManagerKakaoLoginButton />
-                        <ManagerAppleLoginButton />
-                    </Column>
-                ) : (
-                    <Column>
-                        <KakaoLoginButton />
-                        <AppleLoginButton />
-                    </Column>
-                )}
-            </SBackground>
+            <Logo src={AlterLogo} alt='알터 로고' />
+            <InputSection>
+                <Column>
+                    <AuthInput
+                        type='text'
+                        placeholder='이메일'
+                        value={email}
+                        onChange={(e) =>
+                            setEmail(e.target.value)
+                        }
+                    />
+                    <AuthInput
+                        type='password'
+                        placeholder='비밀번호'
+                        value={password}
+                        onChange={(e) =>
+                            setPassword(e.target.value)
+                        }
+                    />
+                </Column>
+                <LoginButton onClick={handleLogin}>
+                    로그인
+                </LoginButton>
+            </InputSection>
+            <DividerWithText>
+                <Line />
+                <CenterText>간편 로그인</CenterText>
+                <Line />
+            </DividerWithText>
+            <SocialLoginSection>
+                <KakaoLoginButton />
+                <AppleLoginButton />
+                <AuthLinks>
+                    <span>아이디 찾기</span>
+                    <span>|</span>
+                    <span>비밀번호 찾기</span>
+                    <span>|</span>
+                    <span
+                        style={{
+                            cursor: 'pointer',
+                        }}
+                        onClick={goToSignup}
+                    >
+                        회원가입
+                    </span>
+                </AuthLinks>
+            </SocialLoginSection>
         </Container>
     );
 };
@@ -48,56 +88,218 @@ const Login = () => {
 export default Login;
 
 const Logo = styled.img`
-    height: 300px;
+    height: 200px;
     width: auto;
+    margin-bottom: 40px;
+
+    @media (max-width: 480px) {
+        height: 160px;
+        margin-bottom: 32px;
+    }
+
+    @media (max-width: 360px) {
+        height: 130px;
+        margin-bottom: 28px;
+    }
 `;
 
-const SBackground = styled.div`
-    margin: 60px 0;
-    padding: 40px;
-    box-sizing: border-box;
-    max-height: 720px;
-    border-radius: 16px;
-    background: #ffffff;
-    box-shadow: 4px 4px 12px 2px rgba(0, 0, 0, 0.25);
+const InputSection = styled.div`
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 400px;
+
+    @media (max-width: 480px) {
+        gap: 16px;
+        max-width: 100%;
+    }
+
+    @media (max-width: 360px) {
+        gap: 14px;
+    }
 `;
 
 const Column = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 9px;
-    margin-top: 24px;
+    gap: 16px;
+    width: 100%;
+
+    @media (max-width: 480px) {
+        gap: 14px;
+    }
+
+    @media (max-width: 360px) {
+        gap: 12px;
+    }
+`;
+
+const LoginButton = styled.button`
+    width: 100%;
+    height: 56px;
+    border: none;
+    background: #2de283;
+    color: #ffffff;
+    font-size: 18px;
+    font-family: 'Pretendard';
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(45, 226, 131, 0.3);
+
+    &:hover {
+        background: #25c973;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(45, 226, 131, 0.4);
+    }
+
+    &:active {
+        background: #1fb865;
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(45, 226, 131, 0.3);
+    }
+
+    @media (max-width: 480px) {
+        height: 52px;
+        font-size: 17px;
+        border-radius: 10px;
+    }
+
+    @media (max-width: 360px) {
+        height: 48px;
+        font-size: 16px;
+        border-radius: 8px;
+    }
+`;
+
+const SocialLoginSection = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 400px;
+    align-items: center;
+
+    @media (max-width: 480px) {
+        gap: 14px;
+        max-width: 100%;
+    }
+
+    @media (max-width: 360px) {
+        gap: 12px;
+    }
 `;
 
 const Container = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100vw;
+    max-width: 100vw;
+    padding: 24px 20px;
+    box-sizing: border-box;
+    background: #ffffff;
+    position: relative;
+    overflow-x: hidden;
+
+    @media (max-width: 480px) {
+        padding: 20px 16px;
+    }
+
+    @media (max-width: 360px) {
+        padding: 16px 12px;
+    }
+
+    /* iOS Safari safe area */
+    @supports (padding: max(0px)) {
+        padding-left: max(20px, env(safe-area-inset-left));
+        padding-right: max(
+            20px,
+            env(safe-area-inset-right)
+        );
+        padding-top: max(24px, env(safe-area-inset-top));
+        padding-bottom: max(
+            24px,
+            env(safe-area-inset-bottom)
+        );
+    }
 `;
 
-const ToggleWrapper = styled.div`
+const AuthLinks = styled.div`
     display: flex;
-    gap: 12px;
-    margin-top: 24px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    color: #767676;
+    margin-top: 10px;
+
+    span {
+        cursor: pointer;
+        transition: color 0.2s ease;
+
+        &:hover {
+            color: #2de283;
+        }
+    }
+
+    @media (max-width: 480px) {
+        font-size: 13px;
+        gap: 6px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 12px;
+        gap: 4px;
+    }
 `;
 
-const ToggleButton = styled.button`
-    padding: 10px 24px;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 16px;
-    background-color: ${({ $active }) =>
-        $active ? '#2de283' : '#eee'};
-    color: ${({ $active }) => ($active ? '#fff' : '#333')};
-    transition: background-color 0.3s ease;
+const DividerWithText = styled.div`
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    margin: 32px 0;
 
-    &:hover {
-        background-color: ${({ $active }) =>
-            $active ? '#2de283' : '#e6fcef'};
+    @media (max-width: 480px) {
+        margin: 28px 0;
+        max-width: 100%;
+    }
+
+    @media (max-width: 360px) {
+        margin: 24px 0;
+    }
+`;
+
+const Line = styled.div`
+    flex: 1;
+    height: 1px;
+    background-color: #d9d9d9;
+`;
+
+const CenterText = styled.span`
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 20px;
+    color: #999999;
+    margin: 0 15px;
+
+    @media (max-width: 480px) {
+        font-size: 14px;
+        margin: 0 10px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 13px;
+        margin: 0 8px;
     }
 `;

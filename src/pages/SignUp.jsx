@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import SignUpStep1 from "../components/auth/SignUpStep1";
-import SignUpStep2 from "../components/auth/SignUpStep2";
+import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import SignUpStep1 from '../components/auth/SignUpStep1';
+import SignUpStep2 from '../components/auth/SignUpStep2';
 import {
     checkNicknameDuplicate,
+    checkEmailDuplicate,
     signUp,
-} from "../services/auth";
+} from '../services/auth';
 
 const SignUp = () => {
     const location = useLocation();
@@ -14,40 +15,47 @@ const SignUp = () => {
 
     // 공통 상태 관리
     const [signupSessionId] = useState(
-        location.state?.signupSessionId || ""
+        location.state?.signupSessionId || ''
     );
     const [name, setName] = useState(
-        location.state?.name || ""
+        location.state?.name || ''
     );
     const [phone, setPhone] = useState(
-        location.state?.phone || ""
+        location.state?.phone || ''
     );
     const [birth, setBirth] = useState(
-        location.state?.birthday || ""
+        location.state?.birthday || ''
     );
     const [gender, setGender] = useState(
-        location.state?.gender === "GENDER_MALE"
-            ? "남"
-            : location.state?.gender === "GENDER_FEMALE"
-            ? "여"
-            : ""
+        location.state?.gender === 'GENDER_MALE'
+            ? '남'
+            : location.state?.gender === 'GENDER_FEMALE'
+            ? '여'
+            : ''
     );
-    const [nickname, setNickname] = useState("");
+    const [nickname, setNickname] = useState('');
     const [nicknameChecked, setNicknameChecked] =
         useState(false);
     const [nicknameCheckMessage, setNicknameCheckMessage] =
-        useState("");
+        useState('');
+    const [email, setEmail] = useState('');
+    const [emailChecked, setEmailChecked] = useState(false);
+    const [emailCheckMessage, setEmailCheckMessage] =
+        useState('');
+    const [password, setPassword] = useState('');
+    const [passwordCheck, setPasswordCheck] = useState('');
     const [agreed, setAgreed] = useState(false);
     const [adAgreed, setAdAgreed] = useState(false);
 
     // 유효성 검사
     const isStep1Valid = name && gender && phone && birth;
-    const isStep2Valid = nicknameChecked && agreed;
+    const isStep2Valid =
+        nicknameChecked && emailChecked && agreed;
 
     const getGenderCode = (genderStr) => {
-        if (genderStr === "남") return "GENDER_MALE";
-        if (genderStr === "여") return "GENDER_FEMALE";
-        return "";
+        if (genderStr === '남') return 'GENDER_MALE';
+        if (genderStr === '여') return 'GENDER_FEMALE';
+        return '';
     };
 
     const handleCheckNickname = async (nickname) => {
@@ -56,7 +64,17 @@ const SignUp = () => {
                 await checkNicknameDuplicate(nickname);
             return isAvailable;
         } catch (error) {
-            alert(error.message);
+            return false;
+        }
+    };
+
+    const handleCheckEmail = async (email) => {
+        try {
+            const isAvailable = await checkEmailDuplicate(
+                email
+            );
+            return isAvailable;
+        } catch (error) {
             return false;
         }
     };
@@ -70,14 +88,16 @@ const SignUp = () => {
                 gender: getGenderCode(gender),
                 nickname,
                 signupSessionId,
+                email,
+                password,
             };
             await signUp(userData);
-            alert("회원가입 완료!");
-            navigate("/login");
+            alert('회원가입 완료!');
+            navigate('/login');
         } catch (error) {
             alert(
                 error.message ||
-                    "회원가입 중 오류가 발생했습니다."
+                    '회원가입 중 오류가 발생했습니다.'
             );
         }
     };
@@ -109,6 +129,16 @@ const SignUp = () => {
                         setNicknameChecked,
                         nicknameCheckMessage,
                         setNicknameCheckMessage,
+                        email,
+                        setEmail,
+                        emailChecked,
+                        setEmailChecked,
+                        emailCheckMessage,
+                        setEmailCheckMessage,
+                        password,
+                        passwordCheck,
+                        setPassword,
+                        setPasswordCheck,
                         agreed,
                         setAgreed,
                         adAgreed,
@@ -118,6 +148,7 @@ const SignUp = () => {
                     onPrev={() => setStep(1)}
                     onSubmit={handleSignUp}
                     checkNickname={handleCheckNickname}
+                    checkEmail={handleCheckEmail}
                 />
             )}
         </div>
