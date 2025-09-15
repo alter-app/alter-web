@@ -3,9 +3,14 @@ import { Outlet, useLocation } from 'react-router-dom';
 
 const MainLayout = () => {
     const location = useLocation();
-    const isAuthPage = ['/login', '/signup', '/phoneauth'].includes(location.pathname);
+    const isWebviewPage = [
+        '/',
+        '/login',
+        '/signup',
+        '/phoneauth',
+    ].includes(location.pathname);
 
-    if (isAuthPage) {
+    if (isWebviewPage) {
         return <Outlet />;
     }
 
