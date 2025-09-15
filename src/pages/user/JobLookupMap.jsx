@@ -22,7 +22,11 @@ const JobLookupMap = () => {
     return (
         <MapContainer>
             <StyledNaverMap>
-                <NaverMap />
+                <NaverMap
+                    latitude={37.5665}
+                    longitude={126.978}
+                    businessName='서울시청'
+                />
             </StyledNaverMap>
             <JobPost>
                 <List>
