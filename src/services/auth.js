@@ -116,17 +116,67 @@ export const checkNicknameDuplicate = async (nickname) => {
             }
         );
 
+        const data = await response.json();
+
         if (!response.ok) {
             throw new Error('서버 응답 오류');
         }
 
-        const data = await response.json();
         return data.data.duplicated === false;
     } catch (error) {
         console.error('닉네임 중복 검사 오류:', error);
         throw new Error(
             '닉네임 중복 검사 중 오류가 발생했습니다.'
         );
+    }
+};
+
+// 이메일 중복 검사 로직
+export const checkEmailDuplicate = async (email) => {
+    try {
+        const response = await fetch(
+            `${backend}/public/users/exists/email`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }),
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            // 백엔드에서 오는 상세한 오류 메시지 사용
+            if (data.data && data.data.length > 0) {
+                const emailError = data.data.find(
+                    (error) => error.field === 'email'
+                );
+                if (emailError) {
+                    return {
+                        success: false,
+                        message: emailError.message,
+                    };
+                }
+            }
+            // 일반적인 오류 메시지도 UI에 표시
+            return {
+                success: false,
+                message: data.message || '서버 응답 오류',
+            };
+        }
+
+        return {
+            success: true,
+            duplicated: data.data.duplicated === false,
+        };
+    } catch (error) {
+        console.error('이메일 중복 검사 오류:', error);
+        return {
+            success: false,
+            message: '이메일 확인 중 오류가 발생했습니다.',
+        };
     }
 };
 
@@ -167,12 +217,11 @@ export const loginWithProvider = async (
     provider,
     authorizationCode,
     setAuth,
-    navigate,
-    state // "manager" or "user"
+    navigate
 ) => {
     try {
         const response = await fetch(
-            `${backend}/public/${state}/login`,
+            `${backend}/public/users/login-social`,
             {
                 method: 'POST',
                 headers: {
@@ -246,5 +295,84 @@ export const loginWithProvider = async (
         console.error('백엔드로 code 전송 실패:', error);
         alert('네트워크 오류가 발생했습니다.');
         navigate('/error');
+    }
+};
+
+// ID/PW 로그인 요청을 처리하는 로직
+export const loginIDPW = async (
+    userData,
+    setAuth,
+    navigate
+) => {
+    try {
+        const response = await fetch(
+            `${backend}/public/users/login`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData),
+            }
+        );
+
+        const data = await response.json();
+
+        if (response.ok) {
+            const {
+                accessToken,
+                refreshToken,
+                authorizationId,
+                scope,
+            } = data.data;
+
+            // 토큰/인증 정보 상태에 저장
+            setAuth({
+                accessToken,
+                refreshToken,
+                authorizationId,
+                scope,
+            });
+
+            return navigate('/main'); // 로그인 성공 시 메인 페이지 이동
+        }
+
+        // 실패 시 에러 메시지 처리
+        const errorMessage =
+            data.message || '로그인에 실패했습니다.';
+        alert(errorMessage);
+        throw new Error(errorMessage);
+    } catch (error) {
+        console.error('로그인 오류:', error);
+        alert('네트워크 오류가 발생했습니다.');
+        navigate('/error');
+    }
+};
+
+// IDPW 회원가입 세션 생성 로직
+export const createSignupSession = async (phone) => {
+    try {
+        const response = await fetch(
+            `${backend}/public/users/signup-session`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ contact: phone }),
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+
+        const data = await response.json();
+        return data.data.signupSessionId;
+    } catch (error) {
+        console.error('회원가입 세션 생성 중 오류:', error);
+        throw new Error(
+            '회원가입 세션 생성 중 오류가 발생했습니다.'
+        );
     }
 };
