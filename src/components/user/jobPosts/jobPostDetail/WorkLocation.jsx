@@ -2,7 +2,7 @@ import styled, { css } from 'styled-components';
 import dropdown from '../../../../assets/icons/dropdown.svg';
 import { useState } from 'react';
 
-const WorkLocation = () => {
+const WorkLocation = ({ workspace }) => {
     const [modal, setModal] = useState(false);
 
     return (
@@ -10,8 +10,8 @@ const WorkLocation = () => {
             <WorkLocationLabel>근무 위치</WorkLocationLabel>
             <WorkLocationRow>
                 <WorkLocationAddress>
-                    경기 무슨시 무슨구 무슨동 무슨로00번길
-                    00 글자수 최대로 여기저기 요리조리
+                    {workspace?.fullAddress ||
+                        '주소 정보가 없습니다.'}
                 </WorkLocationAddress>
                 <DropdownWrapper>
                     <Dropdown
@@ -22,19 +22,11 @@ const WorkLocation = () => {
                     />
                     {modal && (
                         <Modal>
-                            경기 무슨시 무슨구 무슨동
-                            무슨로00번길 00 글자수 최대로
-                            여기저기 요리조리
+                            {workspace?.fullAddress ||
+                                '주소 정보가 없습니다.'}
                         </Modal>
                     )}
                 </DropdownWrapper>
-            </WorkLocationRow>
-            <WorkLocationRow>
-                <SubwayLineChip>1</SubwayLineChip>
-                <SubwayLineChip>수인분당선</SubwayLineChip>
-                <SubwayStationText>
-                    무슨역 몇번 출구
-                </SubwayStationText>
             </WorkLocationRow>
         </WorkLocationBox>
     );
@@ -43,14 +35,23 @@ const WorkLocation = () => {
 export default WorkLocation;
 
 const WorkLocationBox = styled.div`
-    width: 390px;
-    height: 132px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding: 18px 20px;
+    padding: 20px;
     box-sizing: border-box;
     background-color: #ffffff;
+
+    @media (max-width: 480px) {
+        padding: 16px;
+        gap: 14px;
+    }
+
+    @media (max-width: 360px) {
+        padding: 14px 12px;
+        gap: 12px;
+    }
 `;
 
 const WorkLocationLabel = styled.div`
@@ -59,10 +60,20 @@ const WorkLocationLabel = styled.div`
     font-weight: 600;
     font-size: 14px;
     line-height: 20px;
+
+    @media (max-width: 480px) {
+        font-size: 13px;
+        line-height: 18px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 12px;
+        line-height: 16px;
+    }
 `;
 
 const WorkLocationAddress = styled.div`
-    width: 324px;
+    flex: 1;
     color: #111111;
     font-family: 'Pretendard';
     font-weight: 400;
@@ -72,32 +83,98 @@ const WorkLocationAddress = styled.div`
     box-sizing: border-box;
     text-overflow: ellipsis;
     white-space: nowrap;
+
+    @media (max-width: 480px) {
+        font-size: 13px;
+        line-height: 18px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 12px;
+        line-height: 16px;
+    }
 `;
 
 const WorkLocationRow = styled.div`
     display: flex;
     gap: 6px;
     align-items: center;
+
+    @media (max-width: 480px) {
+        gap: 4px;
+    }
+
+    @media (max-width: 360px) {
+        gap: 3px;
+    }
 `;
 
 const SubwayLineChip = styled.div`
-    display: inline-block;
-    padding: 2px 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
     background-color: #f1cf69;
-    border-radius: 12px;
-    color: #f4f4f4;
+    border-radius: 16px;
+    color: #ffffff;
     font-family: 'Pretendard';
-    font-weight: 400;
+    font-weight: 600;
     font-size: 12px;
-    line-height: 18px;
+    line-height: 1.2;
+    margin-right: 6px;
+    margin-bottom: 4px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    @media (max-width: 480px) {
+        padding: 3px 8px;
+        font-size: 11px;
+        border-radius: 14px;
+        margin-right: 4px;
+        margin-bottom: 3px;
+    }
+
+    @media (max-width: 360px) {
+        padding: 2px 6px;
+        font-size: 10px;
+        border-radius: 12px;
+        margin-right: 3px;
+        margin-bottom: 2px;
+    }
+
+    @media (max-width: 320px) {
+        padding: 2px 5px;
+        font-size: 9px;
+        border-radius: 10px;
+    }
 `;
 
 const SubwayStationText = styled.div`
-    color: #767676;
+    color: #666666;
     font-family: 'Pretendard';
-    font-weight: 600;
+    font-weight: 500;
     font-size: 14px;
-    line-height: 24px;
+    line-height: 1.4;
+    margin-bottom: 4px;
+
+    @media (max-width: 480px) {
+        font-size: 13px;
+        margin-bottom: 3px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 12px;
+        margin-bottom: 2px;
+    }
+
+    @media (max-width: 320px) {
+        font-size: 11px;
+    }
 `;
 
 const DropdownWrapper = styled.div`
@@ -107,26 +184,56 @@ const DropdownWrapper = styled.div`
 `;
 
 const Modal = styled.div`
-    width: 350px;
-    height: 48px;
+    min-width: 280px;
+    max-width: calc(100vw - 40px);
+    min-height: 48px;
     background-color: #ffffff;
     box-sizing: border-box;
-    border-radius: 8px;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    padding-left: 12px;
-    padding-right: 4px;
+    border-radius: 12px;
+    padding: 12px 16px;
     font-family: 'Pretendard';
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
-    color: #767676;
-    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.25);
+    color: #333333;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid #f0f0f0;
     position: absolute;
-    top: 100%; /* 드롭다운 바로 아래 */
-    right: 0; /* 드롭다운 오른쪽 정렬 */
-    margin-top: 4px; /* 약간의 간격 */
-    z-index: 10;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 1000;
+    word-wrap: break-word;
+    white-space: normal;
+    display: flex;
+    align-items: center;
+
+    @media (max-width: 480px) {
+        min-width: 240px;
+        max-width: calc(100vw - 32px);
+        min-height: 44px;
+        font-size: 13px;
+        line-height: 18px;
+        padding: 10px 14px;
+        border-radius: 10px;
+        top: calc(100% + 6px);
+    }
+
+    @media (max-width: 360px) {
+        min-width: 200px;
+        max-width: calc(100vw - 24px);
+        min-height: 40px;
+        font-size: 12px;
+        line-height: 16px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        top: calc(100% + 4px);
+    }
+
+    @media (max-width: 320px) {
+        min-width: 180px;
+        max-width: calc(100vw - 16px);
+        right: -10px;
+    }
 `;
 
 const Dropdown = styled.img`
@@ -134,9 +241,39 @@ const Dropdown = styled.img`
     height: 20px;
     display: flex;
     cursor: pointer;
+    transition: transform 0.2s ease;
+    padding: 4px;
+    border-radius: 4px;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    &:active {
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+
     ${({ open }) =>
         open &&
         css`
             transform: rotate(180deg);
         `}
+
+    @media (max-width: 480px) {
+        width: 18px;
+        height: 18px;
+        padding: 3px;
+    }
+
+    @media (max-width: 360px) {
+        width: 16px;
+        height: 16px;
+        padding: 2px;
+    }
+
+    @media (max-width: 320px) {
+        width: 14px;
+        height: 14px;
+        padding: 2px;
+    }
 `;

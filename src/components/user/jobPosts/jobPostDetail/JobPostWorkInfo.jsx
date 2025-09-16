@@ -77,14 +77,23 @@ const JobPostWorkInfo = ({
 export default JobPostWorkInfo;
 
 const WorkInfoBox = styled.div`
-    width: 390px;
-    height: 172px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 16px;
     padding: 20px 20px;
     box-sizing: border-box;
     background-color: #ffffff;
+
+    @media (max-width: 480px) {
+        padding: 16px 16px;
+        gap: 14px;
+    }
+
+    @media (max-width: 360px) {
+        padding: 14px 12px;
+        gap: 12px;
+    }
 `;
 
 const WorkInfoLabel = styled.div`
@@ -93,6 +102,16 @@ const WorkInfoLabel = styled.div`
     font-weight: 600;
     font-size: 14px;
     line-height: 20px;
+
+    @media (max-width: 480px) {
+        font-size: 13px;
+        line-height: 18px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 12px;
+        line-height: 16px;
+    }
 `;
 
 const PayChip = styled.div`
@@ -111,6 +130,20 @@ const PayChip = styled.div`
     font-size: 14px;
     line-height: 20px;
     box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.18);
+
+    @media (max-width: 480px) {
+        width: 38px;
+        height: 22px;
+        font-size: 13px;
+        line-height: 18px;
+    }
+
+    @media (max-width: 360px) {
+        width: 35px;
+        height: 20px;
+        font-size: 12px;
+        line-height: 16px;
+    }
 `;
 
 const WorkPayValue = styled.div`
@@ -119,11 +152,29 @@ const WorkPayValue = styled.div`
     font-weight: 600;
     font-size: 16px;
     line-height: 24px;
+
+    @media (max-width: 480px) {
+        font-size: 15px;
+        line-height: 22px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 14px;
+        line-height: 20px;
+    }
 `;
 
 const WorkPayRow = styled.div`
     display: flex;
     gap: 8px;
+
+    @media (max-width: 480px) {
+        gap: 6px;
+    }
+
+    @media (max-width: 360px) {
+        gap: 4px;
+    }
 `;
 
 const WorkDayLabel = styled.div`
@@ -133,11 +184,31 @@ const WorkDayLabel = styled.div`
     line-height: 20px;
     color: #999999;
     margin-right: 40px;
+
+    @media (max-width: 480px) {
+        font-size: 13px;
+        line-height: 18px;
+        margin-right: 30px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 12px;
+        line-height: 16px;
+        margin-right: 20px;
+    }
 `;
 
 const WorkDayList = styled.div`
     display: flex;
     gap: 18px;
+
+    @media (max-width: 480px) {
+        gap: 14px;
+    }
+
+    @media (max-width: 360px) {
+        gap: 10px;
+    }
 `;
 
 const WorkDayItem = styled.div`
@@ -150,6 +221,16 @@ const WorkDayItem = styled.div`
         selected ? 600 : 400};
     color: ${({ selected }) =>
         selected ? '#111111' : '#999999'};
+
+    @media (max-width: 480px) {
+        font-size: 13px;
+        line-height: 18px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 12px;
+        line-height: 16px;
+    }
 `;
 
 const NegotiableTag = styled.div`
@@ -162,6 +243,18 @@ const NegotiableTag = styled.div`
     font-weight: 400;
     font-size: 12px;
     line-height: 20px;
+
+    @media (max-width: 480px) {
+        font-size: 11px;
+        line-height: 18px;
+        padding: 0 4px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 10px;
+        line-height: 16px;
+        padding: 0 3px;
+    }
 `;
 
 const Row = styled.div`
@@ -182,6 +275,18 @@ const WorkTimeLabel = styled.div`
     line-height: 20px;
     color: #999999;
     margin-right: 40px;
+
+    @media (max-width: 480px) {
+        font-size: 13px;
+        line-height: 18px;
+        margin-right: 30px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 12px;
+        line-height: 16px;
+        margin-right: 20px;
+    }
 `;
 
 const WorkTimeValue = styled.div`
@@ -190,6 +295,16 @@ const WorkTimeValue = styled.div`
     font-size: 14px;
     line-height: 20px;
     color: #111111;
+
+    @media (max-width: 480px) {
+        font-size: 13px;
+        line-height: 18px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 12px;
+        line-height: 16px;
+    }
 `;
 
 const WorkTimeSub = styled.div`
@@ -198,9 +313,27 @@ const WorkTimeSub = styled.div`
     font-size: 14px;
     line-height: 20px;
     color: #999999;
+
+    @media (max-width: 480px) {
+        font-size: 13px;
+        line-height: 18px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 12px;
+        line-height: 16px;
+    }
 `;
 
 const WorkTimeRow = styled.div`
     display: flex;
     gap: 8px;
+
+    @media (max-width: 480px) {
+        gap: 6px;
+    }
+
+    @media (max-width: 360px) {
+        gap: 4px;
+    }
 `;
