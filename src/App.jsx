@@ -10,6 +10,7 @@ import AppleCallback from './pages/callback/AppleCallback';
 import MainLayout from './layouts/MainLayout';
 import FooterLayout from './layouts/FooterLayout';
 import JobLookupMap from './pages/user/JobLookupMap';
+import JobPostDetail from './pages/user/JobPostDetail';
 import JobPosting from './pages/owner/JobPosting';
 import JobApply from './pages/user/JobApply';
 import MyPage from './pages/user/MyPage';
@@ -83,6 +84,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <JobLookupMap />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/job-detail'
+                        element={
+                            <ProtectedRoute>
+                                <JobPostDetail />
                             </ProtectedRoute>
                         }
                     />

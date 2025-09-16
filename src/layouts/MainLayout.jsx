@@ -8,6 +8,7 @@ const MainLayout = () => {
         '/login',
         '/signup',
         '/phoneauth',
+        '/user/map',
     ].includes(location.pathname);
 
     if (isWebviewPage) {
