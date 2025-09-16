@@ -1,103 +1,729 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import JobPostDetail from '../../components/user/jobPosts/JobPostDetail';
-import JobPostList from '../../components/user/jobPosts/JobPostList';
+import { useNavigate } from 'react-router-dom';
 import NaverMap from '../../components/owner/NaverMap';
+import JobPostList from '../../components/user/jobPosts/JobPostList';
+import BottomNavigation from '../../layouts/BottomNavigation';
 
 const JobLookupMap = () => {
-    const [selectedId, setSelectedId] = useState(null);
+    const navigate = useNavigate();
+    const [listHeight, setListHeight] = useState(40);
+    const [isDragging, setIsDragging] = useState(false);
+    const [startY, setStartY] = useState(0);
+    const [startHeight, setStartHeight] = useState(0);
     const [scrapMap, setScrapMap] = useState({});
+    const [velocity, setVelocity] = useState(0);
+    const [lastY, setLastY] = useState(0);
+    const [lastTime, setLastTime] = useState(0);
+    const [jobPostings, setJobPostings] = useState([]);
+    const [jobPostingsCursor, setJobPostingsCursor] =
+        useState('');
+    const [
+        jobPostingsTotalCount,
+        setJobPostingsTotalCount,
+    ] = useState(0);
+    const [showSearchButton, setShowSearchButton] =
+        useState(false);
+    const mapRef = useRef(null);
 
-    const handleScrapChange = (id, value) => {
-        setScrapMap((prev) => ({ ...prev, [id]: value }));
+    const handleSearchClick = () => {
+        if (
+            mapRef.current &&
+            mapRef.current.refreshMarkers
+        ) {
+            // 검색 버튼 숨기기
+            setShowSearchButton(false);
+            // 마커와 공고 리스트 로드 (콜백으로 자동 업데이트)
+            mapRef.current.refreshMarkers();
+        }
+    };
+
+    const handleCurrentLocationClick = () => {
+        if (
+            mapRef.current &&
+            mapRef.current.goToCurrentLocation
+        ) {
+            mapRef.current.goToCurrentLocation();
+        }
     };
 
     useEffect(() => {
+        // 페이지 로드 시 body 스크롤 방지
         document.body.style.overflow = 'hidden';
         return () => {
             document.body.style.overflow = '';
         };
     }, []);
 
+    const handleScrapChange = (id, value) => {
+        setScrapMap((prev) => ({ ...prev, [id]: value }));
+    };
+
+    const handleTouchStart = (e) => {
+        setIsDragging(true);
+        const touchY = e.touches[0].clientY;
+        setStartY(touchY);
+        setStartHeight(listHeight);
+        setLastY(touchY);
+        setLastTime(Date.now());
+        setVelocity(0);
+    };
+
+    const handleTouchMove = (e) => {
+        if (!isDragging) return;
+
+        e.preventDefault();
+
+        const currentY = e.touches[0].clientY;
+        const currentTime = Date.now();
+        const deltaY = startY - currentY;
+
+        // 속도 계산 (더 정확한 계산)
+        const timeDelta = currentTime - lastTime;
+        if (timeDelta > 0) {
+            const velocityY =
+                (lastY - currentY) / timeDelta;
+            setVelocity(velocityY);
+        }
+
+        // 부드러운 드래그를 위한 제약 완화 (드래그 핸들이 보이도록 조정)
+        const maxHeight = window.innerHeight - 110; // 하단 네비(70px) + 드래그 핸들(40px) = 110px 여백
+        const minHeight = 20; // 더 작은 최소값
+
+        const newHeight = Math.max(
+            minHeight,
+            Math.min(maxHeight, startHeight + deltaY)
+        );
+        setListHeight(newHeight);
+
+        setLastY(currentY);
+        setLastTime(currentTime);
+    };
+
+    const handleTouchEnd = () => {
+        setIsDragging(false);
+
+        // 속도 기반 스냅 (드래그 핸들이 보이도록 조정)
+        const maxHeight = window.innerHeight - 110; // 하단 네비(70px) + 드래그 핸들(40px) = 110px 여백
+        const minHeight = 40;
+        const midHeight = window.innerHeight * 0.4;
+        const largeHeight = window.innerHeight * 0.7;
+
+        let targetHeight = minHeight;
+
+        // 속도가 빠르면 방향에 따라 스냅
+        if (Math.abs(velocity) > 0.5) {
+            if (velocity > 0) {
+                // 위로 드래그
+                if (listHeight < midHeight) {
+                    targetHeight = largeHeight;
+                } else {
+                    targetHeight = maxHeight;
+                }
+            } else {
+                // 아래로 드래그
+                if (listHeight > largeHeight) {
+                    targetHeight = midHeight;
+                } else {
+                    targetHeight = minHeight;
+                }
+            }
+        } else {
+            // 속도가 느리면 현재 위치 기반 스냅
+            if (listHeight < window.innerHeight * 0.2) {
+                targetHeight = minHeight;
+            } else if (
+                listHeight <
+                window.innerHeight * 0.5
+            ) {
+                targetHeight = midHeight;
+            } else {
+                targetHeight = largeHeight;
+            }
+        }
+
+        setListHeight(targetHeight);
+        setVelocity(0);
+    };
+
+    const handleMouseDown = (e) => {
+        setIsDragging(true);
+        const mouseY = e.clientY;
+        setStartY(mouseY);
+        setStartHeight(listHeight);
+        setLastY(mouseY);
+        setLastTime(Date.now());
+        setVelocity(0);
+    };
+
+    const handleMouseMove = (e) => {
+        if (!isDragging) return;
+
+        const currentY = e.clientY;
+        const currentTime = Date.now();
+        const deltaY = startY - currentY;
+
+        // 속도 계산 (더 정확한 계산)
+        const timeDelta = currentTime - lastTime;
+        if (timeDelta > 0) {
+            const velocityY =
+                (lastY - currentY) / timeDelta;
+            setVelocity(velocityY);
+        }
+
+        // 부드러운 드래그를 위한 제약 완화 (드래그 핸들이 보이도록 조정)
+        const maxHeight = window.innerHeight - 110; // 하단 네비(70px) + 드래그 핸들(40px) = 110px 여백
+        const minHeight = 20; // 더 작은 최소값
+
+        const newHeight = Math.max(
+            minHeight,
+            Math.min(maxHeight, startHeight + deltaY)
+        );
+        setListHeight(newHeight);
+
+        setLastY(currentY);
+        setLastTime(currentTime);
+    };
+
+    const handleMouseUp = () => {
+        setIsDragging(false);
+
+        // 속도 기반 스냅 (터치와 동일한 로직, 드래그 핸들이 보이도록 조정)
+        const maxHeight = window.innerHeight - 110; // 하단 네비(70px) + 드래그 핸들(40px) = 110px 여백
+        const minHeight = 40;
+        const midHeight = window.innerHeight * 0.4;
+        const largeHeight = window.innerHeight * 0.7;
+
+        let targetHeight = minHeight;
+
+        // 속도가 빠르면 방향에 따라 스냅
+        if (Math.abs(velocity) > 0.5) {
+            if (velocity > 0) {
+                // 위로 드래그
+                if (listHeight < midHeight) {
+                    targetHeight = largeHeight;
+                } else {
+                    targetHeight = maxHeight;
+                }
+            } else {
+                // 아래로 드래그
+                if (listHeight > largeHeight) {
+                    targetHeight = midHeight;
+                } else {
+                    targetHeight = minHeight;
+                }
+            }
+        } else {
+            // 속도가 느리면 현재 위치 기반 스냅
+            if (listHeight < window.innerHeight * 0.2) {
+                targetHeight = minHeight;
+            } else if (
+                listHeight <
+                window.innerHeight * 0.5
+            ) {
+                targetHeight = midHeight;
+            } else {
+                targetHeight = largeHeight;
+            }
+        }
+
+        setListHeight(targetHeight);
+        setVelocity(0);
+    };
+
+    useEffect(() => {
+        if (isDragging) {
+            document.addEventListener(
+                'mousemove',
+                handleMouseMove
+            );
+            document.addEventListener(
+                'mouseup',
+                handleMouseUp
+            );
+            document.addEventListener(
+                'touchmove',
+                handleTouchMove,
+                { passive: false }
+            );
+            document.addEventListener(
+                'touchend',
+                handleTouchEnd
+            );
+        }
+
+        return () => {
+            document.removeEventListener(
+                'mousemove',
+                handleMouseMove
+            );
+            document.removeEventListener(
+                'mouseup',
+                handleMouseUp
+            );
+            document.removeEventListener(
+                'touchmove',
+                handleTouchMove
+            );
+            document.removeEventListener(
+                'touchend',
+                handleTouchEnd
+            );
+        };
+    }, [isDragging, startY, startHeight, listHeight]);
+
     return (
-        <MapContainer>
-            <StyledNaverMap>
-                <NaverMap
-                    latitude={37.5665}
-                    longitude={126.978}
-                    businessName='서울시청'
-                />
-            </StyledNaverMap>
-            <JobPost>
-                <List>
+        <Container>
+            <MapSection>
+                {showSearchButton && (
+                    <SearchButton
+                        onClick={handleSearchClick}
+                    >
+                        <SearchText>
+                            이 지역에서 검색
+                        </SearchText>
+                    </SearchButton>
+                )}
+                <MapContainer>
+                    <NaverMap
+                        ref={mapRef}
+                        businessName='현재 위치'
+                        onJobPostingsUpdate={(data) => {
+                            if (
+                                typeof data === 'object' &&
+                                data.data
+                            ) {
+                                setJobPostings(data.data);
+                                setJobPostingsCursor(
+                                    data.cursor || ''
+                                );
+                                setJobPostingsTotalCount(
+                                    data.totalCount || 0
+                                );
+
+                                // 마커 클릭으로 업장별 공고 조회 시 리스트 펼치기
+                                if (
+                                    data.cursor === '' &&
+                                    data.data.length > 0
+                                ) {
+                                    // 업장별 조회 (cursor가 빈 문자열)이고 공고가 있으면 리스트 펼치기
+                                    setListHeight(
+                                        Math.min(
+                                            window.innerHeight *
+                                                0.6,
+                                            400
+                                        )
+                                    );
+                                }
+                            } else {
+                                setJobPostings(data);
+                            }
+                        }}
+                        onMapMoved={() =>
+                            setShowSearchButton(true)
+                        }
+                    />
+                </MapContainer>
+                <CurrentLocationButton
+                    $listHeight={listHeight}
+                    onClick={handleCurrentLocationClick}
+                >
+                    <svg
+                        width='20'
+                        height='20'
+                        viewBox='0 0 24 24'
+                        fill='none'
+                    >
+                        <path
+                            d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'
+                            fill='#333'
+                        />
+                    </svg>
+                </CurrentLocationButton>
+            </MapSection>
+
+            <JobListContainer
+                $height={listHeight}
+                $isDragging={isDragging}
+            >
+                <DragHandle
+                    onMouseDown={handleMouseDown}
+                    onTouchStart={handleTouchStart}
+                >
+                    <DragBar />
+                </DragHandle>
+                <JobListContent>
                     <JobPostList
+                        posts={jobPostings}
+                        cursor={jobPostingsCursor}
+                        totalCount={jobPostingsTotalCount}
+                        onLoadMore={() => {
+                            if (
+                                mapRef.current &&
+                                mapRef.current
+                                    .loadMoreJobPostings
+                            ) {
+                                mapRef.current.loadMoreJobPostings(
+                                    jobPostingsCursor
+                                );
+                            }
+                        }}
                         onSelect={(post) =>
-                            setSelectedId(post.id)
+                            navigate('/job-detail', {
+                                state: { id: post.id },
+                            })
                         }
                         scrapMap={scrapMap}
                         onScrapChange={handleScrapChange}
                     />
-                </List>
-                {selectedId && (
-                    <Detail>
-                        <JobPostDetail
-                            id={selectedId}
-                            onClose={() =>
-                                setSelectedId(null)
-                            }
-                            scrapMap={scrapMap}
-                            onScrapChange={
-                                handleScrapChange
-                            }
-                        />
-                    </Detail>
-                )}
-            </JobPost>
-        </MapContainer>
+                </JobListContent>
+            </JobListContainer>
+
+            <BottomNavigation />
+        </Container>
     );
 };
 
 export default JobLookupMap;
 
-const MapContainer = styled.div`
-    position: relative;
+const Container = styled.div`
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
     width: 100vw;
-    min-height: calc(100dvh - 80px);
-    overflow: hidden;
-`;
-
-const StyledNaverMap = styled.div`
-    position: absolute;
-    top: 0;
-    left: 390px;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-`;
-const JobPost = styled.div`
-    position: absolute;
+    max-width: 100vw;
+    background: #ffffff;
+    position: fixed;
     top: 0;
     left: 0;
-    height: 100vh;
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+
+    /* iOS Safari safe area */
+    @supports (padding: max(0px)) {
+        padding-left: max(0px, env(safe-area-inset-left));
+        padding-right: max(0px, env(safe-area-inset-right));
+        padding-top: max(0px, env(safe-area-inset-top));
+        padding-bottom: max(
+            0px,
+            env(safe-area-inset-bottom)
+        );
+    }
+
+    /* 모바일 웹뷰 최적화 */
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+`;
+
+const MapSection = styled.div`
+    flex: 1;
+    position: relative;
     display: flex;
-    z-index: 2;
-    gap: 12px;
+    flex-direction: column;
+    height: calc(100vh - 80px);
+    height: calc(100dvh - 80px);
+    overflow: hidden;
+
+    @media (max-width: 480px) {
+        height: calc(100vh - 70px);
+        height: calc(100dvh - 70px);
+    }
+
+    @media (max-width: 360px) {
+        height: calc(100vh - 60px);
+        height: calc(100dvh - 60px);
+    }
 `;
 
-const List = styled.div`
-    width: 390px;
-    height: 100vh;
-    background: #fff;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
-    z-index: 3;
+const SearchButton = styled.button`
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    width: auto;
+    min-width: 200px;
+    max-width: 300px;
+    height: 40px;
+    border: none;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 0 16px;
+
+    &:hover {
+        background: rgba(255, 255, 255, 1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    &:active {
+        transform: translateX(-50%) translateY(1px);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 480px) {
+        top: 16px;
+        height: 36px;
+        min-width: 180px;
+        max-width: 280px;
+        padding: 0 14px;
+    }
+
+    @media (max-width: 360px) {
+        top: 12px;
+        height: 34px;
+        min-width: 160px;
+        max-width: 260px;
+        padding: 0 12px;
+    }
+
+    @media (max-width: 320px) {
+        top: 10px;
+        height: 32px;
+        min-width: 140px;
+        max-width: 240px;
+        padding: 0 10px;
+    }
 `;
 
-const Detail = styled.div`
-    height: 100vh;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
-    z-index: 3;
-    background: transparent;
-    padding-top: 10px;
+const SearchIcon = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666666;
+    transition: color 0.2s ease;
+
+    ${SearchButton}:hover & {
+        color: #399982;
+    }
+`;
+
+const SearchText = styled.span`
+    font-family: 'Pretendard';
+    font-size: 15px;
+    font-weight: 500;
+    color: #666666;
+    transition: color 0.2s ease;
+    white-space: nowrap;
+
+    ${SearchButton}:hover & {
+        color: #399982;
+    }
+
+    @media (max-width: 480px) {
+        font-size: 14px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 13px;
+    }
+
+    @media (max-width: 320px) {
+        font-size: 12px;
+    }
+`;
+
+const MapContainer = styled.div`
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+`;
+
+const CurrentLocationButton = styled.button`
+    position: absolute;
+    bottom: ${(props) => {
+        // 리스트가 접혔을 때(작을 때)만 리스트 위에, 그 외에는 고정 위치
+        if (props.$listHeight < 100) {
+            return Math.max(140, props.$listHeight + 20);
+        }
+        // 리스트가 펼쳐져 있을 때는 고정 위치
+        return 140;
+    }}px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        background: #399982;
+
+        svg path {
+            fill: #ffffff;
+        }
+    }
+
+    &:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    @media (max-width: 480px) {
+        width: 44px;
+        height: 44px;
+        bottom: ${(props) => {
+            // 리스트가 접혔을 때만 리스트 위에, 그 외에는 고정 위치
+            if (props.$listHeight < 100) {
+                return Math.max(
+                    120,
+                    props.$listHeight + 16
+                );
+            }
+            // 리스트가 펼쳐져 있을 때는 고정 위치 (더 높게)
+            return 120;
+        }}px;
+        right: 16px;
+    }
+
+    @media (max-width: 360px) {
+        width: 40px;
+        height: 40px;
+        bottom: ${(props) => {
+            // 리스트가 접혔을 때만 리스트 위에, 그 외에는 고정 위치
+            if (props.$listHeight < 100) {
+                return Math.max(
+                    110,
+                    props.$listHeight + 12
+                );
+            }
+            // 리스트가 펼쳐져 있을 때는 고정 위치 (더 높게)
+            return 110;
+        }}px;
+        right: 12px;
+    }
+
+    @media (max-width: 320px) {
+        width: 38px;
+        height: 38px;
+        bottom: ${(props) => {
+            // 리스트가 접혔을 때만 리스트 위에, 그 외에는 고정 위치
+            if (props.$listHeight < 100) {
+                return Math.max(
+                    100,
+                    props.$listHeight + 10
+                );
+            }
+            // 리스트가 펼쳐져 있을 때는 고정 위치 (더 높게)
+            return 100;
+        }}px;
+        right: 10px;
+    }
+`;
+
+const JobListContainer = styled.div`
+    position: fixed;
+    bottom: 70px;
+    left: 0;
+    right: 0;
+    height: ${(props) => Math.max(40, props.$height)}px;
+    background: #ffffff;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    z-index: 20;
+    overflow: hidden;
+    -webkit-overflow-scrolling: touch;
+    transition: ${(props) =>
+        props.$isDragging
+            ? 'none'
+            : 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)'};
+
+    @media (max-width: 480px) {
+        bottom: 60px;
+        border-radius: 16px 16px 0 0;
+    }
+
+    @media (max-width: 360px) {
+        bottom: 50px;
+        border-radius: 12px 12px 0 0;
+    }
+`;
+
+const DragHandle = styled.div`
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    background: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: none;
+    position: relative;
+
+    &:active {
+        cursor: grabbing;
+        background: #f8f9fa;
+    }
+
+    @media (max-width: 480px) {
+        height: 35px;
+    }
+
+    @media (max-width: 360px) {
+        height: 30px;
+    }
+`;
+
+const DragBar = styled.div`
+    width: 50px;
+    height: 5px;
+    background: #c0c0c0;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    ${DragHandle}:hover & {
+        background: #999999;
+        transform: scale(1.1);
+    }
+
+    @media (max-width: 480px) {
+        width: 45px;
+        height: 4px;
+    }
+
+    @media (max-width: 360px) {
+        width: 40px;
+        height: 4px;
+    }
+`;
+
+const JobListContent = styled.div`
+    height: calc(100% - 40px);
+    overflow: hidden;
+    background: #ffffff;
+
+    @media (max-width: 480px) {
+        height: calc(100% - 35px);
+    }
+
+    @media (max-width: 360px) {
+        height: calc(100% - 30px);
+    }
 `;
