@@ -24,6 +24,8 @@ const JobLookupMap = () => {
     ] = useState(0);
     const [showSearchButton, setShowSearchButton] =
         useState(false);
+    const [isAtCurrentLocation, setIsAtCurrentLocation] =
+        useState(true);
     const mapRef = useRef(null);
 
     const handleSearchClick = () => {
@@ -322,10 +324,14 @@ const JobLookupMap = () => {
                         onMapMoved={() =>
                             setShowSearchButton(true)
                         }
+                        onCurrentLocationStatusChange={(isAtCurrent) =>
+                            setIsAtCurrentLocation(isAtCurrent)
+                        }
                     />
                 </MapContainer>
                 <CurrentLocationButton
                     $listHeight={listHeight}
+                    $isAtCurrentLocation={isAtCurrentLocation}
                     onClick={handleCurrentLocationClick}
                 >
                     <svg
@@ -336,7 +342,7 @@ const JobLookupMap = () => {
                     >
                         <path
                             d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'
-                            fill='#333'
+                            fill={isAtCurrentLocation ? '#ffffff' : '#333'}
                         />
                     </svg>
                 </CurrentLocationButton>
@@ -557,7 +563,8 @@ const CurrentLocationButton = styled.button`
     height: 48px;
     border: none;
     border-radius: 50%;
-    background: #ffffff;
+    background: ${(props) => 
+        props.$isAtCurrentLocation ? '#399982' : '#ffffff'};
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     cursor: pointer;
     display: flex;
@@ -571,10 +578,12 @@ const CurrentLocationButton = styled.button`
     &:hover {
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        background: #399982;
+        background: ${(props) => 
+            props.$isAtCurrentLocation ? '#399982' : '#f0f0f0'};
 
         svg path {
-            fill: #ffffff;
+            fill: ${(props) => 
+                props.$isAtCurrentLocation ? '#ffffff' : '#333'};
         }
     }
 
