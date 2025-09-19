@@ -25,6 +25,8 @@ const NaverMap = forwardRef(
             onJobPostingsUpdate,
             onMapMoved,
             onCurrentLocationStatusChange,
+            onMapBackgroundClick,
+            onMarkerClick,
         },
         ref
     ) => {
@@ -174,6 +176,50 @@ const NaverMap = forwardRef(
             } catch (error) {
                 console.error(
                     '공고 리스트 로드 실패:',
+                    error
+                );
+            }
+        };
+
+        // 저장된 좌표로 공고 리스트 로드
+        const loadJobPostingsInBoundsWithCoordinates = async (map, bounds) => {
+            try {
+                const response = await getMapJobPostings(
+                    bounds.coordinate1,
+                    bounds.coordinate2,
+                    '', // cursorInfo
+                    10 // pageSize
+                );
+
+                if (
+                    response.data &&
+                    Array.isArray(response.data)
+                ) {
+                    setJobPostings(response.data);
+                    setJobPostingsCursor(
+                        response.page.cursor || ''
+                    );
+                    setJobPostingsTotalCount(
+                        response.page.totalCount || 0
+                    );
+                    // 외부 컴포넌트에 공고 리스트 업데이트 알림 (렌더링 완료 후)
+                    if (onJobPostingsUpdate) {
+                        setTimeout(() => {
+                            onJobPostingsUpdate({
+                                data: response.data,
+                                cursor:
+                                    response.page.cursor ||
+                                    '',
+                                totalCount:
+                                    response.page
+                                        .totalCount || 0,
+                            });
+                        }, 0);
+                    }
+                }
+            } catch (error) {
+                console.error(
+                    '저장된 좌표로 공고 리스트 로드 실패:',
                     error
                 );
             }
@@ -342,6 +388,12 @@ const NaverMap = forwardRef(
             },
             loadMoreJobPostings,
             loadWorkspacePostings,
+            loadJobPostingsInBounds: (bounds) => {
+                if (mapInstance && bounds) {
+                    // 저장된 좌표로 공고 리스트 로드
+                    loadJobPostingsInBoundsWithCoordinates(mapInstance, bounds);
+                }
+            },
             getJobPostings: () => ({
                 data: jobPostings,
                 cursor: jobPostingsCursor,
@@ -595,6 +647,22 @@ const NaverMap = forwardRef(
                     }
                 );
 
+                // 지도 배경 클릭 이벤트 리스너 추가
+                window.naver.maps.Event.addListener(
+                    map,
+                    'click',
+                    (e) => {
+                        // 마커가 아닌 지도 배경을 클릭한 경우
+                        if (!e.overlay || e.overlay === null) {
+                            // 외부 컴포넌트에 지도 배경 클릭 알림
+                            if (onMapBackgroundClick) {
+                                onMapBackgroundClick();
+                            }
+                        }
+                    }
+                );
+
+
                 // 초기 마커 로드 제거 (검색 버튼으로만 마커 로드)
                 // loadMarkersInBounds(map);
 
@@ -779,6 +847,27 @@ const NaverMap = forwardRef(
                             '마커 클릭:',
                             markerData
                         );
+                        
+                        // 마커 클릭 시 현재 지도 뷰 좌표 저장
+                        if (onMarkerClick && mapInstance) {
+                            const bounds = mapInstance.getBounds();
+                            const sw = bounds.getSW();
+                            const ne = bounds.getNE();
+                            
+                            const currentBounds = {
+                                coordinate1: {
+                                    latitude: sw.lat(),
+                                    longitude: sw.lng(),
+                                },
+                                coordinate2: {
+                                    latitude: ne.lat(),
+                                    longitude: ne.lng(),
+                                }
+                            };
+                            
+                            onMarkerClick(currentBounds);
+                        }
+                        
                         // 해당 업장의 공고만 조회
                         if (markerData.workspaceId) {
                             loadWorkspacePostings(

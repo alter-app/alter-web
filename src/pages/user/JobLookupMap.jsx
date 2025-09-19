@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import NaverMap from '../../components/owner/NaverMap';
 import JobPostList from '../../components/user/jobPosts/JobPostList';
+import MarkerJobPostList from '../../components/user/jobPosts/MarkerJobPostList';
 import BottomNavigation from '../../layouts/BottomNavigation';
 
 const JobLookupMap = () => {
@@ -26,6 +27,9 @@ const JobLookupMap = () => {
         useState(false);
     const [isAtCurrentLocation, setIsAtCurrentLocation] =
         useState(true);
+    const [isWorkspaceView, setIsWorkspaceView] = useState(false); // 마커별 조회 모드인지 여부
+    const [savedBounds, setSavedBounds] = useState(null); // 마커 클릭 전 지도 뷰 좌표 저장
+    const savedBoundsRef = useRef(null); // ref로도 저장하여 즉시 접근 가능
     const mapRef = useRef(null);
 
     const handleSearchClick = () => {
@@ -47,6 +51,27 @@ const JobLookupMap = () => {
         ) {
             mapRef.current.goToCurrentLocation();
         }
+    };
+
+    const handleMapBackgroundClick = () => {
+        // 지도 배경 클릭 시 하단 스크롤바 접기
+        setListHeight(40);
+        
+        // 전체 조회 모드로 복원
+        setIsWorkspaceView(false);
+        
+        // 저장된 좌표로 다시 조회 (ref 사용)
+        const boundsToUse = savedBoundsRef.current || savedBounds;
+        
+        if (boundsToUse && mapRef.current && mapRef.current.loadJobPostingsInBounds) {
+            mapRef.current.loadJobPostingsInBounds(boundsToUse);
+        }
+    };
+
+    const handleMarkerClick = (bounds) => {
+        setSavedBounds(bounds);
+        // ref에도 동시에 저장하여 즉시 접근 가능
+        savedBoundsRef.current = bounds;
     };
 
     useEffect(() => {
@@ -334,19 +359,25 @@ const JobLookupMap = () => {
                                     data.totalCount || 0
                                 );
 
-                                // 마커 클릭으로 업장별 공고 조회 시 리스트 펼치기
-                                if (
-                                    data.cursor === '' &&
-                                    data.data.length > 0
-                                ) {
-                                    // 업장별 조회 (cursor가 빈 문자열)이고 공고가 있으면 리스트 펼치기
-                                    setListHeight(
-                                        Math.min(
-                                            window.innerHeight *
-                                                0.4,
-                                            300
-                                        )
-                                    );
+                                // 마커별 조회인지 전체 조회인지 구분
+                                const isWorkspaceSpecific = data.cursor === '' && data.totalCount <= 50;
+                                
+                                if (isWorkspaceSpecific) {
+                                    // 마커별 조회 모드
+                                    setIsWorkspaceView(true);
+                                    
+                                    // 마커별 조회 시 리스트 펼치기
+                                    if (data.data.length > 0) {
+                                        setListHeight(
+                                            Math.min(
+                                                window.innerHeight * 0.6,
+                                                400
+                                            )
+                                        );
+                                    }
+                                } else {
+                                    // 전체 조회 모드
+                                    setIsWorkspaceView(false);
                                 }
                             } else {
                                 setJobPostings(data);
@@ -362,6 +393,8 @@ const JobLookupMap = () => {
                                 isAtCurrent
                             )
                         }
+                        onMapBackgroundClick={handleMapBackgroundClick}
+                        onMarkerClick={handleMarkerClick}
                     />
                 </MapContainer>
                 <CurrentLocationButton
@@ -400,29 +433,43 @@ const JobLookupMap = () => {
                     <DragBar />
                 </DragHandle>
                 <JobListContent>
-                    <JobPostList
-                        posts={jobPostings}
-                        cursor={jobPostingsCursor}
-                        totalCount={jobPostingsTotalCount}
-                        onLoadMore={() => {
-                            if (
-                                mapRef.current &&
-                                mapRef.current
-                                    .loadMoreJobPostings
-                            ) {
-                                mapRef.current.loadMoreJobPostings(
-                                    jobPostingsCursor
-                                );
+                    {isWorkspaceView ? (
+                        // 마커별 조회 모드: 간단한 목록만 표시
+                        <MarkerJobPostList
+                            posts={jobPostings}
+                            onSelect={(post) =>
+                                navigate('/job-detail', {
+                                    state: { id: post.id },
+                                })
                             }
-                        }}
-                        onSelect={(post) =>
-                            navigate('/job-detail', {
-                                state: { id: post.id },
-                            })
-                        }
-                        scrapMap={scrapMap}
-                        onScrapChange={handleScrapChange}
-                    />
+                            scrapMap={scrapMap}
+                            onScrapChange={handleScrapChange}
+                        />
+                    ) : (
+                        // 전체 조회 모드: 검색, 필터링, 무한스크롤 포함
+                        <JobPostList
+                            posts={jobPostings}
+                            cursor={jobPostingsCursor}
+                            totalCount={jobPostingsTotalCount}
+                            onLoadMore={() => {
+                                if (
+                                    mapRef.current &&
+                                    mapRef.current.loadMoreJobPostings
+                                ) {
+                                    mapRef.current.loadMoreJobPostings(
+                                        jobPostingsCursor
+                                    );
+                                }
+                            }}
+                            onSelect={(post) =>
+                                navigate('/job-detail', {
+                                    state: { id: post.id },
+                                })
+                            }
+                            scrapMap={scrapMap}
+                            onScrapChange={handleScrapChange}
+                        />
+                    )}
                 </JobListContent>
             </JobListContainer>
 
