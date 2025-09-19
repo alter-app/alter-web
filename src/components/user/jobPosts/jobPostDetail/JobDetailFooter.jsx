@@ -58,11 +58,19 @@ export default JobDetailFooter;
 
 const ApplyButtonBar = styled.div`
     width: 100vw;
-    max-width: 390px;
+    max-width: 100vw;
     height: 64px;
     display: flex;
     z-index: 1000;
     box-shadow: 0px -1px 4px 0px rgba(0, 0, 0, 0.25);
+
+    @media (max-width: 480px) {
+        height: 60px;
+    }
+
+    @media (max-width: 360px) {
+        height: 56px;
+    }
 `;
 
 const BookmarkButtonWrapper = styled.div`
@@ -72,6 +80,16 @@ const BookmarkButtonWrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+
+    @media (max-width: 480px) {
+        width: 60px;
+        height: 60px;
+    }
+
+    @media (max-width: 360px) {
+        width: 56px;
+        height: 56px;
+    }
 `;
 
 const ApplyButton = styled.button`
@@ -85,4 +103,26 @@ const ApplyButton = styled.button`
     font-size: 20px;
     line-height: 28px;
     cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        background-color: #26c973;
+    }
+
+    &:active {
+        background-color: #20b066;
+        transform: scale(0.98);
+    }
+
+    @media (max-width: 480px) {
+        height: 60px;
+        font-size: 18px;
+        line-height: 26px;
+    }
+
+    @media (max-width: 360px) {
+        height: 56px;
+        font-size: 16px;
+        line-height: 24px;
+    }
 `;

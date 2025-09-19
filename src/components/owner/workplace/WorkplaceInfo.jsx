@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import info_icon from '../../../assets/icons/workplace/info_icon.svg';
 import RouteButton from './RouteButton';
-import NaverMap from '../../owner/NaverMap';
+import WorkplaceMap from './WorkplaceMap';
 
 const WorkplaceInfo = ({
     businessRegistrationNo,
@@ -53,7 +53,7 @@ const WorkplaceInfo = ({
                             </MultilineValue>
                         </InfoRow>
                     </InfoColumn>
-                    <NaverMap
+                    <WorkplaceMap
                         latitude={latitude}
                         longitude={longitude}
                         businessName={businessName}

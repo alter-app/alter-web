@@ -4,6 +4,7 @@ import { postingApply } from '../../services/post';
 import { useState, useEffect } from 'react';
 import { getPostDetail } from '../../services/post';
 import { formatTimeToHHMM } from '../../utils/timeUtil';
+import BottomNavigation from '../../layouts/BottomNavigation';
 
 const WEEKDAYS_KOR = {
     MONDAY: '월',
@@ -137,6 +138,7 @@ const JobApply = () => {
                     지원
                 </StyledButton>
             </Container>
+            <BottomNavigation />
         </Column>
     );
 };
@@ -153,6 +155,16 @@ const Column = styled.div`
     display: flex;
     flex-direction: column;
     gap: 10px;
+    min-height: 100vh;
+    padding-bottom: 80px;
+
+    @media (max-width: 480px) {
+        padding-bottom: 70px;
+    }
+
+    @media (max-width: 360px) {
+        padding-bottom: 60px;
+    }
 `;
 const Container = styled.div`
     width: 820px;

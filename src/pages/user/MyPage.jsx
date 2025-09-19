@@ -5,6 +5,7 @@ import UserProfile from '../../components/user/mypage/UserProfile';
 import CertificateList from '../../components/user/mypage/CertificateList';
 import ApplicationList from '../../components/user/mypage/ApplicationList';
 import ScrappedPostList from '../../components/user/mypage/ScrappedPostList';
+import BottomNavigation from '../../layouts/BottomNavigation';
 
 const MyPage = () => {
     const [userInfo, setUserInfo] = useState([]);
@@ -52,6 +53,7 @@ const MyPage = () => {
                     )}
                 </TabPanel>
             </ContainerColumn>
+            <BottomNavigation />
         </>
     );
 };
@@ -61,6 +63,16 @@ export default MyPage;
 const ContainerColumn = styled.div`
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
+    padding-bottom: 80px;
+
+    @media (max-width: 480px) {
+        padding-bottom: 70px;
+    }
+
+    @media (max-width: 360px) {
+        padding-bottom: 60px;
+    }
 `;
 
 const TabContainer = styled.div`

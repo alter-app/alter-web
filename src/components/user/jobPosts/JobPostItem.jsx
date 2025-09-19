@@ -27,10 +27,14 @@ const JobPostItem = ({
     checked,
     onScrapChange,
 }) => {
-    const startTime = formatTimeToHHMM(
-        schedules[0].startTime
-    );
-    const endTime = formatTimeToHHMM(schedules[0].endTime);
+    const startTime =
+        schedules && schedules.length > 0
+            ? formatTimeToHHMM(schedules[0].startTime)
+            : '시간 미정';
+    const endTime =
+        schedules && schedules.length > 0
+            ? formatTimeToHHMM(schedules[0].endTime)
+            : '시간 미정';
 
     const handleBookmark = async (e) => {
         e.stopPropagation();
@@ -56,7 +60,7 @@ const JobPostItem = ({
     return (
         <InfoContainer onClick={onClick}>
             <CompanyName>
-                {workspace.businessName}
+                {workspace?.businessName || '회사명 없음'}
             </CompanyName>
             <TopRow>
                 <Title>{title}</Title>
@@ -84,9 +88,13 @@ const JobPostItem = ({
                 <InfoGroup>
                     <img src={calendar} alt='근무 요일' />
                     <InfoText>
-                        {getKoreanDays(
-                            schedules[0].workingDays
-                        )}
+                        {schedules &&
+                        schedules.length > 0 &&
+                        schedules[0].workingDays
+                            ? getKoreanDays(
+                                  schedules[0].workingDays
+                              )
+                            : '요일 미정'}
                     </InfoText>
                 </InfoGroup>
             </InfoRow>
@@ -99,31 +107,39 @@ export default JobPostItem;
 const InfoContainer = styled.div`
     display: flex;
     flex-direction: column;
-    width: 390px;
+    width: 100%;
     padding: 16px 20px;
     box-sizing: border-box;
     gap: 5px;
     border-bottom: 1px solid #f6f6f6;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+
+    &:active {
+        background: #f8f9fa;
+    }
 `;
 
 const Title = styled.div`
-    width: 300px;
+    flex: 1;
     color: #111111;
     font-family: 'Pretendard';
     font-weight: 600;
     font-size: 16px;
     line-height: 24px;
-    box-sizing: border-box; /* 패딩/보더 포함한 크기 계산 */
-    overflow: hidden; /* 넘치는 내용 숨김 */
-    white-space: nowrap; /* 줄바꿈 없이 한 줄로 표시 */
-    text-overflow: ellipsis; /* 넘치면 ...으로 표시 */
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
 `;
 
 const TopRow = styled.div`
     display: flex;
     align-items: center;
-    gap: 25px;
+    gap: 12px;
+    min-width: 0;
 `;
 
 const CompanyName = styled.div`
