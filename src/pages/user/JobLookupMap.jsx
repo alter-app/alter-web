@@ -28,11 +28,14 @@ const JobLookupMap = () => {
         useState(false);
     const [isAtCurrentLocation, setIsAtCurrentLocation] =
         useState(true);
-    const [isWorkspaceView, setIsWorkspaceView] = useState(false); // 마커별 조회 모드인지 여부
+    const [isWorkspaceView, setIsWorkspaceView] =
+        useState(false); // 마커별 조회 모드인지 여부
     const [savedBounds, setSavedBounds] = useState(null); // 마커 클릭 전 지도 뷰 좌표 저장
     const savedBoundsRef = useRef(null); // ref로도 저장하여 즉시 접근 가능
-    const [selectedPostId, setSelectedPostId] = useState(null);
-    const [showDetailOverlay, setShowDetailOverlay] = useState(false);
+    const [selectedPostId, setSelectedPostId] =
+        useState(null);
+    const [showDetailOverlay, setShowDetailOverlay] =
+        useState(false);
     const mapRef = useRef(null);
 
     const handleSearchClick = () => {
@@ -59,15 +62,22 @@ const JobLookupMap = () => {
     const handleMapBackgroundClick = () => {
         // 지도 배경 클릭 시 하단 스크롤바 접기
         setListHeight(40);
-        
+
         // 전체 조회 모드로 복원
         setIsWorkspaceView(false);
-        
+
         // 저장된 좌표로 다시 조회 (ref 사용)
-        const boundsToUse = savedBoundsRef.current || savedBounds;
-        
-        if (boundsToUse && mapRef.current && mapRef.current.loadJobPostingsInBounds) {
-            mapRef.current.loadJobPostingsInBounds(boundsToUse);
+        const boundsToUse =
+            savedBoundsRef.current || savedBounds;
+
+        if (
+            boundsToUse &&
+            mapRef.current &&
+            mapRef.current.loadJobPostingsInBounds
+        ) {
+            mapRef.current.loadJobPostingsInBounds(
+                boundsToUse
+            );
         }
     };
 
@@ -99,37 +109,58 @@ const JobLookupMap = () => {
     useEffect(() => {
         // 페이지 로드 시 body 스크롤 방지
         document.body.style.overflow = 'hidden';
-        
+
         // Flutter 웹뷰에서 네이티브 화면 정보 수신
         const handleNativeDataInjected = (event) => {
             if (event.detail && event.detail.screen) {
-                window.nativeScreenInfo = event.detail.screen;
-                console.log('네이티브 화면 정보 수신:', window.nativeScreenInfo);
-                
+                window.nativeScreenInfo =
+                    event.detail.screen;
+                console.log(
+                    '네이티브 화면 정보 수신:',
+                    window.nativeScreenInfo
+                );
+
                 // 화면 정보에 따라 동적으로 스타일 적용
-                applyNativeScreenStyles(event.detail.screen);
+                applyNativeScreenStyles(
+                    event.detail.screen
+                );
             }
         };
-        
+
         // 네이티브 데이터 주입 이벤트 리스너 등록
-        window.addEventListener('nativeDataInjected', handleNativeDataInjected);
-        
+        window.addEventListener(
+            'nativeDataInjected',
+            handleNativeDataInjected
+        );
+
         return () => {
             document.body.style.overflow = '';
-            window.removeEventListener('nativeDataInjected', handleNativeDataInjected);
+            window.removeEventListener(
+                'nativeDataInjected',
+                handleNativeDataInjected
+            );
         };
     }, []);
-    
+
     // 네이티브 화면 정보에 따른 스타일 적용 함수
     const applyNativeScreenStyles = (screenInfo) => {
-        const { statusBarHeight, bottomPadding } = screenInfo;
-        
+        const { statusBarHeight, bottomPadding } =
+            screenInfo;
+
         // CSS 변수로 화면 정보 설정
-        document.documentElement.style.setProperty('--status-bar-height', `${statusBarHeight}px`);
-        document.documentElement.style.setProperty('--bottom-padding', `${bottomPadding}px`);
-        
+        document.documentElement.style.setProperty(
+            '--status-bar-height',
+            `${statusBarHeight}px`
+        );
+        document.documentElement.style.setProperty(
+            '--bottom-padding',
+            `${bottomPadding}px`
+        );
+
         // 지도 컨테이너 스타일 조정
-        const mapContainer = document.querySelector('[data-testid="map-container"]');
+        const mapContainer = document.querySelector(
+            '[data-testid="map-container"]'
+        );
         if (mapContainer) {
             mapContainer.style.paddingTop = `${statusBarHeight}px`;
         }
@@ -167,7 +198,10 @@ const JobLookupMap = () => {
         }
 
         // 부드러운 드래그를 위한 제약 완화 (드래그 핸들이 보이도록 조정)
-        const maxHeight = window.innerHeight - 120; // 하단 네비(80px) + 드래그 핸들(40px) = 120px 여백
+        const maxHeight = Math.min(
+            window.innerHeight * 0.8,
+            window.innerHeight - 120
+        ); // 화면 높이의 80% 또는 하단 여백 고려
         const minHeight = 20; // 더 작은 최소값
 
         const newHeight = Math.max(
@@ -184,7 +218,10 @@ const JobLookupMap = () => {
         setIsDragging(false);
 
         // 속도 기반 스냅 (드래그 핸들이 보이도록 조정)
-        const maxHeight = window.innerHeight - 120; // 하단 네비(80px) + 드래그 핸들(40px) = 120px 여백
+        const maxHeight = Math.min(
+            window.innerHeight * 0.8,
+            window.innerHeight - 120
+        ); // 화면 높이의 80% 또는 하단 여백 고려
         const minHeight = 40;
         const midHeight = window.innerHeight * 0.4;
         const largeHeight = window.innerHeight * 0.4;
@@ -252,7 +289,10 @@ const JobLookupMap = () => {
         }
 
         // 부드러운 드래그를 위한 제약 완화 (드래그 핸들이 보이도록 조정)
-        const maxHeight = window.innerHeight - 120; // 하단 네비(80px) + 드래그 핸들(40px) = 120px 여백
+        const maxHeight = Math.min(
+            window.innerHeight * 0.8,
+            window.innerHeight - 120
+        ); // 화면 높이의 80% 또는 하단 여백 고려
         const minHeight = 20; // 더 작은 최소값
 
         const newHeight = Math.max(
@@ -269,7 +309,10 @@ const JobLookupMap = () => {
         setIsDragging(false);
 
         // 속도 기반 스냅 (터치와 동일한 로직, 드래그 핸들이 보이도록 조정)
-        const maxHeight = window.innerHeight - 120; // 하단 네비(80px) + 드래그 핸들(40px) = 120px 여백
+        const maxHeight = Math.min(
+            window.innerHeight * 0.8,
+            window.innerHeight - 120
+        ); // 화면 높이의 80% 또는 하단 여백 고려
         const minHeight = 40;
         const midHeight = window.innerHeight * 0.4;
         const largeHeight = window.innerHeight * 0.4;
@@ -364,7 +407,7 @@ const JobLookupMap = () => {
                         </SearchText>
                     </SearchButton>
                 )}
-                <MapContainer data-testid="map-container">
+                <MapContainer data-testid='map-container'>
                     <NaverMap
                         ref={mapRef}
                         businessName='현재 위치'
@@ -382,24 +425,33 @@ const JobLookupMap = () => {
                                 );
 
                                 // 마커별 조회인지 전체 조회인지 구분
-                                const isWorkspaceSpecific = data.cursor === '' && data.totalCount <= 50;
-                                
+                                const isWorkspaceSpecific =
+                                    data.cursor === '' &&
+                                    data.totalCount <= 50;
+
                                 if (isWorkspaceSpecific) {
                                     // 마커별 조회 모드
-                                    setIsWorkspaceView(true);
-                                    
+                                    setIsWorkspaceView(
+                                        true
+                                    );
+
                                     // 마커별 조회 시 리스트 펼치기
-                                    if (data.data.length > 0) {
+                                    if (
+                                        data.data.length > 0
+                                    ) {
                                         setListHeight(
                                             Math.min(
-                                                window.innerHeight * 0.6,
+                                                window.innerHeight *
+                                                    0.8,
                                                 400
                                             )
                                         );
                                     }
                                 } else {
                                     // 전체 조회 모드
-                                    setIsWorkspaceView(false);
+                                    setIsWorkspaceView(
+                                        false
+                                    );
                                 }
                             } else {
                                 setJobPostings(data);
@@ -415,7 +467,9 @@ const JobLookupMap = () => {
                                 isAtCurrent
                             )
                         }
-                        onMapBackgroundClick={handleMapBackgroundClick}
+                        onMapBackgroundClick={
+                            handleMapBackgroundClick
+                        }
                         onMarkerClick={handleMarkerClick}
                     />
                 </MapContainer>
@@ -455,35 +509,42 @@ const JobLookupMap = () => {
                     <DragBar />
                 </DragHandle>
                 <JobListContent>
-                     {isWorkspaceView ? (
-                         // 마커별 조회 모드: 간단한 목록만 표시
-                         <MarkerJobPostList
-                             posts={jobPostings}
-                             onSelect={handlePostSelect}
-                             scrapMap={scrapMap}
-                             onScrapChange={handleScrapChange}
-                         />
-                     ) : (
-                         // 전체 조회 모드: 검색, 필터링, 무한스크롤 포함
-                         <JobPostList
-                             posts={jobPostings}
-                             cursor={jobPostingsCursor}
-                             totalCount={jobPostingsTotalCount}
-                             onLoadMore={() => {
-                                 if (
-                                     mapRef.current &&
-                                     mapRef.current.loadMoreJobPostings
-                                 ) {
-                                     mapRef.current.loadMoreJobPostings(
-                                         jobPostingsCursor
-                                     );
-                                 }
-                             }}
-                             onSelect={handlePostSelect}
-                             scrapMap={scrapMap}
-                             onScrapChange={handleScrapChange}
-                         />
-                     )}
+                    {isWorkspaceView ? (
+                        // 마커별 조회 모드: 간단한 목록만 표시
+                        <MarkerJobPostList
+                            posts={jobPostings}
+                            onSelect={handlePostSelect}
+                            scrapMap={scrapMap}
+                            onScrapChange={
+                                handleScrapChange
+                            }
+                        />
+                    ) : (
+                        // 전체 조회 모드: 검색, 필터링, 무한스크롤 포함
+                        <JobPostList
+                            posts={jobPostings}
+                            cursor={jobPostingsCursor}
+                            totalCount={
+                                jobPostingsTotalCount
+                            }
+                            onLoadMore={() => {
+                                if (
+                                    mapRef.current &&
+                                    mapRef.current
+                                        .loadMoreJobPostings
+                                ) {
+                                    mapRef.current.loadMoreJobPostings(
+                                        jobPostingsCursor
+                                    );
+                                }
+                            }}
+                            onSelect={handlePostSelect}
+                            scrapMap={scrapMap}
+                            onScrapChange={
+                                handleScrapChange
+                            }
+                        />
+                    )}
                 </JobListContent>
             </JobListContainer>
 
@@ -556,8 +617,13 @@ const SearchButton = styled.button`
     position: absolute;
     top: ${() => {
         // Flutter 웹뷰에서 네이티브 화면 정보가 있으면 사용
-        if (window.nativeScreenInfo && window.nativeScreenInfo.statusBarHeight) {
-            return window.nativeScreenInfo.statusBarHeight + 20;
+        if (
+            window.nativeScreenInfo &&
+            window.nativeScreenInfo.statusBarHeight
+        ) {
+            return (
+                window.nativeScreenInfo.statusBarHeight + 20
+            );
         }
         return '20px';
     }};
@@ -767,8 +833,13 @@ const JobListContainer = styled.div`
     position: fixed;
     bottom: ${() => {
         // Flutter 웹뷰에서 네이티브 화면 정보가 있으면 사용
-        if (window.nativeScreenInfo && window.nativeScreenInfo.bottomPadding) {
-            return window.nativeScreenInfo.bottomPadding + 70;
+        if (
+            window.nativeScreenInfo &&
+            window.nativeScreenInfo.bottomPadding
+        ) {
+            return (
+                window.nativeScreenInfo.bottomPadding + 70
+            );
         }
         return '70px';
     }};
