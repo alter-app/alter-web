@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import NaverMap from '../../components/owner/NaverMap';
 import JobPostList from '../../components/user/jobPosts/JobPostList';
 import MarkerJobPostList from '../../components/user/jobPosts/MarkerJobPostList';
+import JobPostDetailOverlay from '../../components/user/jobPosts/JobPostDetailOverlay';
 import BottomNavigation from '../../layouts/BottomNavigation';
 
 const JobLookupMap = () => {
@@ -30,6 +31,8 @@ const JobLookupMap = () => {
     const [isWorkspaceView, setIsWorkspaceView] = useState(false); // 마커별 조회 모드인지 여부
     const [savedBounds, setSavedBounds] = useState(null); // 마커 클릭 전 지도 뷰 좌표 저장
     const savedBoundsRef = useRef(null); // ref로도 저장하여 즉시 접근 가능
+    const [selectedPostId, setSelectedPostId] = useState(null);
+    const [showDetailOverlay, setShowDetailOverlay] = useState(false);
     const mapRef = useRef(null);
 
     const handleSearchClick = () => {
@@ -72,6 +75,25 @@ const JobLookupMap = () => {
         setSavedBounds(bounds);
         // ref에도 동시에 저장하여 즉시 접근 가능
         savedBoundsRef.current = bounds;
+    };
+
+    const handlePostSelect = (post) => {
+        setSelectedPostId(post.id);
+        setShowDetailOverlay(true);
+    };
+
+    const handleCloseDetailOverlay = () => {
+        setShowDetailOverlay(false);
+        setSelectedPostId(null);
+    };
+
+    const handleApply = (postDetail) => {
+        // 오버레이 닫기
+        handleCloseDetailOverlay();
+        // 지원 페이지로 이동
+        navigate('/job-apply', {
+            state: { id: postDetail.id },
+        });
     };
 
     useEffect(() => {
@@ -433,47 +455,48 @@ const JobLookupMap = () => {
                     <DragBar />
                 </DragHandle>
                 <JobListContent>
-                    {isWorkspaceView ? (
-                        // 마커별 조회 모드: 간단한 목록만 표시
-                        <MarkerJobPostList
-                            posts={jobPostings}
-                            onSelect={(post) =>
-                                navigate('/job-detail', {
-                                    state: { id: post.id },
-                                })
-                            }
-                            scrapMap={scrapMap}
-                            onScrapChange={handleScrapChange}
-                        />
-                    ) : (
-                        // 전체 조회 모드: 검색, 필터링, 무한스크롤 포함
-                        <JobPostList
-                            posts={jobPostings}
-                            cursor={jobPostingsCursor}
-                            totalCount={jobPostingsTotalCount}
-                            onLoadMore={() => {
-                                if (
-                                    mapRef.current &&
-                                    mapRef.current.loadMoreJobPostings
-                                ) {
-                                    mapRef.current.loadMoreJobPostings(
-                                        jobPostingsCursor
-                                    );
-                                }
-                            }}
-                            onSelect={(post) =>
-                                navigate('/job-detail', {
-                                    state: { id: post.id },
-                                })
-                            }
-                            scrapMap={scrapMap}
-                            onScrapChange={handleScrapChange}
-                        />
-                    )}
+                     {isWorkspaceView ? (
+                         // 마커별 조회 모드: 간단한 목록만 표시
+                         <MarkerJobPostList
+                             posts={jobPostings}
+                             onSelect={handlePostSelect}
+                             scrapMap={scrapMap}
+                             onScrapChange={handleScrapChange}
+                         />
+                     ) : (
+                         // 전체 조회 모드: 검색, 필터링, 무한스크롤 포함
+                         <JobPostList
+                             posts={jobPostings}
+                             cursor={jobPostingsCursor}
+                             totalCount={jobPostingsTotalCount}
+                             onLoadMore={() => {
+                                 if (
+                                     mapRef.current &&
+                                     mapRef.current.loadMoreJobPostings
+                                 ) {
+                                     mapRef.current.loadMoreJobPostings(
+                                         jobPostingsCursor
+                                     );
+                                 }
+                             }}
+                             onSelect={handlePostSelect}
+                             scrapMap={scrapMap}
+                             onScrapChange={handleScrapChange}
+                         />
+                     )}
                 </JobListContent>
             </JobListContainer>
 
             <BottomNavigation />
+
+            {/* JobPostDetail 오버레이 */}
+            {showDetailOverlay && selectedPostId && (
+                <JobPostDetailOverlay
+                    postId={selectedPostId}
+                    onClose={handleCloseDetailOverlay}
+                    onApply={handleApply}
+                />
+            )}
         </Container>
     );
 };
