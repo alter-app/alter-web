@@ -333,44 +333,30 @@ const Content = styled.div`
     flex: 1;
     overflow-y: auto;
     padding-top: 60px;
-    padding-bottom: 160px;
     -webkit-overflow-scrolling: touch;
 
     @supports (padding: max(0px)) {
         padding-top: calc(
             60px + max(0px, env(safe-area-inset-top))
         );
-        padding-bottom: calc(
-            160px + max(0px, env(safe-area-inset-bottom))
-        );
     }
 
     @media (max-width: 480px) {
         padding-top: 56px;
-        padding-bottom: 150px;
 
         @supports (padding: max(0px)) {
             padding-top: calc(
                 56px + max(0px, env(safe-area-inset-top))
-            );
-            padding-bottom: calc(
-                150px +
-                    max(0px, env(safe-area-inset-bottom))
             );
         }
     }
 
     @media (max-width: 360px) {
         padding-top: 52px;
-        padding-bottom: 140px;
 
         @supports (padding: max(0px)) {
             padding-top: calc(
                 52px + max(0px, env(safe-area-inset-top))
-            );
-            padding-bottom: calc(
-                140px +
-                    max(0px, env(safe-area-inset-bottom))
             );
         }
     }
