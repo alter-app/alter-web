@@ -70,11 +70,13 @@ const BottomNavContainer = styled.div`
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
 
     @media (max-width: 480px) {
-        height: 70px;
+        height: 100px;
+        padding-bottom: 20px;
     }
 
     @media (max-width: 360px) {
-        height: 60px;
+        height: 80px;
+        padding-bottom: 20px;
     }
 `;
 

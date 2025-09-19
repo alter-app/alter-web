@@ -94,8 +94,10 @@ const NaverMap = forwardRef(
         const [hasSearched, setHasSearched] =
             useState(false);
         const hasSearchedRef = useRef(false);
-        const [isAtCurrentLocation, setIsAtCurrentLocation] =
-            useState(true);
+        const [
+            isAtCurrentLocation,
+            setIsAtCurrentLocation,
+        ] = useState(true);
 
         // hasSearched 상태 변경 시 ref도 업데이트
         useEffect(() => {
@@ -105,10 +107,14 @@ const NaverMap = forwardRef(
         // 현재 위치 상태 변경 시 부모 컴포넌트에 알림
         useEffect(() => {
             if (onCurrentLocationStatusChange) {
-                onCurrentLocationStatusChange(isAtCurrentLocation);
+                onCurrentLocationStatusChange(
+                    isAtCurrentLocation
+                );
             }
-        }, [isAtCurrentLocation, onCurrentLocationStatusChange]);
-
+        }, [
+            isAtCurrentLocation,
+            onCurrentLocationStatusChange,
+        ]);
 
         // 지도 영역의 공고 리스트 로드
         const loadJobPostingsInBounds = async (map) => {
@@ -351,7 +357,7 @@ const NaverMap = forwardRef(
                         );
                     mapInstance.setCenter(center);
                     mapInstance.setZoom(16);
-                    
+
                     // 현재 위치 버튼 클릭 시에는 즉시 상태 변경
                     setIsAtCurrentLocation(true);
                 }
@@ -574,7 +580,6 @@ const NaverMap = forwardRef(
                     setIsAtCurrentLocation(true);
                 }, 500); // 지도 완전 로드 후 500ms 대기
 
-
                 // 지도 이동 이벤트 리스너 추가 (검색 버튼 표시 및 현재 위치 상태 체크)
                 window.naver.maps.Event.addListener(
                     map,
@@ -589,7 +594,6 @@ const NaverMap = forwardRef(
                         }
                     }
                 );
-
 
                 // 초기 마커 로드 제거 (검색 버튼으로만 마커 로드)
                 // loadMarkersInBounds(map);
@@ -626,22 +630,29 @@ const NaverMap = forwardRef(
 
                 // 현재 위치 버튼 전용 이벤트 리스너 통합 관리
                 const locationEventListeners = [];
-                
+
                 const handleLocationStateChange = () => {
                     setIsAtCurrentLocation(false);
                 };
 
                 // 통합된 이벤트 리스너 등록 및 관리
                 const addLocationEventListeners = () => {
-                    const locationEvents = ['dragend', 'zoom_changed', 'center_changed'];
-                    
-                    locationEvents.forEach(eventType => {
-                        const listener = window.naver.maps.Event.addListener(
-                            map,
-                            eventType,
-                            handleLocationStateChange
+                    const locationEvents = [
+                        'dragend',
+                        'zoom_changed',
+                        'center_changed',
+                    ];
+
+                    locationEvents.forEach((eventType) => {
+                        const listener =
+                            window.naver.maps.Event.addListener(
+                                map,
+                                eventType,
+                                handleLocationStateChange
+                            );
+                        locationEventListeners.push(
+                            listener
                         );
-                        locationEventListeners.push(listener);
                     });
                 };
 

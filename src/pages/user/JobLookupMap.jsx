@@ -89,7 +89,7 @@ const JobLookupMap = () => {
         }
 
         // 부드러운 드래그를 위한 제약 완화 (드래그 핸들이 보이도록 조정)
-        const maxHeight = window.innerHeight - 110; // 하단 네비(70px) + 드래그 핸들(40px) = 110px 여백
+        const maxHeight = window.innerHeight - 120; // 하단 네비(80px) + 드래그 핸들(40px) = 120px 여백
         const minHeight = 20; // 더 작은 최소값
 
         const newHeight = Math.max(
@@ -106,10 +106,10 @@ const JobLookupMap = () => {
         setIsDragging(false);
 
         // 속도 기반 스냅 (드래그 핸들이 보이도록 조정)
-        const maxHeight = window.innerHeight - 110; // 하단 네비(70px) + 드래그 핸들(40px) = 110px 여백
+        const maxHeight = window.innerHeight - 120; // 하단 네비(80px) + 드래그 핸들(40px) = 120px 여백
         const minHeight = 40;
         const midHeight = window.innerHeight * 0.4;
-        const largeHeight = window.innerHeight * 0.7;
+        const largeHeight = window.innerHeight * 0.4;
 
         let targetHeight = minHeight;
 
@@ -174,7 +174,7 @@ const JobLookupMap = () => {
         }
 
         // 부드러운 드래그를 위한 제약 완화 (드래그 핸들이 보이도록 조정)
-        const maxHeight = window.innerHeight - 110; // 하단 네비(70px) + 드래그 핸들(40px) = 110px 여백
+        const maxHeight = window.innerHeight - 120; // 하단 네비(80px) + 드래그 핸들(40px) = 120px 여백
         const minHeight = 20; // 더 작은 최소값
 
         const newHeight = Math.max(
@@ -191,10 +191,10 @@ const JobLookupMap = () => {
         setIsDragging(false);
 
         // 속도 기반 스냅 (터치와 동일한 로직, 드래그 핸들이 보이도록 조정)
-        const maxHeight = window.innerHeight - 110; // 하단 네비(70px) + 드래그 핸들(40px) = 110px 여백
+        const maxHeight = window.innerHeight - 120; // 하단 네비(80px) + 드래그 핸들(40px) = 120px 여백
         const minHeight = 40;
         const midHeight = window.innerHeight * 0.4;
-        const largeHeight = window.innerHeight * 0.7;
+        const largeHeight = window.innerHeight * 0.4;
 
         let targetHeight = minHeight;
 
@@ -312,8 +312,8 @@ const JobLookupMap = () => {
                                     setListHeight(
                                         Math.min(
                                             window.innerHeight *
-                                                0.6,
-                                            400
+                                                0.4,
+                                            300
                                         )
                                     );
                                 }
@@ -324,14 +324,20 @@ const JobLookupMap = () => {
                         onMapMoved={() =>
                             setShowSearchButton(true)
                         }
-                        onCurrentLocationStatusChange={(isAtCurrent) =>
-                            setIsAtCurrentLocation(isAtCurrent)
+                        onCurrentLocationStatusChange={(
+                            isAtCurrent
+                        ) =>
+                            setIsAtCurrentLocation(
+                                isAtCurrent
+                            )
                         }
                     />
                 </MapContainer>
                 <CurrentLocationButton
                     $listHeight={listHeight}
-                    $isAtCurrentLocation={isAtCurrentLocation}
+                    $isAtCurrentLocation={
+                        isAtCurrentLocation
+                    }
                     onClick={handleCurrentLocationClick}
                 >
                     <svg
@@ -342,7 +348,11 @@ const JobLookupMap = () => {
                     >
                         <path
                             d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'
-                            fill={isAtCurrentLocation ? '#ffffff' : '#333'}
+                            fill={
+                                isAtCurrentLocation
+                                    ? '#ffffff'
+                                    : '#333'
+                            }
                         />
                     </svg>
                 </CurrentLocationButton>
@@ -419,6 +429,7 @@ const Container = styled.div`
 
     /* 모바일 웹뷰 최적화 */
     -webkit-user-select: none;
+    user-select: none;
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
 `;
@@ -445,7 +456,7 @@ const MapSection = styled.div`
 
 const SearchButton = styled.button`
     position: absolute;
-    top: 20px;
+    top: 10%;
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
@@ -478,7 +489,7 @@ const SearchButton = styled.button`
     }
 
     @media (max-width: 480px) {
-        top: 16px;
+        top: 10%;
         height: 36px;
         min-width: 180px;
         max-width: 280px;
@@ -486,7 +497,7 @@ const SearchButton = styled.button`
     }
 
     @media (max-width: 360px) {
-        top: 12px;
+        top: 10%;
         height: 34px;
         min-width: 160px;
         max-width: 260px;
@@ -494,7 +505,7 @@ const SearchButton = styled.button`
     }
 
     @media (max-width: 320px) {
-        top: 10px;
+        top: 10%;
         height: 32px;
         min-width: 140px;
         max-width: 240px;
@@ -563,7 +574,7 @@ const CurrentLocationButton = styled.button`
     height: 48px;
     border: none;
     border-radius: 50%;
-    background: ${(props) => 
+    background: ${(props) =>
         props.$isAtCurrentLocation ? '#399982' : '#ffffff'};
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     cursor: pointer;
@@ -578,12 +589,16 @@ const CurrentLocationButton = styled.button`
     &:hover {
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        background: ${(props) => 
-            props.$isAtCurrentLocation ? '#399982' : '#f0f0f0'};
+        background: ${(props) =>
+            props.$isAtCurrentLocation
+                ? '#399982'
+                : '#f0f0f0'};
 
         svg path {
-            fill: ${(props) => 
-                props.$isAtCurrentLocation ? '#ffffff' : '#333'};
+            fill: ${(props) =>
+                props.$isAtCurrentLocation
+                    ? '#ffffff'
+                    : '#333'};
         }
     }
 
@@ -599,12 +614,12 @@ const CurrentLocationButton = styled.button`
             // 리스트가 접혔을 때만 리스트 위에, 그 외에는 고정 위치
             if (props.$listHeight < 100) {
                 return Math.max(
-                    120,
+                    160,
                     props.$listHeight + 16
                 );
             }
             // 리스트가 펼쳐져 있을 때는 고정 위치 (더 높게)
-            return 120;
+            return 160;
         }}px;
         right: 16px;
     }
@@ -616,12 +631,12 @@ const CurrentLocationButton = styled.button`
             // 리스트가 접혔을 때만 리스트 위에, 그 외에는 고정 위치
             if (props.$listHeight < 100) {
                 return Math.max(
-                    110,
+                    150,
                     props.$listHeight + 12
                 );
             }
             // 리스트가 펼쳐져 있을 때는 고정 위치 (더 높게)
-            return 110;
+            return 150;
         }}px;
         right: 12px;
     }
@@ -633,12 +648,12 @@ const CurrentLocationButton = styled.button`
             // 리스트가 접혔을 때만 리스트 위에, 그 외에는 고정 위치
             if (props.$listHeight < 100) {
                 return Math.max(
-                    100,
+                    140,
                     props.$listHeight + 10
                 );
             }
             // 리스트가 펼쳐져 있을 때는 고정 위치 (더 높게)
-            return 100;
+            return 140;
         }}px;
         right: 10px;
     }
@@ -646,7 +661,7 @@ const CurrentLocationButton = styled.button`
 
 const JobListContainer = styled.div`
     position: fixed;
-    bottom: 70px;
+    bottom: 80px;
     left: 0;
     right: 0;
     height: ${(props) => Math.max(40, props.$height)}px;
@@ -662,12 +677,12 @@ const JobListContainer = styled.div`
             : 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)'};
 
     @media (max-width: 480px) {
-        bottom: 60px;
+        bottom: 90px;
         border-radius: 16px 16px 0 0;
     }
 
     @media (max-width: 360px) {
-        bottom: 50px;
+        bottom: 70px;
         border-radius: 12px 12px 0 0;
     }
 `;
