@@ -45,7 +45,7 @@ const BottomNavigation = () => {
                     $active={isActive('/mypage')}
                 />
                 <NavLabel $active={isActive('/mypage')}>
-                    마이페이지
+                    MY
                 </NavLabel>
             </NavItem>
         </BottomNavContainer>
