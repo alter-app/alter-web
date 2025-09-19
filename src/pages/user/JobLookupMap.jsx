@@ -52,10 +52,41 @@ const JobLookupMap = () => {
     useEffect(() => {
         // 페이지 로드 시 body 스크롤 방지
         document.body.style.overflow = 'hidden';
+        
+        // Flutter 웹뷰에서 네이티브 화면 정보 수신
+        const handleNativeDataInjected = (event) => {
+            if (event.detail && event.detail.screen) {
+                window.nativeScreenInfo = event.detail.screen;
+                console.log('네이티브 화면 정보 수신:', window.nativeScreenInfo);
+                
+                // 화면 정보에 따라 동적으로 스타일 적용
+                applyNativeScreenStyles(event.detail.screen);
+            }
+        };
+        
+        // 네이티브 데이터 주입 이벤트 리스너 등록
+        window.addEventListener('nativeDataInjected', handleNativeDataInjected);
+        
         return () => {
             document.body.style.overflow = '';
+            window.removeEventListener('nativeDataInjected', handleNativeDataInjected);
         };
     }, []);
+    
+    // 네이티브 화면 정보에 따른 스타일 적용 함수
+    const applyNativeScreenStyles = (screenInfo) => {
+        const { statusBarHeight, bottomPadding } = screenInfo;
+        
+        // CSS 변수로 화면 정보 설정
+        document.documentElement.style.setProperty('--status-bar-height', `${statusBarHeight}px`);
+        document.documentElement.style.setProperty('--bottom-padding', `${bottomPadding}px`);
+        
+        // 지도 컨테이너 스타일 조정
+        const mapContainer = document.querySelector('[data-testid="map-container"]');
+        if (mapContainer) {
+            mapContainer.style.paddingTop = `${statusBarHeight}px`;
+        }
+    };
 
     const handleScrapChange = (id, value) => {
         setScrapMap((prev) => ({ ...prev, [id]: value }));
@@ -286,7 +317,7 @@ const JobLookupMap = () => {
                         </SearchText>
                     </SearchButton>
                 )}
-                <MapContainer>
+                <MapContainer data-testid="map-container">
                     <NaverMap
                         ref={mapRef}
                         businessName='현재 위치'
@@ -416,16 +447,12 @@ const Container = styled.div`
     overflow: hidden;
     -webkit-overflow-scrolling: touch;
 
-    /* iOS Safari safe area */
-    @supports (padding: max(0px)) {
-        padding-left: max(0px, env(safe-area-inset-left));
-        padding-right: max(0px, env(safe-area-inset-right));
-        padding-top: max(0px, env(safe-area-inset-top));
-        padding-bottom: max(
-            0px,
-            env(safe-area-inset-bottom)
-        );
-    }
+    /* Flutter 웹뷰에서는 safe-area-inset을 사용하지 않음 */
+    /* 네이티브 앱에서 제공하는 화면 정보 사용 */
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+    padding-bottom: 0;
 
     /* 모바일 웹뷰 최적화 */
     -webkit-user-select: none;
@@ -439,24 +466,31 @@ const MapSection = styled.div`
     position: relative;
     display: flex;
     flex-direction: column;
-    height: calc(100vh - 80px);
-    height: calc(100dvh - 80px);
+    height: 100vh;
+    height: 100dvh;
     overflow: hidden;
 
+    /* Flutter 웹뷰에서는 전체 화면 사용 */
     @media (max-width: 480px) {
-        height: calc(100vh - 70px);
-        height: calc(100dvh - 70px);
+        height: 100vh;
+        height: 100dvh;
     }
 
     @media (max-width: 360px) {
-        height: calc(100vh - 60px);
-        height: calc(100dvh - 60px);
+        height: 100vh;
+        height: 100dvh;
     }
 `;
 
 const SearchButton = styled.button`
     position: absolute;
-    top: 10%;
+    top: ${() => {
+        // Flutter 웹뷰에서 네이티브 화면 정보가 있으면 사용
+        if (window.nativeScreenInfo && window.nativeScreenInfo.statusBarHeight) {
+            return window.nativeScreenInfo.statusBarHeight + 20;
+        }
+        return '20px';
+    }};
     left: 50%;
     transform: translateX(-50%);
     z-index: 10;
@@ -661,7 +695,13 @@ const CurrentLocationButton = styled.button`
 
 const JobListContainer = styled.div`
     position: fixed;
-    bottom: 80px;
+    bottom: ${() => {
+        // Flutter 웹뷰에서 네이티브 화면 정보가 있으면 사용
+        if (window.nativeScreenInfo && window.nativeScreenInfo.bottomPadding) {
+            return window.nativeScreenInfo.bottomPadding + 70;
+        }
+        return '70px';
+    }};
     left: 0;
     right: 0;
     height: ${(props) => Math.max(40, props.$height)}px;
