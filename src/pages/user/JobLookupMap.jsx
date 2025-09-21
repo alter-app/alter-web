@@ -5,6 +5,7 @@ import NaverMap from '../../components/owner/NaverMap';
 import JobPostList from '../../components/user/jobPosts/JobPostList';
 import MarkerJobPostList from '../../components/user/jobPosts/MarkerJobPostList';
 import JobPostDetailOverlay from '../../components/user/jobPosts/JobPostDetailOverlay';
+import JobApplyOverlay from '../../components/user/jobPosts/JobApplyOverlay';
 import BottomNavigation from '../../layouts/BottomNavigation';
 
 const JobLookupMap = () => {
@@ -36,6 +37,9 @@ const JobLookupMap = () => {
         useState(null);
     const [showDetailOverlay, setShowDetailOverlay] =
         useState(false);
+    const [showApplyOverlay, setShowApplyOverlay] =
+        useState(false);
+    const [applyPostId, setApplyPostId] = useState(null);
     const mapRef = useRef(null);
 
     const handleSearchClick = () => {
@@ -98,12 +102,25 @@ const JobLookupMap = () => {
     };
 
     const handleApply = (postDetail) => {
-        // 오버레이 닫기
+        // 상세 오버레이 닫기
         handleCloseDetailOverlay();
-        // 지원 페이지로 이동
-        navigate('/job-apply', {
-            state: { id: postDetail.id },
-        });
+        // 지원 오버레이 열기
+        setApplyPostId(postDetail.id);
+        setShowApplyOverlay(true);
+    };
+
+    const handleCloseApplyOverlay = () => {
+        // 지원 오버레이를 닫고 상세 오버레이를 다시 열기
+        const currentApplyPostId = applyPostId;
+        setShowApplyOverlay(false);
+        setApplyPostId(null);
+        setSelectedPostId(currentApplyPostId);
+        setShowDetailOverlay(true);
+    };
+
+    const handleApplySuccess = () => {
+        // 지원 성공 시 추가 처리 (예: 토스트 메시지 등)
+        console.log('지원이 완료되었습니다.');
     };
 
     useEffect(() => {
@@ -556,6 +573,15 @@ const JobLookupMap = () => {
                     postId={selectedPostId}
                     onClose={handleCloseDetailOverlay}
                     onApply={handleApply}
+                />
+            )}
+
+            {/* JobApply 오버레이 */}
+            {showApplyOverlay && applyPostId && (
+                <JobApplyOverlay
+                    postId={applyPostId}
+                    onClose={handleCloseApplyOverlay}
+                    onApplySuccess={handleApplySuccess}
                 />
             )}
         </Container>

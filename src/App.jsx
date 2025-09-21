@@ -11,7 +11,6 @@ import MainLayout from './layouts/MainLayout';
 import FooterLayout from './layouts/FooterLayout';
 import JobLookupMap from './pages/user/JobLookupMap';
 import JobPosting from './pages/owner/JobPosting';
-import JobApply from './pages/user/JobApply';
 import MyPage from './pages/user/MyPage';
 import ApplicantListPage from './pages/owner/ApplicantListPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -107,14 +106,6 @@ function App() {
                         element={
                             <ProtectedRoute requiredScope='MANAGER'>
                                 <WorkplaceDetail />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path='/apply'
-                        element={
-                            <ProtectedRoute>
-                                <JobApply />
                             </ProtectedRoute>
                         }
                     />
