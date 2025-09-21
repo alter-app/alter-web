@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import Bookmark from '../Bookmark';
-import { useNavigate } from 'react-router-dom';
 import {
     addPostingScrap,
     deletePostingScrap,
@@ -10,13 +9,12 @@ const JobDetailFooter = ({
     id,
     checked,
     onScrapChange,
+    onApply,
 }) => {
-    const navigate = useNavigate();
-
     const handleApply = () => {
-        navigate('/apply', {
-            state: { id: id },
-        });
+        if (onApply) {
+            onApply();
+        }
     };
 
     const handleBookmark = async (e) => {

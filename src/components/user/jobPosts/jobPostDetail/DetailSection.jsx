@@ -34,21 +34,10 @@ const DetailSectionBox = styled.div`
 `;
 
 const DetailInfoLabel = styled.div`
-    color: #999999;
     font-family: 'Pretendard';
     font-weight: 600;
-    font-size: 14px;
-    line-height: 20px;
-
-    @media (max-width: 480px) {
-        font-size: 13px;
-        line-height: 18px;
-    }
-
-    @media (max-width: 360px) {
-        font-size: 12px;
-        line-height: 16px;
-    }
+    font-size: 16px;
+    color: #333333;
 `;
 
 const StyledDescription = styled.div`

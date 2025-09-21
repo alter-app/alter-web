@@ -46,21 +46,21 @@ const KeywordsBox = styled.div`
 `;
 
 const KeywordsLabel = styled.div`
-    color: #999999;
+    color: #333333;
     font-family: 'Pretendard';
     font-weight: 600;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 20px;
     margin-bottom: 12px;
 
     @media (max-width: 480px) {
-        font-size: 13px;
+        font-size: 15px;
         line-height: 18px;
         margin-bottom: 10px;
     }
 
     @media (max-width: 360px) {
-        font-size: 12px;
+        font-size: 14px;
         line-height: 16px;
         margin-bottom: 8px;
     }
