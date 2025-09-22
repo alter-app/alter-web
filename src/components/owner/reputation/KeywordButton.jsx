@@ -20,17 +20,43 @@ const StyleButton = styled.div`
     background-color: #f4f4f4;
     background-color: ${({ selected }) =>
         selected ? '#2DE283' : '#f4f4f4'};
-    border-radius: 40px;
-    padding: 7px 20px;
+    border-radius: 30px;
+    padding: 5px 14px;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     width: fit-content;
     cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 480px) {
+        padding: 4px 12px;
+        gap: 8px;
+        border-radius: 25px;
+    }
+
+    @media (max-width: 360px) {
+        padding: 3px 10px;
+        gap: 6px;
+        border-radius: 20px;
+    }
 `;
 
 const Emoji = styled.span`
     font-size: 16px;
+
+    @media (max-width: 480px) {
+        font-size: 14px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 12px;
+    }
 `;
 
 const Description = styled.span`
@@ -38,5 +64,16 @@ const Description = styled.span`
     font-family: 'Pretendard';
     font-weight: 400;
     font-size: 16px;
-    line-height: 28px;
+    line-height: 22px;
+    white-space: nowrap;
+
+    @media (max-width: 480px) {
+        font-size: 14px;
+        line-height: 20px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 12px;
+        line-height: 18px;
+    }
 `;
