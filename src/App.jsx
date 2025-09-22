@@ -32,6 +32,14 @@ function App() {
                         }
                     />
                     <Route
+                        path='/mypage'
+                        element={
+                            <ProtectedRoute>
+                                <MyPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
                         path='/oauth/kakao/callback'
                         element={<KakaoCallback />}
                     />
@@ -64,15 +72,6 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <ReputationWrite />
-                            </ProtectedRoute>
-                        }
-                    />
-
-                    <Route
-                        path='/mypage'
-                        element={
-                            <ProtectedRoute>
-                                <MyPage />
                             </ProtectedRoute>
                         }
                     />
