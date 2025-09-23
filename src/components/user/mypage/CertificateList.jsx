@@ -1,6 +1,5 @@
 import styled from 'styled-components';
-import CertificateItem from './CertificateItem';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import {
     getCertificates,
     deleteCertificates,
@@ -11,13 +10,15 @@ import {
 import { formatDateInput } from '../../../utils/weekUtil';
 import CertificateInputForm from './CertificateInputForm';
 import Loader from '../../Loader';
+import { formatJoinDate } from '../../../utils/timeUtil';
 
-const CertificateList = () => {
+const CertificateList = ({ isActive }) => {
     const [certificates, setCertificates] = useState([]);
     const [addStatus, setAddStatus] = useState(false);
     const [editingId, setEditingId] = useState(null);
-    const [detailLoading, setDetailLoading] =
-        useState(false);
+    const [detailLoading, setDetailLoading] = useState(false);
+    const [hasInitialLoad, setHasInitialLoad] = useState(false);
+    const containerRef = useRef(null);
 
     // 수정할 자격 정보
     const [editCertificate, setEditCertificate] = useState({
@@ -39,16 +40,24 @@ const CertificateList = () => {
 
     // 자격 정보 목록 조회 요청
     useEffect(() => {
-        const fetchCertificates = async () => {
-            const result = await getCertificates();
-            setCertificates(result.data);
-        };
-        fetchCertificates();
-        console.log(certificates);
-    }, []);
+        if (!hasInitialLoad) {
+            const fetchCertificates = async () => {
+                const result = await getCertificates();
+                setCertificates(result.data);
+            };
+            fetchCertificates();
+            setHasInitialLoad(true);
+            console.log(certificates);
+        }
+    }, [hasInitialLoad]);
 
     // 자격 삭제 처리 함수
     const handleDelete = async (id) => {
+        const isConfirmed = window.confirm('정말 삭제하시겠습니까?');
+        if (!isConfirmed) {
+            return;
+        }
+
         try {
             await deleteCertificates({ certificateId: id });
             setCertificates((prev) =>
@@ -89,6 +98,11 @@ const CertificateList = () => {
 
     // 자격증 등록 처리
     const handleAddCertificate = async () => {
+        const isConfirmed = window.confirm('정말 등록하시겠습니까?');
+        if (!isConfirmed) {
+            return;
+        }
+
         try {
             await addCertificates(addCertificate);
             // 등록 성공 후 전체 리스트 다시 불러오기
@@ -156,6 +170,11 @@ const CertificateList = () => {
 
     // 수정한 거 저장하는 핸들러
     const handleEditSave = async () => {
+        const isConfirmed = window.confirm('정말 수정하시겠습니까?');
+        if (!isConfirmed) {
+            return;
+        }
+
         try {
             await eidtCertificates(
                 editCertificate,
@@ -169,78 +188,116 @@ const CertificateList = () => {
         }
     };
 
+    if (!isActive) {
+        return null;
+    }
+
     return (
-        <Container>
-            <TopRow>
-                <Title>자격증</Title>
+        <Container ref={containerRef}>
+            <Header>
+                <Title>자격사항 관리</Title>
                 <AddButton onClick={handleToggleAdd}>
-                    {addStatus ? '닫기' : '추가'}
+                    {addStatus ? '취소' : '추가'}
                 </AddButton>
-            </TopRow>
+            </Header>
+            
             {addStatus && (
-                <InputsGap>
-                    <Divider />
+                <AddFormContainer>
                     <CertificateInputForm
                         value={addCertificate}
                         onChange={handleInputChange}
                     />
-                    <StyledButton
-                        onClick={handleAddCertificate}
-                    >
-                        등록
-                    </StyledButton>
-                    <Divider />
-                </InputsGap>
+                    <RegisterButton onClick={handleAddCertificate}>
+                        등록하기
+                    </RegisterButton>
+                </AddFormContainer>
             )}
 
-            {certificates.map((cert) => (
-                <div key={cert.id}>
-                    <CertificateItem
-                        {...cert}
-                        isOpen={editingId === cert.id}
-                        onToggle={() =>
-                            handleToggleEdit(cert)
-                        }
-                    />
-                    {editingId === cert.id && (
-                        <InputsGap>
-                            {detailLoading ? (
-                                <LoaderContainer>
-                                    <Loader />
-                                </LoaderContainer>
-                            ) : (
-                                <CertificateInputForm
-                                    value={editCertificate}
-                                    onChange={
-                                        handleEditInputChange
-                                    }
-                                />
-                            )}
-                            <EditRow>
-                                <EditButton
-                                    onClick={handleEditSave}
-                                >
-                                    수정
-                                </EditButton>
-                                <DelteButton
-                                    onClick={() =>
-                                        handleDelete(
-                                            cert.id
-                                        )
-                                    }
-                                >
-                                    삭제
-                                </DelteButton>
-                            </EditRow>
-                            <Divider />
-                        </InputsGap>
-                    )}
-                </div>
-            ))}
+            {certificates.length === 0 && !addStatus ? (
+                <EmptyContainer>
+                    <EmptyIcon>📜</EmptyIcon>
+                    <EmptyText>등록된 자격사항이 없습니다.</EmptyText>
+                </EmptyContainer>
+            ) : (
+                certificates.map((cert) => (
+                    <CertificateCard key={cert.id}>
+                        <CertificateHeader
+                            onClick={() => handleToggleEdit(cert)}
+                        >
+                            <CertificateInfo>
+                                <CertificateName>{cert.certificateName}</CertificateName>
+                                <PublisherName>{cert.publisherName}</PublisherName>
+                                <IssuedDate>
+                                    발급일 : {formatJoinDate(cert.issuedAt)}
+                                </IssuedDate>
+                                {cert.expiresAt && (
+                                    <ExpiredDate>
+                                        만료일 : {formatJoinDate(cert.expiresAt)}
+                                    </ExpiredDate>
+                                )}
+                            </CertificateInfo>
+                            <ExpandIcon>
+                                <EditIcon viewBox="0 0 24 24" width="20" height="20">
+                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                </EditIcon>
+                            </ExpandIcon>
+                            <DeleteButton
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDelete(cert.id);
+                                }}
+                            >
+                                <DeleteIcon viewBox="0 0 24 24" width="20" height="20">
+                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                </DeleteIcon>
+                            </DeleteButton>
+                        </CertificateHeader>
+                        
+                        {editingId === cert.id && (
+                            <EditFormContainer>
+                                {detailLoading ? (
+                                    <LoaderContainer>
+                                        <Loader />
+                                    </LoaderContainer>
+                                ) : (
+                                    <>
+                                        <CertificateInputForm
+                                            value={editCertificate}
+                                            onChange={handleEditInputChange}
+                                        />
+                                        <EditButton onClick={handleEditSave}>
+                                            수정하기
+                                        </EditButton>
+                                        <CancelButton onClick={() => setEditingId(null)}>
+                                            취소
+                                        </CancelButton>
+                                    </>
+                                )}
+                            </EditFormContainer>
+                        )}
+                        
+                    </CertificateCard>
+                ))
+            )}
         </Container>
     );
 };
 export default CertificateList;
+
+const Container = styled.div`
+    width: 100%;
+    background-color: transparent;
+    display: flex;
+    flex-direction: column;
+`;
+
+const Header = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #ffffff;
+    padding: 8px 20px 4px 20px;
+`;
 
 const Title = styled.div`
     font-family: 'Pretendard';
@@ -250,90 +307,193 @@ const Title = styled.div`
     color: #111111;
 `;
 
-const AddButton = styled.div`
+const AddButton = styled.button`
     font-family: 'Pretendard';
     font-weight: 400;
-    font-size: 18px;
+    font-size: 16px;
     line-height: 24px;
-    color: #797979;
+    color: #111111;
+    background: none;
+    border: none;
     cursor: pointer;
+    padding: 8px 0;
 `;
 
-const TopRow = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-`;
-
-const Container = styled.div`
-    width: 50vw;
-    background-color: #ffffff;
-    display: flex;
-    flex-direction: column;
-    border-radius: 8px;
-    padding: 20px;
-    box-sizing: border-box;
-`;
-
-const InputsGap = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    padding: 15px 0px;
-    box-sizing: border-box;
-`;
-
-const StyledButton = styled.button`
+const RegisterButton = styled.button`
     width: 100%;
     height: 48px;
     border: none;
     background: #2de283;
     color: #ffffff;
     font-size: 16px;
-    line-height: 20px;
     font-family: 'Pretendard';
-    font-weight: 400;
+    font-weight: 700;
     border-radius: 8px;
     cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:active {
+        transform: scale(0.98);
+    }
 `;
 
-const Divider = styled.div`
-    width: 100%;
-    height: 1px;
-    background: #d9d9d9;
+const AddFormContainer = styled.div`
+    background: #ffffff;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+`;
+
+const EmptyContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 300px;
+    background: #ffffff;
+    margin: 2px 0;
+`;
+
+const EmptyIcon = styled.div`
+    font-size: 80px;
+    margin-bottom: 16px;
+`;
+
+const EmptyText = styled.div`
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 16px;
+    color: #999999;
+`;
+
+const CertificateCard = styled.div`
+    background: #ffffff;
+    margin: 2px 0;
+`;
+
+const CertificateHeader = styled.div`
+    display: flex;
+    align-items: center;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: #f8f9fa;
+    }
+`;
+
+const CertificateInfo = styled.div`
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+`;
+
+const CertificateName = styled.div`
+    font-family: 'Pretendard';
+    font-weight: 700;
+    font-size: 16px;
+    color: #111111;
+`;
+
+const PublisherName = styled.div`
+    font-family: 'Pretendard';
+    font-weight: 500;
+    font-size: 14px;
+    color: #999999;
+`;
+
+const IssuedDate = styled.div`
+    font-family: 'Pretendard';
+    font-weight: 500;
+    font-size: 14px;
+    color: #999999;
+`;
+
+const ExpiredDate = styled.div`
+    font-family: 'Pretendard';
+    font-weight: 500;
+    font-size: 14px;
+    color: #999999;
+`;
+
+const ExpandIcon = styled.div`
+    font-size: 16px;
+    color: #999999;
+    margin-right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
+
+const EditIcon = styled.svg`
+    fill: #666666;
+`;
+
+const DeleteIcon = styled.svg`
+    fill: #666666;
+`;
+
+const DeleteButton = styled.button`
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: #f5f5f5;
+    }
+`;
+
+const EditFormContainer = styled.div`
+    background: #ffffff;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border-top: 1px solid #e0e0e0;
 `;
 
 const EditButton = styled.button`
-    padding: 10px 20px;
+    width: 100%;
+    height: 48px;
     border: none;
     background: #2de283;
     color: #ffffff;
     font-size: 16px;
-    line-height: 20px;
     font-family: 'Pretendard';
     font-weight: 400;
     border-radius: 8px;
     cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background: #25c973;
+    }
 `;
 
-const DelteButton = styled.button`
-    padding: 10px 20px;
-    border: none;
-    background: #2de283;
-    color: #ffffff;
+const CancelButton = styled.button`
+    width: 100%;
+    height: 48px;
+    border: 1px solid #e0e0e0;
+    background: #ffffff;
+    color: #999999;
     font-size: 16px;
-    line-height: 20px;
     font-family: 'Pretendard';
     font-weight: 400;
     border-radius: 8px;
     cursor: pointer;
-`;
+    transition: all 0.2s ease;
 
-const EditRow = styled.div`
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 10px;
+    &:hover {
+        background: #f8f9fa;
+        color: #111111;
+    }
 `;
 
 const LoaderContainer = styled.div`
@@ -341,5 +501,5 @@ const LoaderContainer = styled.div`
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 100%;
+    height: 100px;
 `;

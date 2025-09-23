@@ -18,7 +18,7 @@ const CertificateInputForm = ({ value, onChange }) => {
         </AddRow>
         <AddRow>
             <CertificateLabel>
-                일련번호
+                일련번호 (선택)
             </CertificateLabel>
             <CertificateInput
                 name='certificateId'
@@ -78,7 +78,7 @@ const CertificateInput = styled.input`
     border-radius: 8px;
     font-family: 'Pretendard';
     font-weight: 400;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 22px;
     outline: none;
     border: 1px solid transparent;
@@ -100,7 +100,7 @@ const CertificateLabel = styled.div`
     width: 140px;
     font-family: 'Pretendard';
     font-weight: 600;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 18px;
     color: #111111;
     display: flex;
@@ -128,7 +128,7 @@ const DateInput = styled.input`
     border-radius: 8px;
     font-family: 'Pretendard';
     font-weight: 400;
-    font-size: 15px;
+    font-size: 14px;
     line-height: 22px;
     outline: none;
     border: 1px solid #f6f6f6;
