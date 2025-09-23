@@ -5,12 +5,15 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import Loader from '../../Loader';
 import { formatNumber } from '../../../utils/formatNumber';
 import { timeAgo } from '../../../utils/timeUtil';
+import JobPostDetailOverlay from '../jobPosts/JobPostDetailOverlay';
 
-const ScrappedPostList = ({ onRefresh, isActive }) => {
+const ScrappedPostList = ({ isActive }) => {
     const [scrappedPosts, setScrappedPosts] = useState([]);
     const [cursorInfo, setCursorInfo] = useState('');
     const [totalCount, setTotalCount] = useState(0);
     const [hasInitialLoad, setHasInitialLoad] = useState(false);
+    const [showDetailOverlay, setShowDetailOverlay] = useState(false);
+    const [selectedPostId, setSelectedPostId] = useState(null);
     const containerRef = useRef(null);
 
     useEffect(() => {
@@ -49,6 +52,24 @@ const ScrappedPostList = ({ onRefresh, isActive }) => {
         return paymentType === 'HOURLY' ? '시급' : '일급';
     };
 
+    // 공고 상세 오버레이 열기
+    const handleOpenDetailOverlay = (postId) => {
+        setSelectedPostId(postId);
+        setShowDetailOverlay(true);
+    };
+
+    // 공고 상세 오버레이 닫기
+    const handleCloseDetailOverlay = () => {
+        setShowDetailOverlay(false);
+        setSelectedPostId(null);
+    };
+
+    // 지원하기 핸들러
+    const handleApply = (postDetail) => {
+        console.log('지원하기:', postDetail);
+        // 지원 로직은 필요에 따라 구현
+    };
+
     if (scrappedPosts.length === 0) {
         return (
             <EmptyContainer>
@@ -78,7 +99,10 @@ const ScrappedPostList = ({ onRefresh, isActive }) => {
                     scrollableTarget='scrollableListArea'
                 >
                     {scrappedPosts.map((scrap) => (
-                        <ScrapCard key={scrap.id}>
+                        <ScrapCard 
+                            key={scrap.id}
+                            onClick={() => handleOpenDetailOverlay(scrap.posting.id)}
+                        >
                             <ScrapContent>
                                 <BusinessName>{scrap.posting.businessName}</BusinessName>
                                 <JobTitle>{scrap.posting.title}</JobTitle>
@@ -92,6 +116,15 @@ const ScrappedPostList = ({ onRefresh, isActive }) => {
                     ))}
                 </InfiniteScroll>
             </ListArea>
+            
+            {/* JobPostDetail 오버레이 */}
+            {showDetailOverlay && selectedPostId && (
+                <JobPostDetailOverlay
+                    postId={selectedPostId}
+                    onClose={handleCloseDetailOverlay}
+                    onApply={handleApply}
+                />
+            )}
         </Container>
     );
 };
