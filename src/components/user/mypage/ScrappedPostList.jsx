@@ -32,14 +32,13 @@ const ScrappedPostList = ({ isActive }) => {
             
             if (isRefresh) {
                 setScrappedPosts(result.data);
-                setCursorInfo(result.page.cursor);
             } else {
                 setScrappedPosts((prev) => [
                     ...prev,
                     ...result.data,
                 ]);
-                setCursorInfo(result.page.cursor);
             }
+            setCursorInfo(result.page.cursor);
             setTotalCount(result.page.totalCount);
             console.log(result);
         } catch (error) {

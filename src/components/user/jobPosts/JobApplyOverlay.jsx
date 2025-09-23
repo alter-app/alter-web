@@ -5,6 +5,8 @@ import { getPostDetail } from '../../../services/post';
 import { formatTimeToHHMM } from '../../../utils/timeUtil';
 import { formatNumber } from '../../../utils/formatNumber';
 import JobPostTitleBox from './jobPostDetail/JobPostTitleBox';
+
+const MIN_DESCRIPTION_LENGTH = 15;
 import JobApplyWorkInfo from './jobPostDetail/JobApplyWorkInfo';
 import DetailSection from './jobPostDetail/DetailSection';
 import Divider from './jobPostDetail/Divider';
@@ -54,8 +56,8 @@ const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
             setDescriptionError('자기소개를 입력해주세요.');
             return;
         }
-        if (description.length < 15) {
-            setDescriptionError('15자 이상 작성해주세요');
+        if (description.length < MIN_DESCRIPTION_LENGTH) {
+            setDescriptionError(`${MIN_DESCRIPTION_LENGTH}자 이상 작성해주세요`);
             return;
         }
 
