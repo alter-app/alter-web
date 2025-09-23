@@ -9,7 +9,6 @@ import BottomNavigation from '../../layouts/BottomNavigation';
 const MyPage = () => {
     const [userInfo, setUserInfo] = useState([]);
     const [activeTab, setActiveTab] = useState('scrap');
-    const [refreshKey, setRefreshKey] = useState(0);
 
     // 사용자 정보 조회 요청
     useEffect(() => {
@@ -21,10 +20,6 @@ const MyPage = () => {
         console.log(userInfo);
     }, []);
 
-    // Pull-to-refresh 핸들러
-    const handleRefresh = () => {
-        setRefreshKey(prev => prev + 1);
-    };
 
     return (
         <>
@@ -46,13 +41,9 @@ const MyPage = () => {
                 </TabContainer>
                 <TabPanel>
                     <ScrappedPostList 
-                        key={`scrap-${refreshKey}`}
-                        onRefresh={handleRefresh}
                         isActive={activeTab === 'scrap'}
                     />
                     <CertificateList 
-                        key={`certificate-${refreshKey}`}
-                        onRefresh={handleRefresh}
                         isActive={activeTab === 'certificate'}
                     />
                 </TabPanel>
