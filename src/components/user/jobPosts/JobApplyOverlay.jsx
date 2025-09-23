@@ -59,6 +59,12 @@ const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
             return;
         }
 
+        // 제출 확인 알림
+        const isConfirmed = window.confirm('정말 제출하시겠습니까?');
+        if (!isConfirmed) {
+            return;
+        }
+
         try {
             await postingApply({
                 postingId: postId,
@@ -271,7 +277,7 @@ const ScheduleSelector = ({ schedule, isSelected, onClick }) => {
     return (
         <ScheduleSelectorContainer onClick={onClick}>
             <RadioButton>
-                <RadioCircle isSelected={isSelected} />
+                <RadioCircle $isSelected={isSelected} />
             </RadioButton>
             <ScheduleContent>
                 <SchedulePosition>
@@ -290,9 +296,9 @@ const ScheduleSelector = ({ schedule, isSelected, onClick }) => {
                         return (
                             <DayText 
                                 key={day} 
-                                day={day}
-                                isActive={isActive}
-                                isLast={index === daysOfWeek.length - 1}
+                                $day={day}
+                                $isActive={isActive}
+                                $isLast={index === daysOfWeek.length - 1}
                             >
                                 {day}
                             </DayText>
@@ -489,7 +495,7 @@ const RadioCircle = styled.div`
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    border: ${props => props.isSelected ? '6px solid #2de283' : '1px solid #e5e5e5'};
+    border: ${props => props.$isSelected ? '6px solid #2de283' : '1px solid #e5e5e5'};
     transition: all 0.1s ease;
 `;
 
@@ -511,18 +517,18 @@ const ScheduleDays = styled.div`
 
 const DayText = styled.div`
     font-family: 'Pretendard';
-    font-weight: ${props => props.isActive ? '700' : '500'};
+    font-weight: ${props => props.$isActive ? '700' : '500'};
     font-size: 14px;
     background: ${props => {
-        if (props.isActive) return '#2de283';
+        if (props.$isActive) return '#2de283';
         return '#ffffff';
     }};
     color: ${props => {
-        if (props.isActive) return '#ffffff';
+        if (props.$isActive) return '#ffffff';
         return '#767676';
     }};
     border: 1px solid ${props => {
-        if (props.isActive) return '#2de283';
+        if (props.$isActive) return '#2de283';
         return '#e8e8e8';
     }};
     border-radius: 4px;
