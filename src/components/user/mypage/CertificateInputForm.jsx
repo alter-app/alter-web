@@ -1,9 +1,6 @@
 import styled from 'styled-components';
 
 const CertificateInputForm = ({ value, onChange }) => {
-    const handleDateChange = (e) => {
-        onChange(e);
-    };
 
 
     return (
@@ -43,7 +40,7 @@ const CertificateInputForm = ({ value, onChange }) => {
                     type="date"
                     name="issuedAt"
                     value={value.issuedAt || ''}
-                    onChange={handleDateChange}
+                    onChange={onChange}
                 />
             </DateInputWrapper>
         </AddRow>
@@ -54,7 +51,7 @@ const CertificateInputForm = ({ value, onChange }) => {
                     type="date"
                     name="expiresAt"
                     value={value.expiresAt || ''}
-                    onChange={handleDateChange}
+                    onChange={onChange}
                 />
             </DateInputWrapper>
         </AddRow>
@@ -81,9 +78,7 @@ const CertificateInput = styled.input`
     font-size: 14px;
     line-height: 22px;
     outline: none;
-    border: 1px solid transparent;
-    border-radius: 8px;
-    border-color: #f6f6f6;
+    border: 1px solid #f6f6f6;
     background-color: #f6f6f6;
 
     &::placeholder {
@@ -97,7 +92,7 @@ const CertificateInput = styled.input`
 `;
 
 const CertificateLabel = styled.div`
-    width: 140px;
+    min-width: 120px;
     font-family: 'Pretendard';
     font-weight: 600;
     font-size: 14px;
@@ -110,7 +105,7 @@ const CertificateLabel = styled.div`
 const AddRow = styled.div`
     display: flex;
     gap: 20px;
-    justify-content: space-between;
+    align-items: center;
 `;
 
 const DateInputWrapper = styled.div`

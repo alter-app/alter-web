@@ -98,6 +98,24 @@ const CertificateList = ({ isActive }) => {
 
     // 자격증 등록 처리
     const handleAddCertificate = async () => {
+        // 필수 필드 검증
+        const requiredFields = [
+            { key: 'certificateName', label: '이름' },
+            { key: 'publisherName', label: '발행 기관' },
+            { key: 'issuedAt', label: '취득일' }
+        ];
+
+        const missingFields = requiredFields.filter(field => {
+            const fieldValue = addCertificate[field.key];
+            return !fieldValue || fieldValue.trim() === '';
+        });
+
+        if (missingFields.length > 0) {
+            const fieldNames = missingFields.map(field => field.label).join(', ');
+            alert(`${fieldNames}을(를) 입력해주세요.`);
+            return;
+        }
+
         const isConfirmed = window.confirm('정말 등록하시겠습니까?');
         if (!isConfirmed) {
             return;
@@ -170,6 +188,24 @@ const CertificateList = ({ isActive }) => {
 
     // 수정한 거 저장하는 핸들러
     const handleEditSave = async () => {
+        // 필수 필드 검증
+        const requiredFields = [
+            { key: 'certificateName', label: '이름' },
+            { key: 'publisherName', label: '발행 기관' },
+            { key: 'issuedAt', label: '취득일' }
+        ];
+
+        const missingFields = requiredFields.filter(field => {
+            const fieldValue = editCertificate[field.key];
+            return !fieldValue || fieldValue.trim() === '';
+        });
+
+        if (missingFields.length > 0) {
+            const fieldNames = missingFields.map(field => field.label).join(', ');
+            alert(`${fieldNames}을(를) 입력해주세요.`);
+            return;
+        }
+
         const isConfirmed = window.confirm('정말 수정하시겠습니까?');
         if (!isConfirmed) {
             return;
