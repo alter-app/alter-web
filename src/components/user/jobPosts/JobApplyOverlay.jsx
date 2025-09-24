@@ -5,6 +5,7 @@ import { getPostDetail } from '../../../services/post';
 import { formatTimeToHHMM } from '../../../utils/timeUtil';
 import { formatNumber } from '../../../utils/formatNumber';
 import JobPostTitleBox from './jobPostDetail/JobPostTitleBox';
+import PageHeader from '../../shared/PageHeader';
 
 const MIN_DESCRIPTION_LENGTH = 15;
 import JobApplyWorkInfo from './jobPostDetail/JobApplyWorkInfo';
@@ -108,27 +109,11 @@ const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
         return (
             <Overlay>
                 <Container>
-                    <Header>
-                        <BackButton onClick={onClose}>
-                            <BackIcon>
-                                <svg
-                                    width='24'
-                                    height='24'
-                                    viewBox='0 0 24 24'
-                                    fill='none'
-                                >
-                                    <path
-                                        d='M15 18L9 12L15 6'
-                                        stroke='#333'
-                                        strokeWidth='2'
-                                        strokeLinecap='round'
-                                        strokeLinejoin='round'
-                                    />
-                                </svg>
-                            </BackIcon>
-                        </BackButton>
-                        <HeaderTitle>로딩 중...</HeaderTitle>
-                    </Header>
+                    <PageHeader
+                        title='로딩 중...'
+                        onBack={onClose}
+                        variant='sticky'
+                    />
                     <Content>
                         <LoadingText>공고 정보를 불러오는 중...</LoadingText>
                     </Content>
@@ -141,27 +126,11 @@ const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
         return (
             <Overlay>
                 <Container>
-                    <Header>
-                        <BackButton onClick={onClose}>
-                            <BackIcon>
-                                <svg
-                                    width='24'
-                                    height='24'
-                                    viewBox='0 0 24 24'
-                                    fill='none'
-                                >
-                                    <path
-                                        d='M15 18L9 12L15 6'
-                                        stroke='#333'
-                                        strokeWidth='2'
-                                        strokeLinecap='round'
-                                        strokeLinejoin='round'
-                                    />
-                                </svg>
-                            </BackIcon>
-                        </BackButton>
-                        <HeaderTitle>공고를 찾을 수 없습니다</HeaderTitle>
-                    </Header>
+                    <PageHeader
+                        title='공고를 찾을 수 없습니다'
+                        onBack={onClose}
+                        variant='sticky'
+                    />
                     <Content>
                         <ErrorText>요청하신 공고를 찾을 수 없습니다.</ErrorText>
                     </Content>
@@ -173,27 +142,11 @@ const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
     return (
         <Overlay>
             <Container>
-                <Header>
-                    <BackButton onClick={onClose}>
-                        <BackIcon>
-                            <svg
-                                width='24'
-                                height='24'
-                                viewBox='0 0 24 24'
-                                fill='none'
-                            >
-                                <path
-                                    d='M15 18L9 12L15 6'
-                                    stroke='#333'
-                                    strokeWidth='2'
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                />
-                            </svg>
-                        </BackIcon>
-                    </BackButton>
-                    <HeaderTitle>지원하기</HeaderTitle>
-                </Header>
+                <PageHeader
+                    title='지원하기'
+                    onBack={onClose}
+                    variant='sticky'
+                />
 
                 <Content>
                     {/* 공고 제목 및 워크스페이스 정보 */}
@@ -354,86 +307,11 @@ const Container = styled.div`
     width: 100%;
     height: 100%;
     background: #f5f5f5;
-    border-radius: 20px 20px 0 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-
-    @media (max-width: 480px) {
-        border-radius: 16px 16px 0 0;
-    }
-
-    @media (max-width: 360px) {
-        border-radius: 12px 12px 0 0;
-    }
 `;
 
-const Header = styled.div`
-    position: sticky;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 60px;
-    background: #ffffff;
-    border-bottom: 1px solid #e0e0e0;
-    display: flex;
-    align-items: center;
-    padding: 0 16px;
-    z-index: 100;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-
-    @supports (padding: max(0px)) {
-        padding-top: max(0px, env(safe-area-inset-top));
-        height: calc(60px + max(0px, env(safe-area-inset-top)));
-    }
-
-    @media (max-width: 480px) {
-        height: 56px;
-        padding: 0 12px;
-
-        @supports (padding: max(0px)) {
-            height: calc(56px + max(0px, env(safe-area-inset-top)));
-        }
-    }
-`;
-
-const BackButton = styled.button`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    -webkit-tap-highlight-color: transparent;
-
-    &:hover {
-        background: #f5f5f5;
-    }
-
-    &:active {
-        background: #e0e0e0;
-        transform: scale(0.95);
-    }
-`;
-
-const BackIcon = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-`;
-
-const HeaderTitle = styled.h1`
-    font-family: 'Pretendard';
-    font-weight: 600;
-    font-size: 18px;
-    color: #333333;
-    margin: 0;
-    margin-left: 12px;
-`;
 
 const Content = styled.div`
     flex: 1;
