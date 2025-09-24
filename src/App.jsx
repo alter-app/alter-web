@@ -32,14 +32,6 @@ function App() {
                         }
                     />
                     <Route
-                        path='/mypage'
-                        element={
-                            <ProtectedRoute>
-                                <MyPage />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
                         path='/oauth/kakao/callback'
                         element={<KakaoCallback />}
                     />
@@ -52,6 +44,7 @@ function App() {
                         element={<NotFound />}
                     />
                 </Route>
+
 
                 <Route element={<MainLayout />}>
                     <Route path='/' element={<Home />} />
@@ -68,6 +61,14 @@ function App() {
                         element={<PhoneAuthPage />}
                     />
                     <Route
+                        path='/mypage'
+                        element={
+                            <ProtectedRoute>
+                                <MyPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
                         path='/reputation-write'
                         element={
                             <ProtectedRoute>
@@ -75,7 +76,6 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
-
                     <Route
                         path='/job-lookup-map'
                         element={

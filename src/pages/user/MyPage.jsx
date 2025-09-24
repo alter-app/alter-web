@@ -5,6 +5,7 @@ import UserProfile from '../../components/user/mypage/UserProfile';
 import CertificateList from '../../components/user/mypage/CertificateList';
 import ScrappedPostList from '../../components/user/mypage/ScrappedPostList';
 import BottomNavigation from '../../layouts/BottomNavigation';
+import PageHeader from '../../components/shared/PageHeader';
 
 const MyPage = () => {
     const [userInfo, setUserInfo] = useState([]);
@@ -23,6 +24,10 @@ const MyPage = () => {
 
     return (
         <>
+            <PageHeader
+                title='마이페이지'
+                showBackButton={false}
+            />
             <ContainerColumn>
                 <UserProfile />
                 <TabContainer>
@@ -58,14 +63,16 @@ export default MyPage;
 const ContainerColumn = styled.div`
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    min-height: calc(100vh - 80px);
     padding-bottom: 80px;
 
     @media (max-width: 480px) {
+        min-height: calc(100vh - 70px);
         padding-bottom: 70px;
     }
 
     @media (max-width: 360px) {
+        min-height: calc(100vh - 60px);
         padding-bottom: 60px;
     }
 `;
@@ -98,5 +105,5 @@ const Tab = styled.button`
 const TabPanel = styled.div`
     flex: 1;
     background: #f8f9fa;
-    min-height: calc(100vh - 200px);
+    min-height: 0;
 `;

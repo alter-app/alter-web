@@ -110,7 +110,7 @@ const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
             <Overlay>
                 <Container>
                     <PageHeader
-                        title='로딩 중...'
+                        title='지원하기'
                         onBack={onClose}
                         variant='sticky'
                     />
@@ -127,7 +127,7 @@ const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
             <Overlay>
                 <Container>
                     <PageHeader
-                        title='공고를 찾을 수 없습니다'
+                        title='지원하기'
                         onBack={onClose}
                         variant='sticky'
                     />
@@ -145,7 +145,6 @@ const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
                 <PageHeader
                     title='지원하기'
                     onBack={onClose}
-                    variant='sticky'
                 />
 
                 <Content>

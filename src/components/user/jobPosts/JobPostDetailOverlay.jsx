@@ -70,7 +70,7 @@ const JobPostDetailOverlay = ({
             <Overlay>
                 <Container>
                     <PageHeader
-                        title='로딩 중...'
+                        title='알바 상세'
                         onBack={onClose}
                         variant='sticky'
                     />
@@ -89,7 +89,7 @@ const JobPostDetailOverlay = ({
             <Overlay>
                 <Container>
                     <PageHeader
-                        title='공고를 찾을 수 없습니다'
+                        title='알바 상세'
                         onBack={onClose}
                         variant='sticky'
                     />
@@ -110,7 +110,6 @@ const JobPostDetailOverlay = ({
                 <PageHeader
                     title='알바 상세'
                     onBack={onClose}
-                    variant='sticky'
                 />
 
                 <Content>
