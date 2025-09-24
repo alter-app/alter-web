@@ -59,24 +59,45 @@ const BottomNavContainer = styled.div`
     bottom: 0;
     left: 0;
     right: 0;
-    height: 80px;
+    height: 60px;
     background: #ffffff;
     border-top: 1px solid #e0e0e0;
     display: flex;
     justify-content: space-around;
     align-items: center;
     z-index: 100;
-    padding-bottom: env(safe-area-inset-bottom);
+    padding: 12px 0;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
 
+    @supports (padding: max(0px)) {
+        padding-bottom: max(
+            12px,
+            env(safe-area-inset-bottom)
+        );
+    }
+
     @media (max-width: 480px) {
-        height: 100px;
-        padding-bottom: 20px;
+        height: 60px;
+        padding: 14px 0;
+
+        @supports (padding: max(0px)) {
+            padding-bottom: max(
+                14px,
+                env(safe-area-inset-bottom)
+            );
+        }
     }
 
     @media (max-width: 360px) {
-        height: 80px;
-        padding-bottom: 20px;
+        height: 50px;
+        padding: 12px 0;
+
+        @supports (padding: max(0px)) {
+            padding-bottom: max(
+                12px,
+                env(safe-area-inset-bottom)
+            );
+        }
     }
 `;
 

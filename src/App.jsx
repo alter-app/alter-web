@@ -63,7 +63,7 @@ function App() {
                     <Route
                         path='/reputation-write'
                         element={
-                            <ProtectedRoute requiredScope='MANAGER'>
+                            <ProtectedRoute>
                                 <ReputationWrite />
                             </ProtectedRoute>
                         }

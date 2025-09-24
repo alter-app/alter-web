@@ -17,7 +17,6 @@ const MainLayout = () => {
 
     return (
         <div>
-            <Header />
             <main>
                 <Outlet />
             </main>

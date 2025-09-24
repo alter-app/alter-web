@@ -659,7 +659,7 @@ const SearchButton = styled.button`
     }
 
     @media (max-width: 480px) {
-        top: 10%;
+        top: 5%;
         height: 36px;
         min-width: 180px;
         max-width: 280px;
@@ -667,7 +667,7 @@ const SearchButton = styled.button`
     }
 
     @media (max-width: 360px) {
-        top: 10%;
+        top: 5%;
         height: 34px;
         min-width: 160px;
         max-width: 260px;
@@ -675,7 +675,7 @@ const SearchButton = styled.button`
     }
 
     @media (max-width: 320px) {
-        top: 10%;
+        top: 5%;
         height: 32px;
         min-width: 140px;
         max-width: 240px;
@@ -841,7 +841,7 @@ const JobListContainer = styled.div`
                 window.nativeScreenInfo.bottomPadding + 70
             );
         }
-        return '70px';
+        return '50px';
     }};
     left: 0;
     right: 0;
@@ -858,12 +858,12 @@ const JobListContainer = styled.div`
             : 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)'};
 
     @media (max-width: 480px) {
-        bottom: 90px;
+        bottom: 50px;
         border-radius: 16px 16px 0 0;
     }
 
     @media (max-width: 360px) {
-        bottom: 70px;
+        bottom: 40px;
         border-radius: 12px 12px 0 0;
     }
 `;
