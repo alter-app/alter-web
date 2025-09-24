@@ -168,18 +168,9 @@ const Container = styled.div`
     width: 100%;
     height: 100%;
     background: #ffffff;
-    border-radius: 20px 20px 0 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-
-    @media (max-width: 480px) {
-        border-radius: 16px 16px 0 0;
-    }
-
-    @media (max-width: 360px) {
-        border-radius: 12px 12px 0 0;
-    }
 `;
 
 const Content = styled.div`
