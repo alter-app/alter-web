@@ -204,7 +204,6 @@ const Container = styled.div`
 const Content = styled.div`
     flex: 1;
     overflow-y: auto;
-    padding-top: 20px;
     -webkit-overflow-scrolling: touch;
 `;
 

@@ -54,7 +54,7 @@ const KeywordsLabel = styled.div`
     margin-bottom: 12px;
 
     @media (max-width: 480px) {
-        font-size: 15px;
+        font-size: 16px;
         line-height: 18px;
         margin-bottom: 10px;
     }
