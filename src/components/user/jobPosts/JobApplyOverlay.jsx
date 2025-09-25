@@ -6,21 +6,13 @@ import { formatTimeToHHMM } from '../../../utils/timeUtil';
 import { formatNumber } from '../../../utils/formatNumber';
 import JobPostTitleBox from './jobPostDetail/JobPostTitleBox';
 import PageHeader from '../../shared/PageHeader';
-
-const MIN_DESCRIPTION_LENGTH = 15;
 import JobApplyWorkInfo from './jobPostDetail/JobApplyWorkInfo';
 import DetailSection from './jobPostDetail/DetailSection';
 import Divider from './jobPostDetail/Divider';
+import { WEEKDAYS_KOR, WEEKDAYS_KOR_ARRAY } from '../../../utils/weekdayUtils';
 
-const WEEKDAYS_KOR = {
-    MONDAY: '월',
-    TUESDAY: '화',
-    WEDNESDAY: '수',
-    THURSDAY: '목',
-    FRIDAY: '금',
-    SATURDAY: '토',
-    SUNDAY: '일',
-};
+const MIN_DESCRIPTION_LENGTH = 15;
+
 
 const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
     const [description, setDescription] = useState('');
@@ -226,7 +218,7 @@ const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
 
 // ScheduleSelector 컴포넌트
 const ScheduleSelector = ({ schedule, isSelected, onClick }) => {
-    const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
+    const daysOfWeek = WEEKDAYS_KOR_ARRAY.map(item => item.label);
     
     return (
         <ScheduleSelectorContainer onClick={onClick}>

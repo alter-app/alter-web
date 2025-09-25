@@ -6,6 +6,7 @@ import {
     formatTimeToHHMM,
     getWorkDuration,
 } from '../../../../utils/timeUtil';
+import { WEEKDAYS_KOR_ARRAY } from '../../../../utils/weekdayUtils';
 
 const JobPostWorkInfo = ({
     paymentType,
@@ -15,15 +16,6 @@ const JobPostWorkInfo = ({
     const [showAllSchedules, setShowAllSchedules] =
         useState(false);
 
-    const WEEKDAYS_KOR = [
-        { key: 'SUNDAY', label: '일' },
-        { key: 'MONDAY', label: '월' },
-        { key: 'TUESDAY', label: '화' },
-        { key: 'WEDNESDAY', label: '수' },
-        { key: 'THURSDAY', label: '목' },
-        { key: 'FRIDAY', label: '금' },
-        { key: 'SATURDAY', label: '토' },
-    ];
 
     const visibleSchedules = showAllSchedules
         ? schedules
@@ -59,7 +51,7 @@ const JobPostWorkInfo = ({
                         </ScheduleInfoLabel>
                         <ScheduleInfoValue>
                             <WorkDayList>
-                                {WEEKDAYS_KOR.map(
+                                {WEEKDAYS_KOR_ARRAY.map(
                                     (item) => (
                                         <WorkDayItem
                                             key={item.key}
