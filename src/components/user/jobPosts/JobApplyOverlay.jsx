@@ -307,20 +307,7 @@ const Container = styled.div`
 const Content = styled.div`
     flex: 1;
     overflow-y: auto;
-    padding-bottom: 72px;
     -webkit-overflow-scrolling: touch;
-
-    @supports (padding: max(0px)) {
-        padding-bottom: calc(72px + max(0px, env(safe-area-inset-bottom)));
-    }
-
-    @media (max-width: 480px) {
-        padding-bottom: 68px;
-
-        @supports (padding: max(0px)) {
-            padding-bottom: calc(68px + max(0px, env(safe-area-inset-bottom)));
-        }
-    }
 `;
 
 const SectionTitle = styled.div`
@@ -485,14 +472,13 @@ const BottomButtonContainer = styled.div`
     bottom: 0;
     left: 0;
     right: 0;
-    height: 72px;
-    padding: 14px 20px 10px;
+    padding: 16px 20px;
     background: #ffffff;
     border-top: 1px solid #e0e0e0;
     z-index: 100;
 
     @supports (padding: max(0px)) {
-        padding-bottom: calc(10px + max(0px, env(safe-area-inset-bottom)));
+        padding-bottom: calc(16px + max(0px, env(safe-area-inset-bottom)));
     }
 `;
 
