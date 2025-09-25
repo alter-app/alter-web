@@ -3,6 +3,7 @@ import { getUserInfo } from '../../../services/myPage';
 import { formatJoinDate } from '../../../utils/timeUtil';
 import userIcon from '../../../assets/icons/userIcon.png';
 import styled from 'styled-components';
+
 const UserProfile = () => {
     const [userInfo, setUserInfo] = useState({
         name: '',
@@ -22,21 +23,16 @@ const UserProfile = () => {
 
     return (
         <ProfileContainer>
-            <Row>
+            <ProfileContent>
                 <ProfileImg src={userIcon} alt='프로필' />
-                <Column>
-                    <ProfileName>
-                        {userInfo.name}
-                    </ProfileName>
-                    <ProfileNickname>
-                        닉네임 : {userInfo.nickname}
-                    </ProfileNickname>
+                <ProfileInfo>
+                    <ProfileName>{userInfo.name || '이름'}</ProfileName>
+                    <ProfileNickname>{userInfo.nickname || '닉네임'}</ProfileNickname>
                     <CreatedAt>
-                        가입일자 :{' '}
-                        {formatJoinDate(userInfo.createdAt)}
+                        가입일자 : {formatJoinDate(userInfo.createdAt)}
                     </CreatedAt>
-                </Column>
-            </Row>
+                </ProfileInfo>
+            </ProfileContent>
         </ProfileContainer>
     );
 };
@@ -44,48 +40,49 @@ const UserProfile = () => {
 export default UserProfile;
 
 const ProfileContainer = styled.div`
-    padding: 30px 0px;
+    background: #ffffff;
+    padding: 16px 20px;
+`;
+
+const ProfileContent = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 16px;
 `;
 
 const ProfileImg = styled.img`
-    width: 150px;
-    height: 150px;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+`;
+
+const ProfileInfo = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 `;
 
 const ProfileName = styled.div`
     font-family: 'Pretendard';
     font-weight: 600;
-    font-size: 28px;
-    line-height: 38px;
+    font-size: 24px;
+    line-height: 32px;
     color: #111111;
 `;
 
 const ProfileNickname = styled.div`
     font-family: 'Pretendard';
-    font-weight: 400;
-    font-size: 20px;
-    line-height: 26px;
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
     color: #999999;
 `;
 
 const CreatedAt = styled.div`
     font-family: 'Pretendard';
-    font-weight: 400;
+    font-weight: 500;
     font-size: 16px;
-    line-height: 18px;
+    line-height: 24px;
     color: #999999;
-`;
-
-const Row = styled.div`
-    display: flex;
-    gap: 30px;
-`;
-
-const Column = styled.div`
-    display: flex;
-    flex-direction: column;
-    height: 150px;
-    padding-top: 20px;
-    box-sizing: border-box;
-    gap: 10px;
 `;

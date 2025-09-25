@@ -6,6 +6,7 @@ import {
     formatTimeToHHMM,
     getWorkDuration,
 } from '../../../../utils/timeUtil';
+import { WEEKDAYS_KOR_ARRAY } from '../../../../utils/weekdayUtils';
 
 const JobPostWorkInfo = ({
     paymentType,
@@ -15,15 +16,6 @@ const JobPostWorkInfo = ({
     const [showAllSchedules, setShowAllSchedules] =
         useState(false);
 
-    const WEEKDAYS_KOR = [
-        { key: 'MONDAY', label: '월' },
-        { key: 'TUESDAY', label: '화' },
-        { key: 'WEDNESDAY', label: '수' },
-        { key: 'THURSDAY', label: '목' },
-        { key: 'FRIDAY', label: '금' },
-        { key: 'SATURDAY', label: '토' },
-        { key: 'SUNDAY', label: '일' },
-    ];
 
     const visibleSchedules = showAllSchedules
         ? schedules
@@ -59,7 +51,7 @@ const JobPostWorkInfo = ({
                         </ScheduleInfoLabel>
                         <ScheduleInfoValue>
                             <WorkDayList>
-                                {WEEKDAYS_KOR.map(
+                                {WEEKDAYS_KOR_ARRAY.map(
                                     (item) => (
                                         <WorkDayItem
                                             key={item.key}
@@ -84,7 +76,7 @@ const JobPostWorkInfo = ({
                                     {startTime} ~ {endTime}
                                 </WorkTimeValue>
                                 <WorkTimeSub>
-                                    {duration}
+                                    ({duration})
                                 </WorkTimeSub>
                             </WorkTimeRow>
                         </ScheduleInfoValue>
@@ -165,19 +157,19 @@ const WorkInfoBox = styled.div`
 `;
 
 const WorkInfoLabel = styled.div`
-    color: #999999;
+    color: #333333;
     font-family: 'Pretendard';
     font-weight: 600;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 20px;
 
     @media (max-width: 480px) {
-        font-size: 13px;
+        font-size: 16px;
         line-height: 18px;
     }
 
     @media (max-width: 360px) {
-        font-size: 12px;
+        font-size: 14px;
         line-height: 16px;
     }
 `;
@@ -268,37 +260,37 @@ const WorkDayLabel = styled.div`
 
 const WorkDayList = styled.div`
     display: flex;
-    gap: 18px;
-
-    @media (max-width: 480px) {
-        gap: 14px;
-    }
-
-    @media (max-width: 360px) {
-        gap: 10px;
-    }
+    align-items: center;
+    background: #f8f9fa;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 4px;
+    gap: 2px;
 `;
 
 const WorkDayItem = styled.div`
     font-family: 'Pretendard';
+    font-weight: ${props => props.selected ? '700' : '500'};
     font-size: 14px;
-    line-height: 20px;
-    color: #999999;
-    // 선택된 경우
-    font-weight: ${({ selected }) =>
-        selected ? 600 : 400};
-    color: ${({ selected }) =>
-        selected ? '#111111' : '#999999'};
-
-    @media (max-width: 480px) {
-        font-size: 13px;
-        line-height: 18px;
-    }
-
-    @media (max-width: 360px) {
-        font-size: 12px;
-        line-height: 16px;
-    }
+    background: ${props => {
+        if (props.selected) return '#2de283';
+        return '#ffffff';
+    }};
+    color: ${props => {
+        if (props.selected) return '#ffffff';
+        return '#767676';
+    }};
+    border: 1px solid ${props => {
+        if (props.selected) return '#2de283';
+        return '#e8e8e8';
+    }};
+    border-radius: 4px;
+    min-width: 32px;
+    height: 31px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
 `;
 
 const NegotiableTag = styled.div`
@@ -377,20 +369,9 @@ const WorkTimeValue = styled.div`
 
 const WorkTimeSub = styled.div`
     font-family: 'Pretendard';
-    font-weight: 400;
+    font-weight: 500;
     font-size: 14px;
-    line-height: 20px;
     color: #999999;
-
-    @media (max-width: 480px) {
-        font-size: 13px;
-        line-height: 18px;
-    }
-
-    @media (max-width: 360px) {
-        font-size: 12px;
-        line-height: 16px;
-    }
 `;
 
 const WorkTimeRow = styled.div`
@@ -436,18 +417,18 @@ const ScheduleCardHeader = styled.div`
     color: #333333;
     font-family: 'Pretendard';
     font-weight: 600;
-    font-size: 14px;
+    font-size: 16px;
     line-height: 20px;
 
     @media (max-width: 480px) {
         padding: 10px 14px;
-        font-size: 13px;
+        font-size: 15px;
         line-height: 18px;
     }
 
     @media (max-width: 360px) {
         padding: 8px 12px;
-        font-size: 12px;
+        font-size: 14px;
         line-height: 16px;
     }
 `;

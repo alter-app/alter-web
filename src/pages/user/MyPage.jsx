@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import { getUserInfo } from '../../services/myPage';
 import UserProfile from '../../components/user/mypage/UserProfile';
 import CertificateList from '../../components/user/mypage/CertificateList';
-import ApplicationList from '../../components/user/mypage/ApplicationList';
 import ScrappedPostList from '../../components/user/mypage/ScrappedPostList';
 import BottomNavigation from '../../layouts/BottomNavigation';
+import PageHeader from '../../components/shared/PageHeader';
 
 const MyPage = () => {
     const [userInfo, setUserInfo] = useState([]);
@@ -21,36 +21,36 @@ const MyPage = () => {
         console.log(userInfo);
     }, []);
 
+
     return (
         <>
+            <PageHeader
+                title='마이페이지'
+                showBackButton={false}
+            />
             <ContainerColumn>
                 <UserProfile />
-                <CertificateList />
                 <TabContainer>
                     <Tab
                         $active={activeTab === 'scrap'}
-                        onClick={() =>
-                            setActiveTab('scrap')
-                        }
+                        onClick={() => setActiveTab('scrap')}
                     >
-                        스크랩 리스트
+                        저장한 공고
                     </Tab>
                     <Tab
-                        $active={activeTab === 'apply'}
-                        onClick={() =>
-                            setActiveTab('apply')
-                        }
+                        $active={activeTab === 'certificate'}
+                        onClick={() => setActiveTab('certificate')}
                     >
-                        지원 리스트
+                        자격사항 관리
                     </Tab>
                 </TabContainer>
                 <TabPanel>
-                    {activeTab === 'scrap' && (
-                        <ScrappedPostList />
-                    )}
-                    {activeTab === 'apply' && (
-                        <ApplicationList />
-                    )}
+                    <ScrappedPostList 
+                        isActive={activeTab === 'scrap'}
+                    />
+                    <CertificateList 
+                        isActive={activeTab === 'certificate'}
+                    />
                 </TabPanel>
             </ContainerColumn>
             <BottomNavigation />
@@ -63,22 +63,25 @@ export default MyPage;
 const ContainerColumn = styled.div`
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    min-height: calc(100vh - 80px);
     padding-bottom: 80px;
 
     @media (max-width: 480px) {
+        min-height: calc(100vh - 70px);
         padding-bottom: 70px;
     }
 
     @media (max-width: 360px) {
+        min-height: calc(100vh - 60px);
         padding-bottom: 60px;
     }
 `;
 
 const TabContainer = styled.div`
     display: flex;
-    width: 50vw;
-    margin-top: 30px;
+    width: 100%;
+    background: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
 `;
 
 const Tab = styled.button`
@@ -86,16 +89,21 @@ const Tab = styled.button`
     padding: 16px 0;
     background: none;
     border: none;
-    color: ${({ $active }) =>
-        $active ? '#2de283' : '#999999'};
-    font-size: 20px;
-    font-weight: ${({ $active }) => ($active ? 700 : 400)};
-    border-bottom: 2px solid
-        ${({ $active }) =>
-            $active ? ' #2de283' : '#999999'};
+    color: ${({ $active }) => ($active ? '#2de283' : '#999999')};
+    font-size: 16px;
+    font-weight: ${({ $active }) => ($active ? 600 : 400)};
+    font-family: 'Pretendard';
+    border-bottom: 2px solid ${({ $active }) => ($active ? '#2de283' : 'transparent')};
     cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        color: #2de283;
+    }
 `;
 
 const TabPanel = styled.div`
-    padding: 24px 0;
+    flex: 1;
+    background: #f8f9fa;
+    min-height: 0;
 `;

@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import Bookmark from '../Bookmark';
-import { useNavigate } from 'react-router-dom';
 import {
     addPostingScrap,
     deletePostingScrap,
@@ -10,31 +9,31 @@ const JobDetailFooter = ({
     id,
     checked,
     onScrapChange,
+    onApply,
 }) => {
-    const navigate = useNavigate();
-
     const handleApply = () => {
-        navigate('/apply', {
-            state: { id: id },
-        });
+        if (onApply) {
+            onApply();
+        }
     };
 
     const handleBookmark = async (e) => {
         e.stopPropagation();
         const nextChecked = !checked;
-        onScrapChange(nextChecked);
-
+        
         try {
             if (nextChecked) {
                 await addPostingScrap({ postingId: id });
+                onScrapChange(true);
             } else {
                 await deletePostingScrap({
                     favoritePostingId: id,
                 });
+                onScrapChange(false);
             }
         } catch (error) {
-            alert('스크랩 실패');
-            onScrapChange(checked);
+            console.error('스크랩 처리 실패:', error);
+            alert(nextChecked ? '스크랩 등록에 실패했습니다.' : '스크랩 제거에 실패했습니다.');
         }
     };
 

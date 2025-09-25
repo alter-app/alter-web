@@ -116,7 +116,6 @@ const ReputationWrite = () => {
             <Container>
                 <PageHeader
                     title='평판 작성'
-                    variant='sticky'
                 />
                 <Content>
                     <FormCard>

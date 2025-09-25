@@ -9,6 +9,7 @@ import KeywordList from './jobPostDetail/KeywordList';
 import JobDetailFooter from './jobPostDetail/JobDetailFooter';
 import Divider from './jobPostDetail/Divider';
 import PageHeader from '../../shared/PageHeader';
+import JobApplyOverlay from './JobApplyOverlay';
 import { getPostDetail } from '../../../services/post';
 
 const JobPostDetailOverlay = ({
@@ -18,6 +19,8 @@ const JobPostDetailOverlay = ({
 }) => {
     const [postDetail, setPostDetail] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [scrapped, setScrapped] = useState(false);
+    const [showApplyOverlay, setShowApplyOverlay] = useState(false);
 
     useEffect(() => {
         const fetchPostDetail = async () => {
@@ -27,6 +30,7 @@ const JobPostDetailOverlay = ({
                         postId
                     );
                     setPostDetail(result.data);
+                    setScrapped(result.data.scrapped || false);
                     console.log(result);
                 }
             } catch (error) {
@@ -43,9 +47,22 @@ const JobPostDetailOverlay = ({
     }, [postId]);
 
     const handleApply = () => {
+        setShowApplyOverlay(true);
+    };
+
+    const handleCloseApplyOverlay = () => {
+        setShowApplyOverlay(false);
+    };
+
+    const handleApplySuccess = () => {
+        setShowApplyOverlay(false);
         if (onApply) {
             onApply(postDetail);
         }
+    };
+
+    const handleScrapChange = (newScrapped) => {
+        setScrapped(newScrapped);
     };
 
     if (loading) {
@@ -53,7 +70,7 @@ const JobPostDetailOverlay = ({
             <Overlay>
                 <Container>
                     <PageHeader
-                        title='로딩 중...'
+                        title='알바 상세'
                         onBack={onClose}
                         variant='sticky'
                     />
@@ -72,7 +89,7 @@ const JobPostDetailOverlay = ({
             <Overlay>
                 <Container>
                     <PageHeader
-                        title='공고를 찾을 수 없습니다'
+                        title='알바 상세'
                         onBack={onClose}
                         variant='sticky'
                     />
@@ -93,7 +110,6 @@ const JobPostDetailOverlay = ({
                 <PageHeader
                     title='알바 상세'
                     onBack={onClose}
-                    variant='sticky'
                 />
 
                 <Content>
@@ -142,10 +158,21 @@ const JobPostDetailOverlay = ({
                 </Content>
 
                 <JobDetailFooter
-                    postId={postDetail.id}
+                    id={postDetail.id}
+                    checked={scrapped}
+                    onScrapChange={handleScrapChange}
                     onApply={handleApply}
                 />
             </Container>
+            
+            {/* JobApply 오버레이 */}
+            {showApplyOverlay && (
+                <JobApplyOverlay
+                    postId={postDetail.id}
+                    onClose={handleCloseApplyOverlay}
+                    onApplySuccess={handleApplySuccess}
+                />
+            )}
         </Overlay>
     );
 };
@@ -176,7 +203,6 @@ const Container = styled.div`
 const Content = styled.div`
     flex: 1;
     overflow-y: auto;
-    padding-top: 20px;
     -webkit-overflow-scrolling: touch;
 `;
 
