@@ -12,11 +12,13 @@ import FooterLayout from './layouts/FooterLayout';
 import JobLookupMap from './pages/user/JobLookupMap';
 import JobPosting from './pages/owner/JobPosting';
 import MyPage from './pages/user/MyPage';
+import MyJob from './pages/user/MyJob';
 import ApplicantListPage from './pages/owner/ApplicantListPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Main from './pages/owner/Main';
 import WorkplaceDetail from './components/owner/workplace/WorkplaceDetail';
-import ReputationWrite from './pages/owner/ReputationWrite';
+import WorkplaceDetailPage from './components/user/myJob/workplaceDetail/WorkplaceDetailPage';
+import ReputationWrite from './pages/ReputationWrite';
 
 function App() {
     return (
@@ -45,7 +47,6 @@ function App() {
                     />
                 </Route>
 
-
                 <Route element={<MainLayout />}>
                     <Route path='/' element={<Home />} />
                     <Route
@@ -65,6 +66,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <MyPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/my-applications'
+                        element={
+                            <ProtectedRoute>
+                                <MyJob />
                             </ProtectedRoute>
                         }
                     />
@@ -105,6 +114,14 @@ function App() {
                         element={
                             <ProtectedRoute requiredScope='MANAGER'>
                                 <WorkplaceDetail />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/my-job/workplace/:workplaceId/:workplaceName'
+                        element={
+                            <ProtectedRoute>
+                                <WorkplaceDetailPage />
                             </ProtectedRoute>
                         }
                     />

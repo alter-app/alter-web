@@ -3,11 +3,11 @@ import {
     getUserReputationKeywords,
     getManagerReputationKeywords,
     submitReputation,
-} from '../../services/reputationService';
-import useAuthStore from '../../store/authStore';
-import KeywordList from '../../components/owner/reputation/KeywordList';
-import EpisodeInputCard from '../../components/owner/reputation/EpisodeInputCard';
-import PageHeader from '../../components/shared/PageHeader';
+} from '../services/reputationService';
+import useAuthStore from '../store/authStore';
+import KeywordList from '../components/owner/reputation/KeywordList';
+import EpisodeInputCard from '../components/owner/reputation/EpisodeInputCard';
+import PageHeader from '../components/shared/PageHeader';
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -114,9 +114,7 @@ const ReputationWrite = () => {
     return (
         <Overlay>
             <Container>
-                <PageHeader
-                    title='평판 작성'
-                />
+                <PageHeader title='평판 작성' />
                 <Content>
                     <FormCard>
                         <SubTitle>{subtitleText}</SubTitle>
@@ -416,3 +414,5 @@ const EpisodeSubTitle = styled.div`
         line-height: 18px;
     }
 `;
+
+
