@@ -419,6 +419,7 @@ const WorkplaceDetailPage = () => {
                 <CurrentEmployeesSection
                     managers={managers}
                     workers={workers}
+                    workplaceId={workplaceId}
                 />
                 <ScheduleCalendarSection
                     scheduleData={scheduleData}

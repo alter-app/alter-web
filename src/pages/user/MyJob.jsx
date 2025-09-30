@@ -10,7 +10,6 @@ import {
     getUserReputationRequestsList,
     getUserWorkplaceList,
     getUserScheduleSelf,
-    userSubmitReputation,
     userDeclineReputation,
 } from '../../services/myJob';
 import { getApplicationList } from '../../services/myPage';

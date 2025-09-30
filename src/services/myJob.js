@@ -44,7 +44,7 @@ export const userSubmitReputation = async (
         const response = await fetch(
             `${backend}/app/reputations/requests/${requestId}/accept`,
             {
-                method: 'PATCH',
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${accessToken}`,
@@ -412,6 +412,40 @@ export const getWorkplaceSchedule = async (
         console.error('업장 스케줄 조회 오류:', error);
         throw new Error(
             `업장 스케줄 조회 중 오류가 발생했습니다: ${error.message}`
+        );
+    }
+};
+
+// 사용자용 업장 평판 생성
+export const createWorkerReputation = async (
+    workspaceId,
+    keywordsPayload
+) => {
+    const accessToken = useAuthStore.getState().accessToken;
+
+    try {
+        const response = await fetch(
+            `${backend}/app/reputations/requests/workspaces`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({
+                    workspaceId: workspaceId,
+                    keywords: keywordsPayload,
+                }),
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+    } catch (error) {
+        console.error('평판 생성 중 오류:', error);
+        throw new Error(
+            '평판 생성 중 오류가 발생했습니다.'
         );
     }
 };

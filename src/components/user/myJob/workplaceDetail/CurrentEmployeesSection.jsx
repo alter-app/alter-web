@@ -2,7 +2,11 @@ import styled from 'styled-components';
 import ManagersSection from './ManagersSection';
 import WorkersSection from './WorkersSection';
 
-const CurrentEmployeesSection = ({ managers, workers }) => {
+const CurrentEmployeesSection = ({
+    managers,
+    workers,
+    workplaceId,
+}) => {
     console.log('CurrentEmployeesSection 렌더링:', {
         managersCount: managers?.length || 0,
         workersCount: workers?.length || 0,
@@ -12,8 +16,14 @@ const CurrentEmployeesSection = ({ managers, workers }) => {
 
     return (
         <Container>
-            <ManagersSection managers={managers || []} />
-            <WorkersSection workers={workers || []} />
+            <ManagersSection
+                managers={managers || []}
+                workplaceId={workplaceId}
+            />
+            <WorkersSection
+                workers={workers || []}
+                workplaceId={workplaceId}
+            />
         </Container>
     );
 };

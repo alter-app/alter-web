@@ -1,62 +1,80 @@
 import styled from 'styled-components';
+import { useState } from 'react';
+import ReputationRequestModal from './ReputationRequestModal';
 
-const EmployeeCard = ({ employee }) => {
+const EmployeeCard = ({ employee, workplaceId }) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     console.log('EmployeeCard 렌더링:', employee);
 
     const handleMenuClick = () => {
         console.log('메뉴 클릭:', employee.name);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
     };
 
     return (
-        <Card>
-            <CardLeft>
-                <Avatar>
-                    {employee.position?.emoji || '👤'}
-                </Avatar>
-                <EmployeeInfo>
-                    <NameRow>
-                        <Name>{employee.name}</Name>
-                        <PositionTag>
-                            {employee.position
-                                ?.description || '직원'}
-                        </PositionTag>
-                    </NameRow>
-                    <StartTime>
-                        {employee.startTime}
-                    </StartTime>
-                </EmployeeInfo>
-            </CardLeft>
+        <>
+            <Card>
+                <CardLeft>
+                    <Avatar>
+                        {employee.position?.emoji || '👤'}
+                    </Avatar>
+                    <EmployeeInfo>
+                        <NameRow>
+                            <Name>{employee.name}</Name>
+                            <PositionTag>
+                                {employee.position
+                                    ?.description || '직원'}
+                            </PositionTag>
+                        </NameRow>
+                        <StartTime>
+                            {employee.startTime}
+                        </StartTime>
+                    </EmployeeInfo>
+                </CardLeft>
 
-            <CardRight>
-                <MenuButton onClick={handleMenuClick}>
-                    <svg
-                        width='16'
-                        height='16'
-                        viewBox='0 0 24 24'
-                        fill='none'
-                    >
-                        <circle
-                            cx='12'
-                            cy='5'
-                            r='2'
-                            fill='#666666'
-                        />
-                        <circle
-                            cx='12'
-                            cy='12'
-                            r='2'
-                            fill='#666666'
-                        />
-                        <circle
-                            cx='12'
-                            cy='19'
-                            r='2'
-                            fill='#666666'
-                        />
-                    </svg>
-                </MenuButton>
-            </CardRight>
-        </Card>
+                <CardRight>
+                    <MenuButton onClick={handleMenuClick}>
+                        <svg
+                            width='16'
+                            height='16'
+                            viewBox='0 0 24 24'
+                            fill='none'
+                        >
+                            <circle
+                                cx='12'
+                                cy='5'
+                                r='2'
+                                fill='#666666'
+                            />
+                            <circle
+                                cx='12'
+                                cy='12'
+                                r='2'
+                                fill='#666666'
+                            />
+                            <circle
+                                cx='12'
+                                cy='19'
+                                r='2'
+                                fill='#666666'
+                            />
+                        </svg>
+                    </MenuButton>
+                </CardRight>
+            </Card>
+
+            <ReputationRequestModal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                employee={employee}
+                workplaceId={workplaceId}
+            />
+        </>
     );
 };
 

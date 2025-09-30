@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import EmployeeCard from './EmployeeCard';
 
-const WorkersSection = ({ workers }) => {
+const WorkersSection = ({ workers, workplaceId }) => {
     console.log('WorkersSection 렌더링:', {
         workersCount: workers.length,
         workers: workers,
@@ -60,6 +60,7 @@ const WorkersSection = ({ workers }) => {
                             <EmployeeCard
                                 key={worker.id || index}
                                 employee={worker}
+                                workplaceId={workplaceId}
                             />
                         );
                     })

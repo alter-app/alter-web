@@ -1,14 +1,19 @@
 import styled from 'styled-components';
 import EmployeeCard from './EmployeeCard';
 
-const ManagersSection = ({ managers }) => {
+const ManagersSection = ({ managers, workplaceId }) => {
     console.log('ManagersSection 렌더링:', {
         managersCount: managers.length,
         managers: managers,
     });
 
     const crownIcon = (
-        <svg width='20' height='20' viewBox='0 0 24 24' fill='none'>
+        <svg
+            width='20'
+            height='20'
+            viewBox='0 0 24 24'
+            fill='none'
+        >
             <path
                 d='M12 2L15.09 8.26L22 9L17 14L18.18 21L12 17.77L5.82 21L7 14L2 9L8.91 8.26L12 2Z'
                 stroke='#FFA726'
@@ -23,7 +28,9 @@ const ManagersSection = ({ managers }) => {
             <SectionHeader>
                 <HeaderLeft>
                     <IconWrapper>{crownIcon}</IconWrapper>
-                    <Title>관리자 ({managers.length}명)</Title>
+                    <Title>
+                        관리자 ({managers.length}명)
+                    </Title>
                 </HeaderLeft>
             </SectionHeader>
 
@@ -31,18 +38,23 @@ const ManagersSection = ({ managers }) => {
                 {managers.length === 0 ? (
                     <EmptyMessage>
                         <EmptyIcon>👑</EmptyIcon>
-                        <EmptyText>점주/매니저 정보가 없습니다.</EmptyText>
+                        <EmptyText>
+                            점주/매니저 정보가 없습니다.
+                        </EmptyText>
                     </EmptyMessage>
                 ) : (
                     managers.map((manager, index) => {
                         console.log(
-                            `점주/매니저 ${index + 1} 렌더링:`,
+                            `점주/매니저 ${
+                                index + 1
+                            } 렌더링:`,
                             manager
                         );
                         return (
                             <EmployeeCard
                                 key={manager.id || index}
                                 employee={manager}
+                                workplaceId={workplaceId}
                             />
                         );
                     })

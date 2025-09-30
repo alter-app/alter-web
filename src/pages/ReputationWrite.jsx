@@ -4,6 +4,7 @@ import {
     getManagerReputationKeywords,
     submitReputation,
 } from '../services/reputationService';
+import { createWorkerReputation } from '../services/myJob';
 import useAuthStore from '../store/authStore';
 import KeywordList from '../components/owner/reputation/KeywordList';
 import EpisodeInputCard from '../components/owner/reputation/EpisodeInputCard';
@@ -99,10 +100,19 @@ const ReputationWrite = () => {
         }
 
         try {
-            await submitReputation(
-                requestId,
-                keywordsPayload
-            );
+            // 근무자 평판인 경우 새로운 API 사용
+            if (location.state?.type === 'worker') {
+                await createWorkerReputation(
+                    location.state.workplaceId,
+                    keywordsPayload
+                );
+            } else {
+                // 기존 평판 요청 처리
+                await submitReputation(
+                    requestId,
+                    keywordsPayload
+                );
+            }
             navigate('/main');
         } catch (error) {
             alert(
@@ -414,5 +424,3 @@ const EpisodeSubTitle = styled.div`
         line-height: 18px;
     }
 `;
-
-
