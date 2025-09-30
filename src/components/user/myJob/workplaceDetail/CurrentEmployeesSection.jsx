@@ -1,28 +1,14 @@
 import styled from 'styled-components';
 import EmployeeCard from './EmployeeCard';
 
-const CurrentEmployeesSection = ({
-    employees,
-    hasMore = false,
-    isLoadingMore = false,
-    onLoadMore = null,
-    showAllEmployees = false,
-    onToggleShowAll = null,
-}) => {
+const CurrentEmployeesSection = ({ employees }) => {
     console.log('CurrentEmployeesSection 렌더링:', {
         employeesCount: employees.length,
         employees: employees,
-        hasMore,
-        isLoadingMore,
-        showAllEmployees,
     });
 
-    // 표시할 직원 목록 결정 (3명 이상일 때만 제한)
-    const shouldShowToggle = employees.length > 3;
-    const displayEmployees =
-        shouldShowToggle && !showAllEmployees
-            ? employees.slice(0, 3)
-            : employees;
+    // 모든 근무자를 표시
+    const displayEmployees = employees;
     const clockIcon = (
         <svg
             width='20'
@@ -54,23 +40,6 @@ const CurrentEmployeesSection = ({
                     <IconWrapper>{clockIcon}</IconWrapper>
                     <Title>
                         현재 근무 중 ({employees.length}명)
-                        {shouldShowToggle &&
-                            !showAllEmployees && (
-                                <span
-                                    style={{
-                                        color: '#666',
-                                        fontSize: '14px',
-                                        fontWeight: '400',
-                                    }}
-                                >
-                                    {' '}
-                                    (
-                                    {
-                                        displayEmployees.length
-                                    }
-                                    명 표시)
-                                </span>
-                            )}
                     </Title>
                 </HeaderLeft>
             </SectionHeader>
@@ -104,25 +73,6 @@ const CurrentEmployeesSection = ({
                     )
                 )}
             </EmployeeList>
-
-            {hasMore && (
-                <LoadMoreButton
-                    onClick={onLoadMore}
-                    disabled={isLoadingMore}
-                >
-                    {isLoadingMore
-                        ? '로딩 중...'
-                        : '더보기'}
-                </LoadMoreButton>
-            )}
-
-            {shouldShowToggle && (
-                <ToggleButton onClick={onToggleShowAll}>
-                    {showAllEmployees
-                        ? '간략히 보기'
-                        : '전체보기'}
-                </ToggleButton>
-            )}
         </Section>
     );
 };
@@ -176,31 +126,6 @@ const EmployeeList = styled.div`
     gap: 12px;
 `;
 
-const LoadMoreButton = styled.button`
-    width: 100%;
-    padding: 12px 16px;
-    margin-top: 16px;
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    font-family: 'Pretendard';
-    font-weight: 500;
-    font-size: 14px;
-    color: #666666;
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover:not(:disabled) {
-        background: #f8f9fa;
-        border-color: #d0d0d0;
-    }
-
-    &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-`;
-
 const EmptyMessage = styled.div`
     display: flex;
     flex-direction: column;
@@ -224,24 +149,4 @@ const EmptyText = styled.span`
     font-size: 16px;
     color: #666666;
     text-align: center;
-`;
-
-const ToggleButton = styled.button`
-    width: 100%;
-    padding: 12px 16px;
-    margin-top: 12px;
-    background: #f8f9fa;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    font-family: 'Pretendard';
-    font-weight: 500;
-    font-size: 14px;
-    color: #1976d2;
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover {
-        background: #e3f2fd;
-        border-color: #1976d2;
-    }
 `;

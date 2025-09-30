@@ -126,8 +126,6 @@ const WorkplaceDetailPage = () => {
         useState([]);
     const [scheduleData, setScheduleData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [showAllEmployees, setShowAllEmployees] =
-        useState(false);
 
     // 월단위 전환을 위한 상태
     const [currentYear, setCurrentYear] = useState(
@@ -161,9 +159,12 @@ const WorkplaceDetailPage = () => {
                     );
 
                     // API 데이터 구조 확인 및 안전한 배열 접근
+                    // 실제 데이터는 employeesData.data.data에 있음
                     const employeesArray = Array.isArray(
-                        employeesData.data
+                        employeesData.data?.data
                     )
+                        ? employeesData.data.data
+                        : Array.isArray(employeesData.data)
                         ? employeesData.data
                         : Array.isArray(employeesData)
                         ? employeesData
@@ -173,6 +174,26 @@ const WorkplaceDetailPage = () => {
                         '직원 배열:',
                         employeesArray
                     );
+                    console.log(
+                        '직원 배열 길이:',
+                        employeesArray.length
+                    );
+
+                    // 첫 번째 직원 데이터 구조 확인
+                    if (employeesArray.length > 0) {
+                        console.log(
+                            '첫 번째 직원 원본 데이터:',
+                            employeesArray[0]
+                        );
+                        console.log(
+                            '첫 번째 직원 user 데이터:',
+                            employeesArray[0]?.user
+                        );
+                        console.log(
+                            '첫 번째 직원 position 데이터:',
+                            employeesArray[0]?.position
+                        );
+                    }
 
                     // API 데이터를 컴포넌트에 맞게 변환
                     const formattedEmployees =
@@ -238,6 +259,22 @@ const WorkplaceDetailPage = () => {
                         '근무자 수:',
                         formattedEmployees.length
                     );
+
+                    // 변환된 첫 번째 직원 데이터 확인
+                    if (formattedEmployees.length > 0) {
+                        console.log(
+                            '변환된 첫 번째 직원:',
+                            formattedEmployees[0]
+                        );
+                        console.log(
+                            '변환된 첫 번째 직원 position:',
+                            formattedEmployees[0]?.position
+                        );
+                        console.log(
+                            '변환된 첫 번째 직원 name:',
+                            formattedEmployees[0]?.name
+                        );
+                    }
 
                     // 각 근무자 데이터 상세 로깅
                     formattedEmployees.forEach(
@@ -368,11 +405,6 @@ const WorkplaceDetailPage = () => {
         navigate(-1);
     };
 
-    // 전체보기 토글 함수
-    const handleToggleShowAll = () => {
-        setShowAllEmployees(!showAllEmployees);
-    };
-
     if (isLoading) {
         return (
             <>
@@ -401,8 +433,6 @@ const WorkplaceDetailPage = () => {
             <Container>
                 <CurrentEmployeesSection
                     employees={currentEmployees}
-                    showAllEmployees={showAllEmployees}
-                    onToggleShowAll={handleToggleShowAll}
                 />
                 <ScheduleCalendarSection
                     scheduleData={scheduleData}
