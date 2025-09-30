@@ -163,7 +163,7 @@ export const getUserScheduleSelf = async (
 export const getWorkplaceManagers = async (workplaceId) => {
     const accessToken = useAuthStore.getState().accessToken;
     try {
-        const url = `${backend}/app/users/me/workspaces/${workplaceId}/managers`;
+        const url = `${backend}/app/users/me/workspaces/${workplaceId}/managers?pageSize=10`;
 
         console.log('점주/매니저 조회 API 요청:', {
             url,
@@ -211,7 +211,7 @@ export const getWorkplaceManagers = async (workplaceId) => {
 export const getWorkplaceWorkers = async (workplaceId) => {
     const accessToken = useAuthStore.getState().accessToken;
     try {
-        const url = `${backend}/app/users/me/workspaces/${workplaceId}/workers`;
+        const url = `${backend}/app/users/me/workspaces/${workplaceId}/workers?pageSize=10`;
 
         console.log('알바생 조회 API 요청:', {
             url,

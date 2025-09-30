@@ -123,8 +123,8 @@ const WorkplaceDetailPage = () => {
             workplaceName || '알 수 없는 업장'
         ),
     };
-    const [currentEmployees, setCurrentEmployees] =
-        useState([]);
+    const [managers, setManagers] = useState([]);
+    const [workers, setWorkers] = useState([]);
     const [scheduleData, setScheduleData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -167,19 +167,23 @@ const WorkplaceDetailPage = () => {
                         workersData
                     );
 
-                    // 점주/매니저 데이터 변환
+                    // 점주/매니저 데이터 변환 (중첩된 data 구조 처리)
                     const managersArray = Array.isArray(
-                        managersData.data
+                        managersData.data?.data
                     )
+                        ? managersData.data.data
+                        : Array.isArray(managersData.data)
                         ? managersData.data
                         : Array.isArray(managersData)
                         ? managersData
                         : [];
 
-                    // 알바생 데이터 변환
+                    // 알바생 데이터 변환 (중첩된 data 구조 처리)
                     const workersArray = Array.isArray(
-                        workersData.data
+                        workersData.data?.data
                     )
+                        ? workersData.data.data
+                        : Array.isArray(workersData.data)
                         ? workersData.data
                         : Array.isArray(workersData)
                         ? workersData
@@ -256,29 +260,33 @@ const WorkplaceDetailPage = () => {
                                     : null,
                         }));
 
-                    // 모든 근무자를 합쳐서 정렬 (점주/매니저 먼저, 그 다음 알바생)
-                    const formattedEmployees = [
-                        ...formattedManagers,
-                        ...formattedWorkers,
-                    ];
-
                     console.log(
-                        '변환된 모든 근무자 목록:',
-                        formattedEmployees
+                        '변환된 점주/매니저 목록:',
+                        formattedManagers
                     );
                     console.log(
-                        '총 근무자 수:',
-                        formattedEmployees.length
+                        '변환된 근무자 목록:',
+                        formattedWorkers
+                    );
+                    console.log(
+                        '점주/매니저 수:',
+                        formattedManagers.length
+                    );
+                    console.log(
+                        '근무자 수:',
+                        formattedWorkers.length
                     );
 
-                    setCurrentEmployees(formattedEmployees);
+                    setManagers(formattedManagers);
+                    setWorkers(formattedWorkers);
                 } catch (error) {
                     console.error(
                         '근무자 목록 조회 오류:',
                         error
                     );
                     // 에러 발생 시 빈 배열로 초기화
-                    setCurrentEmployees([]);
+                    setManagers([]);
+                    setWorkers([]);
                 }
 
                 // 초기 스케줄 데이터 로딩은 별도 useEffect에서 처리
@@ -409,7 +417,8 @@ const WorkplaceDetailPage = () => {
             />
             <Container>
                 <CurrentEmployeesSection
-                    employees={currentEmployees}
+                    managers={managers}
+                    workers={workers}
                 />
                 <ScheduleCalendarSection
                     scheduleData={scheduleData}
