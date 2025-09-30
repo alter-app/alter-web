@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { formatNumber } from '../../../utils/formatNumber';
 
 const ApplicationCard = ({
     workplaceName,
@@ -71,7 +72,7 @@ const ApplicationCard = ({
                 </CardHeader>
                 <JobInfo>
                     <Position>{position}</Position>
-                    <Wage>{wage}원</Wage>
+                    <Wage>{formatNumber(wage)}원</Wage>
                 </JobInfo>
                 <ApplicationDate>{applicationDate}</ApplicationDate>
             </CardContent>
