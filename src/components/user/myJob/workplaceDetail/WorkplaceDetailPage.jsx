@@ -6,7 +6,8 @@ import BottomNavigation from '../../../../layouts/BottomNavigation';
 import CurrentEmployeesSection from './CurrentEmployeesSection';
 import ScheduleCalendarSection from './ScheduleCalendarSection';
 import {
-    getWorkplaceEmployees,
+    getWorkplaceManagers,
+    getWorkplaceWorkers,
     getWorkplaceSchedule,
 } from '../../../../services/myJob';
 
@@ -148,150 +149,126 @@ const WorkplaceDetailPage = () => {
                         '근무자 목록 조회 시작, workplaceId:',
                         workplaceId
                     );
-                    const employeesData =
-                        await getWorkplaceEmployees(
-                            parseInt(workplaceId),
-                            10
+                    // 점주/매니저와 알바생 목록을 각각 조회
+                    const managersData =
+                        await getWorkplaceManagers(
+                            parseInt(workplaceId)
+                        );
+                    const workersData =
+                        await getWorkplaceWorkers(
+                            parseInt(workplaceId)
                         );
                     console.log(
-                        '근무자 목록 API 응답:',
-                        employeesData
+                        '점주/매니저 API 응답:',
+                        managersData
+                    );
+                    console.log(
+                        '알바생 API 응답:',
+                        workersData
                     );
 
-                    // API 데이터 구조 확인 및 안전한 배열 접근
-                    // 실제 데이터는 employeesData.data.data에 있음
-                    const employeesArray = Array.isArray(
-                        employeesData.data?.data
+                    // 점주/매니저 데이터 변환
+                    const managersArray = Array.isArray(
+                        managersData.data
                     )
-                        ? employeesData.data.data
-                        : Array.isArray(employeesData.data)
-                        ? employeesData.data
-                        : Array.isArray(employeesData)
-                        ? employeesData
+                        ? managersData.data
+                        : Array.isArray(managersData)
+                        ? managersData
+                        : [];
+
+                    // 알바생 데이터 변환
+                    const workersArray = Array.isArray(
+                        workersData.data
+                    )
+                        ? workersData.data
+                        : Array.isArray(workersData)
+                        ? workersData
                         : [];
 
                     console.log(
-                        '직원 배열:',
-                        employeesArray
+                        '점주/매니저 배열:',
+                        managersArray
                     );
                     console.log(
-                        '직원 배열 길이:',
-                        employeesArray.length
+                        '알바생 배열:',
+                        workersArray
                     );
 
-                    // 첫 번째 직원 데이터 구조 확인
-                    if (employeesArray.length > 0) {
-                        console.log(
-                            '첫 번째 직원 원본 데이터:',
-                            employeesArray[0]
-                        );
-                        console.log(
-                            '첫 번째 직원 user 데이터:',
-                            employeesArray[0]?.user
-                        );
-                        console.log(
-                            '첫 번째 직원 position 데이터:',
-                            employeesArray[0]?.position
-                        );
-                    }
+                    // 점주/매니저 데이터를 컴포넌트에 맞게 변환
+                    const formattedManagers =
+                        managersArray.map((manager) => ({
+                            id: manager.id,
+                            name:
+                                manager.manager?.name ||
+                                '알 수 없는 점주/매니저',
+                            position: {
+                                description:
+                                    manager.position
+                                        ?.description ||
+                                    '점주/매니저',
+                                emoji:
+                                    manager.position
+                                        ?.emoji || '👑',
+                            },
+                            avatar: manager.manager?.name
+                                ? manager.manager.name.charAt(
+                                      0
+                                  )
+                                : '?',
+                            status: 'manager',
+                            startTime: '점주/매니저',
+                        }));
 
-                    // API 데이터를 컴포넌트에 맞게 변환
-                    const formattedEmployees =
-                        employeesArray.map(
-                            (employee, index) => {
-                                console.log(
-                                    `원본 직원 데이터 ${
-                                        index + 1
-                                    }:`,
-                                    employee
-                                );
+                    // 알바생 데이터를 컴포넌트에 맞게 변환
+                    const formattedWorkers =
+                        workersArray.map((worker) => ({
+                            id: worker.id,
+                            name:
+                                worker.user?.name ||
+                                '알 수 없는 알바생',
+                            position: {
+                                description:
+                                    worker.position
+                                        ?.description ||
+                                    '알바생',
+                                emoji:
+                                    worker.position
+                                        ?.emoji || '👷',
+                            },
+                            avatar: worker.user?.name
+                                ? worker.user.name.charAt(0)
+                                : '?',
+                            status: 'worker',
+                            startTime: worker.employedAt
+                                ? `입사일: ${new Date(
+                                      worker.employedAt
+                                  ).toLocaleDateString(
+                                      'ko-KR'
+                                  )}`
+                                : '정보 없음',
+                            nextShift:
+                                worker.nextShiftDateTime
+                                    ? `다음 근무: ${new Date(
+                                          worker.nextShiftDateTime
+                                      ).toLocaleDateString(
+                                          'ko-KR'
+                                      )}`
+                                    : null,
+                        }));
 
-                                const formatted = {
-                                    id: employee.id,
-                                    name:
-                                        employee.user
-                                            ?.name ||
-                                        '알 수 없는 직원',
-                                    position: {
-                                        description:
-                                            employee
-                                                .position
-                                                ?.description ||
-                                            '직원',
-                                        emoji:
-                                            employee
-                                                .position
-                                                ?.emoji ||
-                                            '👤',
-                                    },
-                                    avatar: employee.user
-                                        ?.name
-                                        ? employee.user.name.charAt(
-                                              0
-                                          )
-                                        : '?',
-                                    status: 'working', // 기본값
-                                    startTime:
-                                        employee.employedAt
-                                            ? `입사일: ${new Date(
-                                                  employee.employedAt
-                                              ).toLocaleDateString(
-                                                  'ko-KR'
-                                              )}`
-                                            : '정보 없음',
-                                };
-
-                                console.log(
-                                    `변환된 직원 데이터 ${
-                                        index + 1
-                                    }:`,
-                                    formatted
-                                );
-                                return formatted;
-                            }
-                        );
+                    // 모든 근무자를 합쳐서 정렬 (점주/매니저 먼저, 그 다음 알바생)
+                    const formattedEmployees = [
+                        ...formattedManagers,
+                        ...formattedWorkers,
+                    ];
 
                     console.log(
-                        '변환된 근무자 목록:',
+                        '변환된 모든 근무자 목록:',
                         formattedEmployees
                     );
                     console.log(
-                        '근무자 수:',
+                        '총 근무자 수:',
                         formattedEmployees.length
-                    );
-
-                    // 변환된 첫 번째 직원 데이터 확인
-                    if (formattedEmployees.length > 0) {
-                        console.log(
-                            '변환된 첫 번째 직원:',
-                            formattedEmployees[0]
-                        );
-                        console.log(
-                            '변환된 첫 번째 직원 position:',
-                            formattedEmployees[0]?.position
-                        );
-                        console.log(
-                            '변환된 첫 번째 직원 name:',
-                            formattedEmployees[0]?.name
-                        );
-                    }
-
-                    // 각 근무자 데이터 상세 로깅
-                    formattedEmployees.forEach(
-                        (employee, index) => {
-                            console.log(
-                                `근무자 ${index + 1}:`,
-                                {
-                                    id: employee.id,
-                                    name: employee.name,
-                                    position:
-                                        employee.position,
-                                    avatar: employee.avatar,
-                                    startTime:
-                                        employee.startTime,
-                                }
-                            );
-                        }
                     );
 
                     setCurrentEmployees(formattedEmployees);
