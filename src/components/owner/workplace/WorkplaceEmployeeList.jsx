@@ -1,4 +1,7 @@
-import { getWorkplaceEmployee } from '../../../services/workplaceService';
+import {
+    getWorkplaceManagers,
+    getWorkplaceWorkers,
+} from '../../../services/workplaceService';
 import WorkplaceEmployeeItem from './WorkplaceEmployeeItem';
 import { useState, useEffect, useRef } from 'react';
 import user_icon_title from '../../../assets/icons/workplace/user_icon_title.svg';
@@ -16,11 +19,135 @@ const WorkplaceEmployeeList = ({ id }) => {
 
     const fetchWorkplaceEmployeeList = async () => {
         try {
-            const result = await getWorkplaceEmployee(id);
-            setWorkplaceEmployee(result.data);
-            console.log(result.data);
+            console.log(
+                '매니저 계정 - 근무자 목록 조회 시작, workspaceId:',
+                id
+            );
+
+            // 점주/매니저와 알바생 목록을 각각 조회
+            const managersData = await getWorkplaceManagers(
+                id
+            );
+            const workersData = await getWorkplaceWorkers(
+                id
+            );
+
+            console.log(
+                '매니저 계정 - 점주/매니저 API 응답:',
+                managersData
+            );
+            console.log(
+                '매니저 계정 - 알바생 API 응답:',
+                workersData
+            );
+
+            // 점주/매니저 데이터 변환
+            const managersArray = Array.isArray(
+                managersData.data
+            )
+                ? managersData.data
+                : Array.isArray(managersData)
+                ? managersData
+                : [];
+
+            // 알바생 데이터 변환
+            const workersArray = Array.isArray(
+                workersData.data
+            )
+                ? workersData.data
+                : Array.isArray(workersData)
+                ? workersData
+                : [];
+
+            console.log(
+                '매니저 계정 - 점주/매니저 배열:',
+                managersArray
+            );
+            console.log(
+                '매니저 계정 - 알바생 배열:',
+                workersArray
+            );
+
+            // 점주/매니저 데이터를 컴포넌트에 맞게 변환
+            const formattedManagers = managersArray.map(
+                (manager) => ({
+                    id: manager.id,
+                    user: {
+                        name:
+                            manager.user?.name ||
+                            '알 수 없는 점주/매니저',
+                        contact:
+                            manager.user?.contact ||
+                            '연락처 없음',
+                    },
+                    status: {
+                        description:
+                            manager.status?.description ||
+                            '상태 없음',
+                    },
+                    position: {
+                        description:
+                            manager.position?.description ||
+                            '점주/매니저',
+                        emoji:
+                            manager.position?.emoji || '👑',
+                    },
+                    createdAt: manager.createdAt,
+                })
+            );
+
+            // 알바생 데이터를 컴포넌트에 맞게 변환
+            const formattedWorkers = workersArray.map(
+                (worker) => ({
+                    id: worker.id,
+                    user: {
+                        name:
+                            worker.user?.name ||
+                            '알 수 없는 알바생',
+                        contact:
+                            worker.user?.contact ||
+                            '연락처 없음',
+                    },
+                    status: {
+                        description:
+                            worker.status?.description ||
+                            '상태 없음',
+                    },
+                    position: {
+                        description:
+                            worker.position?.description ||
+                            '알바생',
+                        emoji:
+                            worker.position?.emoji || '👷',
+                    },
+                    employedAt: worker.employedAt,
+                    resignedAt: worker.resignedAt,
+                    nextShiftDateTime:
+                        worker.nextShiftDateTime,
+                })
+            );
+
+            // 모든 근무자를 합쳐서 정렬 (점주/매니저 먼저, 그 다음 알바생)
+            const allEmployees = [
+                ...formattedManagers,
+                ...formattedWorkers,
+            ];
+
+            console.log(
+                '매니저 계정 - 변환된 모든 근무자 목록:',
+                allEmployees
+            );
+            console.log(
+                '매니저 계정 - 총 근무자 수:',
+                allEmployees.length
+            );
+
+            setWorkplaceEmployee(allEmployees);
         } catch (error) {
-            console.error('근무자 조회 오류:', error);
+            console.error(
+                '매니저 계정 - 근무자 조회 오류:',
+                error
+            );
         }
     };
 
