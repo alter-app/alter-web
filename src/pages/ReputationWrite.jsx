@@ -3,11 +3,13 @@ import {
     getUserReputationKeywords,
     getManagerReputationKeywords,
     submitReputation,
-} from '../../services/reputationService';
-import useAuthStore from '../../store/authStore';
-import KeywordList from '../../components/owner/reputation/KeywordList';
-import EpisodeInputCard from '../../components/owner/reputation/EpisodeInputCard';
-import PageHeader from '../../components/shared/PageHeader';
+} from '../services/reputationService';
+import { createWorkerReputation } from '../services/myJob';
+import useAuthStore from '../store/authStore';
+import KeywordList from '../components/owner/reputation/KeywordList';
+import EpisodeInputCard from '../components/owner/reputation/EpisodeInputCard';
+import PageHeader from '../components/shared/PageHeader';
+import ReputationCompletionModal from '../components/user/myJob/workplaceDetail/ReputationCompletionModal';
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -16,6 +18,10 @@ const ReputationWrite = () => {
     const [allKeywords, setAllKeywords] = useState([]);
     const [categories, setCategories] = useState([]);
     const [episodeInputs, setEpisodeInputs] = useState({});
+    const [
+        isCompletionModalOpen,
+        setIsCompletionModalOpen,
+    ] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
     const requestId = location.state?.requestId;
@@ -99,11 +105,22 @@ const ReputationWrite = () => {
         }
 
         try {
-            await submitReputation(
-                requestId,
-                keywordsPayload
-            );
-            navigate('/main');
+            // 근무자 평판인 경우 새로운 API 사용
+            if (location.state?.type === 'worker') {
+                await createWorkerReputation(
+                    location.state.workplaceId,
+                    keywordsPayload
+                );
+            } else {
+                // 기존 평판 요청 처리
+                await submitReputation(
+                    requestId,
+                    keywordsPayload
+                );
+            }
+
+            // 완료 모달 표시
+            setIsCompletionModalOpen(true);
         } catch (error) {
             alert(
                 `평판 저장 중 오류 발생: ${error.message}`
@@ -111,12 +128,15 @@ const ReputationWrite = () => {
         }
     };
 
+    const handleCompletionModalClose = () => {
+        setIsCompletionModalOpen(false);
+        navigate(-1);
+    };
+
     return (
         <Overlay>
             <Container>
-                <PageHeader
-                    title='평판 작성'
-                />
+                <PageHeader title='평판 작성' />
                 <Content>
                     <FormCard>
                         <SubTitle>{subtitleText}</SubTitle>
@@ -168,6 +188,11 @@ const ReputationWrite = () => {
                     작성 완료
                 </StyledButton>
             </Container>
+
+            <ReputationCompletionModal
+                isOpen={isCompletionModalOpen}
+                onClose={handleCompletionModalClose}
+            />
         </Overlay>
     );
 };
