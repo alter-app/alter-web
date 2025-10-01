@@ -5,8 +5,19 @@ const backend = import.meta.env.VITE_API_URL;
 // 매니저 계정 - 관리중인 업장의 점주/매니저 목록 조회
 export const getWorkplaceManagers = async (workspaceId) => {
     const accessToken = useAuthStore.getState().accessToken;
+
+    if (!accessToken) {
+        throw new Error(
+            '인증 토큰이 없습니다. 다시 로그인해주세요.'
+        );
+    }
+
+    if (!workspaceId) {
+        throw new Error('업장 ID가 필요합니다.');
+    }
+
     try {
-        const url = `${backend}/manager/workspaces/${workspaceId}/managers`;
+        const url = `${backend}/manager/workspaces/${workspaceId}/managers?pageSize=10`;
 
         console.log(
             '매니저 계정 - 점주/매니저 조회 API 요청:',
@@ -40,9 +51,22 @@ export const getWorkplaceManagers = async (workspaceId) => {
                 '서버 응답 오류 상세:',
                 errorText
             );
-            throw new Error(
-                `서버 응답 오류: ${response.status} ${response.statusText}`
-            );
+
+            if (response.status === 401) {
+                throw new Error(
+                    '인증이 만료되었습니다. 다시 로그인해주세요.'
+                );
+            } else if (response.status === 403) {
+                throw new Error(
+                    '해당 업장에 대한 접근 권한이 없습니다.'
+                );
+            } else if (response.status === 404) {
+                throw new Error('업장을 찾을 수 없습니다.');
+            } else {
+                throw new Error(
+                    `서버 응답 오류: ${response.status} ${response.statusText}`
+                );
+            }
         }
 
         const data = await response.json();
@@ -50,23 +74,47 @@ export const getWorkplaceManagers = async (workspaceId) => {
             '매니저 계정 - 점주/매니저 API 응답 데이터:',
             data
         );
+
+        // 데이터 유효성 검사
+        if (!data || typeof data !== 'object') {
+            throw new Error(
+                '서버에서 잘못된 데이터를 반환했습니다.'
+            );
+        }
+
         return data;
     } catch (error) {
         console.error(
             '매니저 계정 - 점주/매니저 조회 오류:',
             error
         );
-        throw new Error(
-            `점주/매니저 조회 중 오류가 발생했습니다: ${error.message}`
-        );
+
+        if (error.message.includes('Failed to fetch')) {
+            throw new Error(
+                '네트워크 연결을 확인해주세요.'
+            );
+        }
+
+        throw error;
     }
 };
 
 // 매니저 계정 - 관리중인 업장의 알바생 목록 조회
 export const getWorkplaceWorkers = async (workspaceId) => {
     const accessToken = useAuthStore.getState().accessToken;
+
+    if (!accessToken) {
+        throw new Error(
+            '인증 토큰이 없습니다. 다시 로그인해주세요.'
+        );
+    }
+
+    if (!workspaceId) {
+        throw new Error('업장 ID가 필요합니다.');
+    }
+
     try {
-        const url = `${backend}/manager/workspaces/${workspaceId}/workers`;
+        const url = `${backend}/manager/workspaces/${workspaceId}/workers?pageSize=10`;
 
         console.log('매니저 계정 - 알바생 조회 API 요청:', {
             url,
@@ -94,9 +142,22 @@ export const getWorkplaceWorkers = async (workspaceId) => {
                 '서버 응답 오류 상세:',
                 errorText
             );
-            throw new Error(
-                `서버 응답 오류: ${response.status} ${response.statusText}`
-            );
+
+            if (response.status === 401) {
+                throw new Error(
+                    '인증이 만료되었습니다. 다시 로그인해주세요.'
+                );
+            } else if (response.status === 403) {
+                throw new Error(
+                    '해당 업장에 대한 접근 권한이 없습니다.'
+                );
+            } else if (response.status === 404) {
+                throw new Error('업장을 찾을 수 없습니다.');
+            } else {
+                throw new Error(
+                    `서버 응답 오류: ${response.status} ${response.statusText}`
+                );
+            }
         }
 
         const data = await response.json();
@@ -104,15 +165,28 @@ export const getWorkplaceWorkers = async (workspaceId) => {
             '매니저 계정 - 알바생 API 응답 데이터:',
             data
         );
+
+        // 데이터 유효성 검사
+        if (!data || typeof data !== 'object') {
+            throw new Error(
+                '서버에서 잘못된 데이터를 반환했습니다.'
+            );
+        }
+
         return data;
     } catch (error) {
         console.error(
             '매니저 계정 - 알바생 조회 오류:',
             error
         );
-        throw new Error(
-            `알바생 조회 중 오류가 발생했습니다: ${error.message}`
-        );
+
+        if (error.message.includes('Failed to fetch')) {
+            throw new Error(
+                '네트워크 연결을 확인해주세요.'
+            );
+        }
+
+        throw error;
     }
 };
 
