@@ -113,7 +113,8 @@ const ReputationWrite = () => {
                     keywordsPayload
                 );
             }
-            navigate('/main');
+            alert('평판이 성공적으로 작성되었습니다!');
+            navigate(-1);
         } catch (error) {
             alert(
                 `평판 저장 중 오류 발생: ${error.message}`
