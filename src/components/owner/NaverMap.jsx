@@ -12,6 +12,10 @@ import {
     getMapJobPostings,
     getWorkspacePostings,
 } from '../../services/workplaceService';
+import {
+    getCurrentLocation,
+    getLocationWithFallback,
+} from '../../utils/locationUtils';
 
 const NAVER_MAP_CLIENT_ID = import.meta.env
     .VITE_NAVER_MAP_CLIENT_ID;
@@ -33,47 +37,6 @@ const NaverMap = forwardRef(
         const mapRef = useRef(null);
         const [currentLocation, setCurrentLocation] =
             useState(() => {
-                // localStorage에서 저장된 위치 정보 확인
-                const savedLocation =
-                    localStorage.getItem('userLocation');
-                if (savedLocation) {
-                    try {
-                        const parsed =
-                            JSON.parse(savedLocation);
-                        const now = Date.now();
-                        const fiveMinutes = 5 * 60 * 1000; // 5분
-
-                        // 저장된 위치가 5분 이내인지 확인
-                        if (
-                            parsed.timestamp &&
-                            now - parsed.timestamp <
-                                fiveMinutes
-                        ) {
-                            console.log(
-                                '저장된 위치 정보 사용 (유효함):',
-                                parsed
-                            );
-                            return {
-                                latitude: parsed.latitude,
-                                longitude: parsed.longitude,
-                            };
-                        } else {
-                            console.log(
-                                '저장된 위치 정보가 만료됨'
-                            );
-                            localStorage.removeItem(
-                                'userLocation'
-                            );
-                        }
-                    } catch (e) {
-                        console.log(
-                            '저장된 위치 정보 파싱 실패'
-                        );
-                        localStorage.removeItem(
-                            'userLocation'
-                        );
-                    }
-                }
                 return {
                     latitude: latitude || 37.5665,
                     longitude: longitude || 126.978,
@@ -456,125 +419,48 @@ const NaverMap = forwardRef(
 
         // 현재 위치 가져오기
         useEffect(() => {
-            // 이미 유효한 위치 정보가 있으면 GPS 요청하지 않음
-            const savedLocation =
-                localStorage.getItem('userLocation');
-            if (savedLocation) {
+            const fetchLocation = async () => {
                 try {
-                    const parsed =
-                        JSON.parse(savedLocation);
-                    const now = Date.now();
-                    const fiveMinutes = 5 * 60 * 1000;
-
-                    if (
-                        parsed.timestamp &&
-                        now - parsed.timestamp < fiveMinutes
-                    ) {
-                        console.log(
-                            '저장된 위치 정보가 유효하므로 GPS 요청 생략'
-                        );
-                        setLocationPermission('granted');
-                        return;
-                    }
-                } catch (e) {
-                    console.log(
-                        '저장된 위치 정보 확인 실패'
-                    );
-                }
-            }
-
-            console.log('위치 정보 요청 시작...');
-
-            if (!navigator.geolocation) {
-                console.log(
-                    'Geolocation API를 지원하지 않습니다.'
-                );
-                setLocationPermission('unavailable');
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    console.log('위치 정보 획득 성공:', {
-                        latitude: position.coords.latitude,
-                        longitude:
-                            position.coords.longitude,
-                        accuracy: position.coords.accuracy,
+                    console.log('위치 정보 요청 시작...');
+                    const location = await getCurrentLocation();
+                    
+                    console.log('위치 정보 획득 성공:', location);
+                    setCurrentLocation({
+                        latitude: location.latitude,
+                        longitude: location.longitude
                     });
-                    const newLocation = {
-                        latitude: position.coords.latitude,
-                        longitude:
-                            position.coords.longitude,
-                    };
-                    setCurrentLocation(newLocation);
                     setLocationPermission('granted');
 
-                    // 위치 정보를 localStorage에 저장 (5분간 유효)
-                    const locationData = {
-                        ...newLocation,
-                        timestamp: Date.now(),
-                        accuracy: position.coords.accuracy,
-                    };
-                    localStorage.setItem(
-                        'userLocation',
-                        JSON.stringify(locationData)
-                    );
-                    console.log(
-                        '위치 정보 저장됨:',
-                        locationData
-                    );
-                },
-                (error) => {
-                    console.log(
-                        '위치 정보를 가져올 수 없습니다:',
-                        {
-                            code: error.code,
-                            message: error.message,
-                        }
-                    );
-
-                    // 에러 코드별 상세 메시지
-                    switch (error.code) {
-                        case error.PERMISSION_DENIED:
-                            console.log(
-                                '위치 권한이 거부되었습니다.'
-                            );
-                            setLocationPermission('denied');
-                            alert(
-                                '위치 권한이 필요합니다. 브라우저 설정에서 위치 권한을 허용해주세요.'
-                            );
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            console.log(
-                                '위치 정보를 사용할 수 없습니다.'
-                            );
-                            setLocationPermission(
-                                'unavailable'
-                            );
-                            break;
-                        case error.TIMEOUT:
-                            console.log(
-                                '위치 요청 시간이 초과되었습니다.'
-                            );
-                            setLocationPermission(
-                                'timeout'
-                            );
-                            break;
-                        default:
-                            console.log(
-                                '알 수 없는 오류가 발생했습니다.'
-                            );
-                            setLocationPermission('error');
-                            break;
+                } catch (error) {
+                    console.log('위치 정보 획득 실패:', error.message);
+                    
+                    // 에러 처리
+                    if (error.code === 1) { // PERMISSION_DENIED
+                        setLocationPermission('denied');
+                        alert('위치 권한이 필요합니다. 브라우저 설정에서 위치 권한을 허용해주세요.');
+                    } else if (error.code === 2) { // POSITION_UNAVAILABLE
+                        setLocationPermission('unavailable');
+                    } else if (error.code === 3) { // TIMEOUT
+                        setLocationPermission('timeout');
+                    } else {
+                        setLocationPermission('error');
                     }
-                    // 기본값 유지 (서울시청)
-                },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 15000, // 15초로 증가
-                    maximumAge: 0, // 캐시 사용 안함
+
+                    // 모든 방법이 실패한 경우 기본값 사용
+                    try {
+                        const fallbackLocation = await getLocationWithFallback();
+                        setCurrentLocation({
+                            latitude: fallbackLocation.latitude,
+                            longitude: fallbackLocation.longitude
+                        });
+                        console.log('기본 위치 사용:', fallbackLocation);
+                    } catch (fallbackError) {
+                        console.log('기본 위치도 사용할 수 없음:', fallbackError.message);
+                    }
                 }
-            );
+            };
+
+            fetchLocation();
         }, []);
 
         useEffect(() => {
