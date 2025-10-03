@@ -3,6 +3,9 @@
  * Flutter 하이브리드 앱과 웹 브라우저 환경을 모두 지원
  */
 
+// 위치정보 획득 타임아웃
+const LOCATION_TIMEOUT = 5000;
+
 /**
  * 네이티브 환경 여부를 판단하는 단순화된 함수
  * @returns {boolean} 네이티브 환경 여부
@@ -91,12 +94,12 @@ export const getNativeLocation = () => {
             window.addEventListener('locationReceived', handleLocationReceived);
             window.addEventListener('nativeError', handleNativeError);
             
-            // 타임아웃 설정 (10초)
+            // 타임아웃 설정
             setTimeout(() => {
                 window.removeEventListener('locationReceived', handleLocationReceived);
                 window.removeEventListener('nativeError', handleNativeError);
                 reject(new Error('Flutter 위치 요청 타임아웃'));
-            }, 10000);
+            }, LOCATION_TIMEOUT);
             
         } else {
             reject(new Error('LocationChannel이 정의되지 않음 - Flutter 통신 불가'));
@@ -129,8 +132,8 @@ export const getWebLocation = () => {
             },
             {
                 enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0 // 캐싱 비활성화 - 항상 새로운 위치 정보 요청
+                timeout: LOCATION_TIMEOUT,
+                maximumAge: 0
             }
         );
     });
@@ -149,12 +152,12 @@ export const getCurrentLocation = async () => {
             console.log('네이티브 앱 환경: 네이티브 위치 정보 요청');
             return await getNativeLocation();
         } catch (error) {
-            console.log('네이티브 위치 정보 주입 실패, 웹 API로 폴백:', error.message);
+            console.log('네이티브 위치 정보 획득 실패, 웹 API로 폴백:', error.message);
             // Flutter 실패 시 웹 API로 폴백
             try {
                 return await getWebLocation();
             } catch (webError) {
-                console.log('웹 위치 정보 주입 실패:', webError.message);
+                console.log('웹 위치 정보 획득 실패:', webError.message);
                 throw webError;
             }
         }
@@ -164,7 +167,7 @@ export const getCurrentLocation = async () => {
             console.log('웹 브라우저 환경: Geolocation API 사용');
             return await getWebLocation();
         } catch (error) {
-            console.log('웹 위치 정보 주입 실패:', error.message);
+            console.log('웹 위치 정보 획득 실패:', error.message);
             throw error;
         }
     }
