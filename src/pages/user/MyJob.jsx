@@ -241,7 +241,7 @@ const MyJob = () => {
 
     const handleReputationViewAll = () => {
         console.log('전체 평판 보기');
-        // 전체 평판 페이지로 이동하는 로직
+        navigate('/reputation-list');
     };
 
     const handleApplicationViewAll = () => {

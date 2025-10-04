@@ -19,6 +19,7 @@ import Main from './pages/owner/Main';
 import WorkplaceDetail from './components/owner/workplace/WorkplaceDetail';
 import WorkplaceDetailPage from './components/user/myJob/workplaceDetail/WorkplaceDetailPage';
 import ReputationWrite from './pages/ReputationWrite';
+import ReputationListPage from './pages/user/ReputationListPage';
 
 function App() {
     return (
@@ -82,6 +83,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <ReputationWrite />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/reputation-list'
+                        element={
+                            <ProtectedRoute>
+                                <ReputationListPage />
                             </ProtectedRoute>
                         }
                     />
