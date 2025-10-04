@@ -21,6 +21,7 @@ import WorkplaceDetailPage from './components/user/myJob/workplaceDetail/Workpla
 import ReputationWrite from './pages/ReputationWrite';
 import ReputationListPage from './pages/user/ReputationListPage';
 import ScheduleListPage from './pages/user/ScheduleListPage';
+import ApplicationListPage from './pages/user/ApplicationListPage';
 
 function App() {
     return (
@@ -100,6 +101,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <ScheduleListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/application-list'
+                        element={
+                            <ProtectedRoute>
+                                <ApplicationListPage />
                             </ProtectedRoute>
                         }
                     />

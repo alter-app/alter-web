@@ -34,24 +34,26 @@ export const getScrapPostList = async ({ cursorInfo }) => {
     }
 };
 
-// 공고 지원 목록 조회 로직
+// 공고 지원 목록 조회 로직 (커서 페이징 지원)
 export const getApplicationList = async ({
-    page = 1,
     pageSize = 10,
+    cursor = null,
 }) => {
     const accessToken = useAuthStore.getState().accessToken;
 
     try {
-        const response = await fetch(
-            `${backend}/app/users/me/postings/applications?page=${page}&pageSize=${pageSize}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
+        let url = `${backend}/app/users/me/postings/applications?pageSize=${pageSize}`;
+        if (cursor) {
+            url += `&cursor=${cursor}`;
+        }
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
 
         if (!response.ok) {
             throw new Error('서버 응답 오류');

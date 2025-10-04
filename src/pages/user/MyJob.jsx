@@ -59,7 +59,6 @@ const MyJob = () => {
                 // 지원 현황 데이터 조회
                 const applicationData =
                     await getApplicationList({
-                        page: 1,
                         pageSize: 3,
                     });
 
@@ -246,7 +245,7 @@ const MyJob = () => {
 
     const handleApplicationViewAll = () => {
         console.log('전체 지원 보기');
-        // 전체 지원 페이지로 이동하는 로직
+        navigate('/application-list');
     };
 
     const handleScheduleViewAll = () => {
