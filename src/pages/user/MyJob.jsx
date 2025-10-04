@@ -251,7 +251,7 @@ const MyJob = () => {
 
     const handleScheduleViewAll = () => {
         console.log('전체 일정 보기');
-        // 전체 일정 페이지로 이동하는 로직
+        navigate('/schedule-list');
     };
 
     const handleReputationAccept = async (reputation) => {

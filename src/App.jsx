@@ -20,6 +20,7 @@ import WorkplaceDetail from './components/owner/workplace/WorkplaceDetail';
 import WorkplaceDetailPage from './components/user/myJob/workplaceDetail/WorkplaceDetailPage';
 import ReputationWrite from './pages/ReputationWrite';
 import ReputationListPage from './pages/user/ReputationListPage';
+import ScheduleListPage from './pages/user/ScheduleListPage';
 
 function App() {
     return (
@@ -91,6 +92,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <ReputationListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/schedule-list'
+                        element={
+                            <ProtectedRoute>
+                                <ScheduleListPage />
                             </ProtectedRoute>
                         }
                     />
