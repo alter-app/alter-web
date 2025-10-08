@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PageHeader from '../../components/shared/PageHeader';
 import ApplicationCard from '../../components/user/myJob/ApplicationCard';
+import StatusFilter from '../../components/user/myJob/StatusFilter';
 import { getApplicationList } from '../../services/myPage';
 import { timeAgo } from '../../utils/timeUtil';
 import Loader from '../../components/Loader';
@@ -13,16 +14,23 @@ const ApplicationListPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
     const [nextCursor, setNextCursor] = useState(null);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [isLoadingMore, setIsLoadingMore] =
+        useState(false);
+    const [selectedStatuses, setSelectedStatuses] =
+        useState([]);
     const navigate = useNavigate();
 
     // 데이터 변환 함수
     const transformApplicationData = (data) => {
         return (data || []).map((item) => ({
             id: item.id,
-            workplaceName: item.posting?.workspace?.name || '알 수 없는 업장',
+            workplaceName:
+                item.posting?.workspace?.name ||
+                '알 수 없는 업장',
             status: item.status,
-            position: item.postingSchedule?.position || '알 수 없는 직책',
+            position:
+                item.postingSchedule?.position ||
+                '알 수 없는 직책',
             wage: item.posting?.payAmount || '0',
             applicationDate: item.createdAt
                 ? timeAgo(item.createdAt)
@@ -36,18 +44,31 @@ const ApplicationListPage = () => {
             try {
                 setIsLoading(true);
 
-                const applicationData = await getApplicationList({
-                    pageSize: 20,
-                });
-                const formattedApplications = transformApplicationData(
-                    applicationData.data
-                );
+                const applicationData =
+                    await getApplicationList({
+                        pageSize: 20,
+                        status:
+                            selectedStatuses.length > 0
+                                ? selectedStatuses
+                                : null,
+                    });
+                const formattedApplications =
+                    transformApplicationData(
+                        applicationData.data
+                    );
 
                 setApplications(formattedApplications);
-                setNextCursor(applicationData.page?.cursor || null);
-                setHasMore(!!applicationData.page?.cursor);
+                setNextCursor(
+                    applicationData.page?.cursor || null
+                );
+                setHasMore(
+                    formattedApplications.length === 20
+                );
             } catch (error) {
-                console.error('지원 목록 조회 실패:', error);
+                console.error(
+                    '지원 목록 조회 실패:',
+                    error
+                );
                 setApplications([]);
                 setHasMore(false);
             } finally {
@@ -56,33 +77,53 @@ const ApplicationListPage = () => {
         };
 
         fetchInitialApplications();
-    }, []);
+    }, [selectedStatuses]);
 
     // 더 많은 데이터 로드
     const fetchMoreApplications = useCallback(async () => {
-        if (!hasMore || isLoadingMore || !nextCursor) return;
+        if (!hasMore || isLoadingMore || !nextCursor)
+            return;
 
         try {
             setIsLoadingMore(true);
 
-            const applicationData = await getApplicationList({
-                pageSize: 20,
-                cursor: nextCursor,
-            });
-            const newApplications = transformApplicationData(
-                applicationData.data
-            );
+            const applicationData =
+                await getApplicationList({
+                    pageSize: 20,
+                    cursor: nextCursor,
+                    status:
+                        selectedStatuses.length > 0
+                            ? selectedStatuses
+                            : null,
+                });
+            const newApplications =
+                transformApplicationData(
+                    applicationData.data
+                );
 
-            setApplications((prev) => [...prev, ...newApplications]);
-            setNextCursor(applicationData.page?.cursor || null);
-            setHasMore(!!applicationData.page?.cursor);
+            setApplications((prev) => [
+                ...prev,
+                ...newApplications,
+            ]);
+            setNextCursor(
+                applicationData.page?.cursor || null
+            );
+            setHasMore(newApplications.length === 20);
         } catch (error) {
-            console.error('추가 지원 목록 조회 실패:', error);
+            console.error(
+                '추가 지원 목록 조회 실패:',
+                error
+            );
             setHasMore(false);
         } finally {
             setIsLoadingMore(false);
         }
-    }, [hasMore, isLoadingMore, nextCursor]);
+    }, [
+        hasMore,
+        isLoadingMore,
+        nextCursor,
+        selectedStatuses,
+    ]);
 
     // 지원 클릭 핸들러
     const handleApplicationClick = (application) => {
@@ -105,6 +146,10 @@ const ApplicationListPage = () => {
         <PageContainer>
             <PageHeader title='지원 현황' />
             <ContentContainer>
+                <StatusFilter
+                    selectedStatuses={selectedStatuses}
+                    onStatusChange={setSelectedStatuses}
+                />
                 {applications.length > 0 ? (
                     <InfiniteScroll
                         dataLength={applications.length}
@@ -118,23 +163,35 @@ const ApplicationListPage = () => {
                     >
                         <SectionCard>
                             <ApplicationList>
-                                {applications.map((application) => (
-                                    <ApplicationCard
-                                        key={application.id}
-                                        workplaceName={
-                                            application.workplaceName
-                                        }
-                                        status={application.status}
-                                        position={application.position}
-                                        wage={application.wage}
-                                        applicationDate={
-                                            application.applicationDate
-                                        }
-                                        onClick={() =>
-                                            handleApplicationClick(application)
-                                        }
-                                    />
-                                ))}
+                                {applications.map(
+                                    (application) => (
+                                        <ApplicationCard
+                                            key={
+                                                application.id
+                                            }
+                                            workplaceName={
+                                                application.workplaceName
+                                            }
+                                            status={
+                                                application.status
+                                            }
+                                            position={
+                                                application.position
+                                            }
+                                            wage={
+                                                application.wage
+                                            }
+                                            applicationDate={
+                                                application.applicationDate
+                                            }
+                                            onClick={() =>
+                                                handleApplicationClick(
+                                                    application
+                                                )
+                                            }
+                                        />
+                                    )
+                                )}
                             </ApplicationList>
                         </SectionCard>
                     </InfiniteScroll>
@@ -183,7 +240,9 @@ const ApplicationListPage = () => {
                                 />
                             </svg>
                         </EmptyIcon>
-                        <EmptyTitle>지원한 공고가 없습니다</EmptyTitle>
+                        <EmptyTitle>
+                            지원한 공고가 없습니다
+                        </EmptyTitle>
                         <EmptyDescription>
                             아직 지원한 공고가 없습니다.
                             <br />

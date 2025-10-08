@@ -34,10 +34,11 @@ export const getScrapPostList = async ({ cursorInfo }) => {
     }
 };
 
-// 공고 지원 목록 조회 로직 (커서 페이징 지원)
+// 공고 지원 목록 조회 로직 (커서 페이징 및 상태 필터링 지원)
 export const getApplicationList = async ({
     pageSize = 10,
     cursor = null,
+    status = null,
 }) => {
     const accessToken = useAuthStore.getState().accessToken;
 
@@ -45,6 +46,13 @@ export const getApplicationList = async ({
         let url = `${backend}/app/users/me/postings/applications?pageSize=${pageSize}`;
         if (cursor) {
             url += `&cursor=${cursor}`;
+        }
+        if (status && status.length > 0) {
+            // status 배열을 쿼리 파라미터로 변환
+            const statusParams = status
+                .map((s) => `status=${s}`)
+                .join('&');
+            url += `&${statusParams}`;
         }
 
         const response = await fetch(url, {
