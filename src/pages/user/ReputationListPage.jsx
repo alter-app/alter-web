@@ -9,14 +9,14 @@ import {
     userDeclineReputation,
 } from '../../services/myJob';
 import { timeAgo } from '../../utils/timeUtil';
+import Loader from '../../components/Loader';
 
 const ReputationListPage = () => {
     const [reputations, setReputations] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
     const [nextCursor, setNextCursor] = useState(null);
-    const [isLoadingMore, setIsLoadingMore] =
-        useState(false);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
     const navigate = useNavigate();
 
     // 데이터 변환 함수
@@ -24,16 +24,12 @@ const ReputationListPage = () => {
         return (data || []).map((item) => ({
             id: item.id,
             workplaceName:
-                item.workplaceName ||
-                item.target?.name ||
-                '알 수 없는 업장',
+                item.workplaceName || item.target?.name || '알 수 없는 업장',
             reviewerName:
                 item.requesterName ||
                 item.requester?.name ||
                 '알 수 없는 요청자',
-            timeAgo: item.createdAt
-                ? timeAgo(item.createdAt)
-                : '알 수 없음',
+            timeAgo: item.createdAt ? timeAgo(item.createdAt) : '알 수 없음',
             rating: item.rating || 0,
             isNew: item.isNew || false,
         }));
@@ -45,23 +41,16 @@ const ReputationListPage = () => {
             try {
                 setIsLoading(true);
 
-                const reputationData =
-                    await getUserReputationRequestsList(20);
-                const formattedReputations =
-                    transformReputationData(
-                        reputationData.data
-                    );
+                const reputationData = await getUserReputationRequestsList(20);
+                const formattedReputations = transformReputationData(
+                    reputationData.data
+                );
 
                 setReputations(formattedReputations);
-                setNextCursor(
-                    reputationData.page?.cursor || null
-                );
+                setNextCursor(reputationData.page?.cursor || null);
                 setHasMore(!!reputationData.page?.cursor);
             } catch (error) {
-                console.error(
-                    '평판 목록 조회 실패:',
-                    error
-                );
+                console.error('평판 목록 조회 실패:', error);
                 setReputations([]);
                 setHasMore(false);
             } finally {
@@ -74,34 +63,22 @@ const ReputationListPage = () => {
 
     // 더 많은 데이터 로드
     const fetchMoreReputations = useCallback(async () => {
-        if (!hasMore || isLoadingMore || !nextCursor)
-            return;
+        if (!hasMore || isLoadingMore || !nextCursor) return;
 
         try {
             setIsLoadingMore(true);
 
-            const reputationData =
-                await getUserReputationRequestsList(
-                    20,
-                    nextCursor
-                );
-            const newReputations = transformReputationData(
-                reputationData.data
+            const reputationData = await getUserReputationRequestsList(
+                20,
+                nextCursor
             );
+            const newReputations = transformReputationData(reputationData.data);
 
-            setReputations((prev) => [
-                ...prev,
-                ...newReputations,
-            ]);
-            setNextCursor(
-                reputationData.page?.cursor || null
-            );
+            setReputations((prev) => [...prev, ...newReputations]);
+            setNextCursor(reputationData.page?.cursor || null);
             setHasMore(!!reputationData.page?.cursor);
         } catch (error) {
-            console.error(
-                '추가 평판 목록 조회 실패:',
-                error
-            );
+            console.error('추가 평판 목록 조회 실패:', error);
             setHasMore(false);
         } finally {
             setIsLoadingMore(false);
@@ -128,9 +105,7 @@ const ReputationListPage = () => {
 
             // 성공 시 목록에서 제거
             setReputations((prev) =>
-                prev.filter(
-                    (rep) => rep.id !== reputation.id
-                )
+                prev.filter((rep) => rep.id !== reputation.id)
             );
 
             alert('평판이 거절되었습니다.');
@@ -145,9 +120,7 @@ const ReputationListPage = () => {
             <PageContainer>
                 <PageHeader title='받은 평판' />
                 <LoadingContainer>
-                    <LoadingText>
-                        평판 목록을 불러오는 중...
-                    </LoadingText>
+                    <Loader />
                 </LoadingContainer>
             </PageContainer>
         );
@@ -164,49 +137,28 @@ const ReputationListPage = () => {
                         hasMore={hasMore}
                         loader={
                             <LoadingContainer>
-                                <LoadingText>
-                                    더 많은 평판을 불러오는
-                                    중...
-                                </LoadingText>
+                                <Loader />
                             </LoadingContainer>
                         }
                     >
                         <SectionCard>
                             <ReputationList>
-                                {reputations.map(
-                                    (reputation) => (
-                                        <ReputationCard
-                                            key={
-                                                reputation.id
-                                            }
-                                            workplaceName={
-                                                reputation.workplaceName
-                                            }
-                                            reviewerName={
-                                                reputation.reviewerName
-                                            }
-                                            timeAgo={
-                                                reputation.timeAgo
-                                            }
-                                            rating={
-                                                reputation.rating
-                                            }
-                                            isNew={
-                                                reputation.isNew
-                                            }
-                                            onAccept={() =>
-                                                handleAccept(
-                                                    reputation
-                                                )
-                                            }
-                                            onReject={() =>
-                                                handleReject(
-                                                    reputation
-                                                )
-                                            }
-                                        />
-                                    )
-                                )}
+                                {reputations.map((reputation) => (
+                                    <ReputationCard
+                                        key={reputation.id}
+                                        workplaceName={reputation.workplaceName}
+                                        reviewerName={reputation.reviewerName}
+                                        timeAgo={reputation.timeAgo}
+                                        rating={reputation.rating}
+                                        isNew={reputation.isNew}
+                                        onAccept={() =>
+                                            handleAccept(reputation)
+                                        }
+                                        onReject={() =>
+                                            handleReject(reputation)
+                                        }
+                                    />
+                                ))}
                             </ReputationList>
                         </SectionCard>
                     </InfiniteScroll>
@@ -235,14 +187,11 @@ const ReputationListPage = () => {
                                 />
                             </svg>
                         </EmptyIcon>
-                        <EmptyTitle>
-                            받은 평판이 없습니다
-                        </EmptyTitle>
+                        <EmptyTitle>받은 평판이 없습니다</EmptyTitle>
                         <EmptyDescription>
                             아직 받은 평판 요청이 없습니다.
                             <br />
-                            근무를 완료하면 평판을 받을 수
-                            있습니다.
+                            근무를 완료하면 평판을 받을 수 있습니다.
                         </EmptyDescription>
                     </EmptyContainer>
                 )}
