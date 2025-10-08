@@ -4,7 +4,10 @@ import {
     getManagerReputationKeywords,
     submitReputation,
 } from '../services/reputationService';
-import { createWorkerReputation } from '../services/myJob';
+import {
+    createWorkerReputation,
+    userSubmitReputation,
+} from '../services/myJob';
 import useAuthStore from '../store/authStore';
 import KeywordList from '../components/owner/reputation/KeywordList';
 import EpisodeInputCard from '../components/owner/reputation/EpisodeInputCard';
@@ -112,11 +115,21 @@ const ReputationWrite = () => {
                     keywordsPayload
                 );
             } else {
-                // 기존 평판 요청 처리
-                await submitReputation(
-                    requestId,
-                    keywordsPayload
-                );
+                // scope에 따라 적절한 API 사용
+                const { scope } = useAuthStore.getState();
+                if (scope === 'APP') {
+                    // 사용자(APP)일 때 userSubmitReputation 사용
+                    await userSubmitReputation(
+                        requestId,
+                        keywordsPayload
+                    );
+                } else {
+                    // 매니저일 때 submitReputation 사용
+                    await submitReputation(
+                        requestId,
+                        keywordsPayload
+                    );
+                }
             }
 
             // 완료 모달 표시

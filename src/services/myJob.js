@@ -2,22 +2,26 @@ import useAuthStore from '../store/authStore';
 
 const backend = import.meta.env.VITE_API_URL;
 
-// 사용자 평판 요청 목록 조회 로직
+// 사용자 평판 요청 목록 조회 로직 (커서 페이징 지원)
 export const getUserReputationRequestsList = async (
-    pageSize
+    pageSize = 10,
+    cursor = null,
+    status = 'REQUESTED'
 ) => {
     const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/app/reputations/requests?status=REQUESTED&pageSize=${pageSize}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
+        let url = `${backend}/app/reputations/requests?status=${status}&pageSize=${pageSize}`;
+        if (cursor) {
+            url += `&cursor=${cursor}`;
+        }
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
 
         if (!response.ok) {
             throw new Error('서버 응답 오류');

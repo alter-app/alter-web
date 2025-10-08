@@ -15,6 +15,7 @@ import {
 import { getApplicationList } from '../../services/myPage';
 import { timeAgo } from '../../utils/timeUtil';
 import { useNavigate } from 'react-router-dom';
+import Loader from '../../components/Loader';
 
 const MyJob = () => {
     const [workplaces, setWorkplaces] = useState([]);
@@ -31,62 +32,56 @@ const MyJob = () => {
                 setIsLoading(true);
 
                 // 평판 요청 목록 조회
-                const reputationData =
-                    await getUserReputationRequestsList(3);
+                const reputationData = await getUserReputationRequestsList(3);
 
                 // API 데이터를 컴포넌트에 맞게 변환
-                const formattedReputations = (
-                    reputationData.data || []
-                ).map((item) => ({
-                    id: item.id,
-                    workplaceName:
-                        item.workplaceName ||
-                        item.target?.name ||
-                        '알 수 없는 업장',
-                    reviewerName:
-                        item.requesterName ||
-                        item.requester?.name ||
-                        '알 수 없는 요청자',
-                    timeAgo: item.createdAt
-                        ? timeAgo(item.createdAt)
-                        : '알 수 없음',
-                    rating: item.rating || 0,
-                    isNew: item.isNew || false,
-                }));
+                const formattedReputations = (reputationData.data || []).map(
+                    (item) => ({
+                        id: item.id,
+                        workplaceName:
+                            item.workplaceName ||
+                            item.target?.name ||
+                            '알 수 없는 업장',
+                        reviewerName:
+                            item.requesterName ||
+                            item.requester?.name ||
+                            '알 수 없는 요청자',
+                        timeAgo: item.createdAt
+                            ? timeAgo(item.createdAt)
+                            : '알 수 없음',
+                        rating: item.rating || 0,
+                        isNew: item.isNew || false,
+                    })
+                );
 
                 setReputations(formattedReputations);
 
                 // 지원 현황 데이터 조회
-                const applicationData =
-                    await getApplicationList({
-                        page: 1,
-                        pageSize: 3,
-                    });
+                const applicationData = await getApplicationList({
+                    pageSize: 3,
+                });
 
                 // API 데이터를 컴포넌트에 맞게 변환
-                const formattedApplications = (
-                    applicationData.data || []
-                ).map((item) => ({
-                    id: item.id,
-                    workplaceName:
-                        item.posting?.workspace?.name ||
-                        '알 수 없는 업장',
-                    status: item.status,
-                    position:
-                        item.postingSchedule?.position ||
-                        '알 수 없는 직책',
-                    wage: item.posting?.payAmount || '0',
-                    applicationDate: item.createdAt
-                        ? timeAgo(item.createdAt)
-                        : '알 수 없음',
-                }));
+                const formattedApplications = (applicationData.data || []).map(
+                    (item) => ({
+                        id: item.id,
+                        workplaceName:
+                            item.posting?.workspace?.name || '알 수 없는 업장',
+                        status: item.status,
+                        position:
+                            item.postingSchedule?.position || '알 수 없는 직책',
+                        wage: item.posting?.payAmount || '0',
+                        applicationDate: item.createdAt
+                            ? timeAgo(item.createdAt)
+                            : '알 수 없음',
+                    })
+                );
 
                 setApplications(formattedApplications);
 
                 // 근무 중인 업장 데이터 조회
                 try {
-                    const workplaceData =
-                        await getUserWorkplaceList(3);
+                    const workplaceData = await getUserWorkplaceList(3);
 
                     // API 데이터를 컴포넌트에 맞게 변환
                     const formattedWorkplaces = (
@@ -102,22 +97,13 @@ const MyJob = () => {
                                 nextShiftDate.getMonth() + 1
                             )
                                 .toString()
-                                .padStart(
-                                    2,
-                                    '0'
-                                )}-${nextShiftDate
+                                .padStart(2, '0')}-${nextShiftDate
                                 .getDate()
                                 .toString()
-                                .padStart(
-                                    2,
-                                    '0'
-                                )} ${nextShiftDate
+                                .padStart(2, '0')} ${nextShiftDate
                                 .getHours()
                                 .toString()
-                                .padStart(
-                                    2,
-                                    '0'
-                                )}:${nextShiftDate
+                                .padStart(2, '0')}:${nextShiftDate
                                 .getMinutes()
                                 .toString()
                                 .padStart(2, '0')}`;
@@ -125,9 +111,7 @@ const MyJob = () => {
 
                         return {
                             id: item.workspaceId,
-                            name:
-                                item.businessName ||
-                                '알 수 없는 업장',
+                            name: item.businessName || '알 수 없는 업장',
                             status: 'working',
                             position: '근무자',
                             wage: '0',
@@ -137,74 +121,50 @@ const MyJob = () => {
 
                     setWorkplaces(formattedWorkplaces);
                 } catch (error) {
-                    console.error(
-                        '근무 중인 업장 조회 오류:',
-                        error
-                    );
+                    console.error('근무 중인 업장 조회 오류:', error);
                     // 에러 발생 시 빈 배열로 초기화
                     setWorkplaces([]);
                 }
 
                 // 이번 주 일정 데이터 조회 (최근 데이터)
                 try {
-                    const scheduleData =
-                        await getUserScheduleSelf();
+                    const scheduleData = await getUserScheduleSelf();
 
                     // API 데이터를 컴포넌트에 맞게 변환
-                    const formattedSchedules = (
-                        scheduleData.data || []
-                    ).map((item) => {
-                        const startDate = new Date(
-                            item.startDateTime
-                        );
-                        const endDate = new Date(
-                            item.endDateTime
-                        );
+                    const formattedSchedules = (scheduleData.data || []).map(
+                        (item) => {
+                            const startDate = new Date(item.startDateTime);
+                            const endDate = new Date(item.endDateTime);
 
-                        // 근무 시간 계산 (시간 단위)
-                        const workHours = Math.round(
-                            (endDate - startDate) /
-                                (1000 * 60 * 60)
-                        );
+                            // 근무 시간 계산 (시간 단위)
+                            const workHours = Math.round(
+                                (endDate - startDate) / (1000 * 60 * 60)
+                            );
 
-                        return {
-                            id: item.shiftId,
-                            day: startDate.toLocaleDateString(
-                                'ko-KR',
-                                {
+                            return {
+                                id: item.shiftId,
+                                day: startDate.toLocaleDateString('ko-KR', {
                                     weekday: 'short',
-                                }
-                            ),
-                            date: startDate
-                                .getDate()
-                                .toString(),
-                            workplace:
-                                item.workspace
-                                    ?.workspaceName ||
-                                '알 수 없는 업장',
-                            time: `${startDate.toLocaleTimeString(
-                                'ko-KR',
-                                {
+                                }),
+                                date: startDate.getDate().toString(),
+                                workplace:
+                                    item.workspace?.workspaceName ||
+                                    '알 수 없는 업장',
+                                time: `${startDate.toLocaleTimeString('ko-KR', {
                                     hour: '2-digit',
                                     minute: '2-digit',
-                                }
-                            )} ~ ${endDate.toLocaleTimeString(
-                                'ko-KR',
-                                {
+                                })} ~ ${endDate.toLocaleTimeString('ko-KR', {
                                     hour: '2-digit',
                                     minute: '2-digit',
-                                }
-                            )}`,
-                            hours: `${workHours}시간`,
-                        };
-                    });
+                                })}`,
+                                hours: `${workHours}시간`,
+                            };
+                        }
+                    );
 
                     setSchedules(formattedSchedules);
                 } catch (error) {
-                    console.error(
-                        '스케줄 조회 오류:',
-                        error
-                    );
+                    console.error('스케줄 조회 오류:', error);
                     // 에러 발생 시 빈 배열로 초기화
                     setSchedules([]);
                 }
@@ -223,9 +183,9 @@ const MyJob = () => {
     const handleWorkplaceClick = (workplace) => {
         console.log('근무지 클릭:', workplace);
         navigate(
-            `/my-job/workplace/${
-                workplace.id
-            }/${encodeURIComponent(workplace.name)}`
+            `/my-job/workplace/${workplace.id}/${encodeURIComponent(
+                workplace.name
+            )}`
         );
     };
 
@@ -241,17 +201,17 @@ const MyJob = () => {
 
     const handleReputationViewAll = () => {
         console.log('전체 평판 보기');
-        // 전체 평판 페이지로 이동하는 로직
+        navigate('/reputation-list');
     };
 
     const handleApplicationViewAll = () => {
         console.log('전체 지원 보기');
-        // 전체 지원 페이지로 이동하는 로직
+        navigate('/application-list');
     };
 
     const handleScheduleViewAll = () => {
         console.log('전체 일정 보기');
-        // 전체 일정 페이지로 이동하는 로직
+        navigate('/schedule-list');
     };
 
     const handleReputationAccept = async (reputation) => {
@@ -276,9 +236,7 @@ const MyJob = () => {
 
             // 목록에서 제거
             setReputations((prev) =>
-                prev.filter(
-                    (item) => item.id !== reputation.id
-                )
+                prev.filter((item) => item.id !== reputation.id)
             );
         } catch (error) {
             console.error('평판 거절 오류:', error);
@@ -289,13 +247,10 @@ const MyJob = () => {
     if (isLoading) {
         return (
             <>
-                <PageHeader
-                    title='내 알바'
-                    showBackButton={false}
-                />
+                <PageHeader title='내 알바' showBackButton={false} />
                 <Container>
                     <LoadingMessage>
-                        데이터를 불러오는 중...
+                        <Loader />
                     </LoadingMessage>
                 </Container>
                 <BottomNavigation />
@@ -305,10 +260,7 @@ const MyJob = () => {
 
     return (
         <>
-            <PageHeader
-                title='내 알바'
-                showBackButton={false}
-            />
+            <PageHeader title='내 알바' showBackButton={false} />
             <Container>
                 <WorkplaceSection
                     workplaces={workplaces}
@@ -323,12 +275,8 @@ const MyJob = () => {
                 />
                 <ApplicationSection
                     applications={applications}
-                    onApplicationClick={
-                        handleApplicationClick
-                    }
-                    onViewAllClick={
-                        handleApplicationViewAll
-                    }
+                    onApplicationClick={handleApplicationClick}
+                    onViewAllClick={handleApplicationViewAll}
                 />
                 <ScheduleSection
                     schedules={schedules}

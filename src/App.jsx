@@ -19,6 +19,9 @@ import Main from './pages/owner/Main';
 import WorkplaceDetail from './components/owner/workplace/WorkplaceDetail';
 import WorkplaceDetailPage from './components/user/myJob/workplaceDetail/WorkplaceDetailPage';
 import ReputationWrite from './pages/ReputationWrite';
+import ReputationListPage from './pages/user/ReputationListPage';
+import ScheduleListPage from './pages/user/ScheduleListPage';
+import ApplicationListPage from './pages/user/ApplicationListPage';
 
 function App() {
     return (
@@ -82,6 +85,30 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <ReputationWrite />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/reputation-list'
+                        element={
+                            <ProtectedRoute>
+                                <ReputationListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/schedule-list'
+                        element={
+                            <ProtectedRoute>
+                                <ScheduleListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/application-list'
+                        element={
+                            <ProtectedRoute>
+                                <ApplicationListPage />
                             </ProtectedRoute>
                         }
                     />

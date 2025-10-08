@@ -10,7 +10,12 @@ const ReputationSection = ({
     onReject,
 }) => {
     const bellIcon = (
-        <svg width='20' height='20' viewBox='0 0 24 24' fill='none'>
+        <svg
+            width='20'
+            height='20'
+            viewBox='0 0 24 24'
+            fill='none'
+        >
             <path
                 d='M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9'
                 stroke='#666666'
@@ -31,27 +36,44 @@ const ReputationSection = ({
     return (
         <Section>
             <SectionCard>
-                <SectionHeader icon={bellIcon} title='받은 평판 요청' />
+                <SectionHeader
+                    icon={bellIcon}
+                    title='받은 평판 요청'
+                />
                 <CardList>
                     {reputations.length > 0 ? (
-                        reputations.map((reputation, index) => (
-                            <ReputationCard
-                                key={index}
-                                workplaceName={reputation.workplaceName}
-                                reviewerName={reputation.reviewerName}
-                                timeAgo={reputation.timeAgo}
-                                rating={reputation.rating}
-                                isNew={reputation.isNew}
-                                onAccept={() =>
-                                    onAccept && onAccept(reputation)
-                                }
-                                onReject={() =>
-                                    onReject && onReject(reputation)
-                                }
-                            />
-                        ))
+                        reputations.map(
+                            (reputation, index) => (
+                                <ReputationCard
+                                    key={index}
+                                    workplaceName={
+                                        reputation.workplaceName
+                                    }
+                                    reviewerName={
+                                        reputation.reviewerName
+                                    }
+                                    timeAgo={
+                                        reputation.timeAgo
+                                    }
+                                    rating={
+                                        reputation.rating
+                                    }
+                                    isNew={reputation.isNew}
+                                    onAccept={() =>
+                                        onAccept &&
+                                        onAccept(reputation)
+                                    }
+                                    onReject={() =>
+                                        onReject &&
+                                        onReject(reputation)
+                                    }
+                                />
+                            )
+                        )
                     ) : (
-                        <EmptyMessage>받은 평판 요청이 없습니다</EmptyMessage>
+                        <EmptyMessage>
+                            받은 평판 요청이 없습니다
+                        </EmptyMessage>
                     )}
                 </CardList>
                 <ViewAllButton onClick={onViewAllClick}>

@@ -34,24 +34,34 @@ export const getScrapPostList = async ({ cursorInfo }) => {
     }
 };
 
-// 공고 지원 목록 조회 로직
+// 공고 지원 목록 조회 로직 (커서 페이징 및 상태 필터링 지원)
 export const getApplicationList = async ({
-    page = 1,
     pageSize = 10,
+    cursor = null,
+    status = null,
 }) => {
     const accessToken = useAuthStore.getState().accessToken;
 
     try {
-        const response = await fetch(
-            `${backend}/app/users/me/postings/applications?page=${page}&pageSize=${pageSize}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
+        let url = `${backend}/app/users/me/postings/applications?pageSize=${pageSize}`;
+        if (cursor) {
+            url += `&cursor=${cursor}`;
+        }
+        if (status && status.length > 0) {
+            // status 배열을 쿼리 파라미터로 변환
+            const statusParams = status
+                .map((s) => `status=${s}`)
+                .join('&');
+            url += `&${statusParams}`;
+        }
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
 
         if (!response.ok) {
             throw new Error('서버 응답 오류');
