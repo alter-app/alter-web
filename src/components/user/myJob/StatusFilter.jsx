@@ -1,10 +1,7 @@
 import styled from 'styled-components';
 import { useState } from 'react';
 
-const StatusFilter = ({
-    selectedStatuses,
-    onStatusChange,
-}) => {
+const StatusFilter = ({ selectedStatuses, onStatusChange }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const statusOptions = [
@@ -38,17 +35,10 @@ const StatusFilter = ({
             label: '기간 만료',
             color: '#999999',
         },
-        {
-            value: 'DELETED',
-            label: '삭제됨',
-            color: '#999999',
-        },
     ];
 
     const handleStatusToggle = (status) => {
-        const newStatuses = selectedStatuses.includes(
-            status
-        )
+        const newStatuses = selectedStatuses.includes(status)
             ? selectedStatuses.filter((s) => s !== status)
             : [...selectedStatuses, status];
         onStatusChange(newStatuses);
@@ -56,35 +46,21 @@ const StatusFilter = ({
 
     const getSelectedLabels = () => {
         if (selectedStatuses.length === 0) return '전체';
-        if (
-            selectedStatuses.length === statusOptions.length
-        )
-            return '전체';
+        if (selectedStatuses.length === statusOptions.length) return '전체';
         return selectedStatuses
             .map(
                 (status) =>
-                    statusOptions.find(
-                        (opt) => opt.value === status
-                    )?.label
+                    statusOptions.find((opt) => opt.value === status)?.label
             )
             .join(', ');
     };
 
     return (
         <FilterContainer>
-            <FilterButton
-                onClick={() => setIsOpen(!isOpen)}
-            >
-                <FilterText>
-                    {getSelectedLabels()}
-                </FilterText>
+            <FilterButton onClick={() => setIsOpen(!isOpen)}>
+                <FilterText>{getSelectedLabels()}</FilterText>
                 <FilterIcon $isOpen={isOpen}>
-                    <svg
-                        width='16'
-                        height='16'
-                        viewBox='0 0 24 24'
-                        fill='none'
-                    >
+                    <svg width='16' height='16' viewBox='0 0 24 24' fill='none'>
                         <path
                             d='M6 9L12 15L18 9'
                             stroke='#666666'
@@ -100,27 +76,19 @@ const StatusFilter = ({
                 <FilterDropdown>
                     <FilterOption
                         onClick={() => onStatusChange([])}
-                        $isSelected={
-                            selectedStatuses.length === 0
-                        }
+                        $isSelected={selectedStatuses.length === 0}
                     >
                         전체
                     </FilterOption>
                     {statusOptions.map((option) => (
                         <FilterOption
                             key={option.value}
-                            onClick={() =>
-                                handleStatusToggle(
-                                    option.value
-                                )
-                            }
+                            onClick={() => handleStatusToggle(option.value)}
                             $isSelected={selectedStatuses.includes(
                                 option.value
                             )}
                         >
-                            <StatusIndicator
-                                $color={option.color}
-                            />
+                            <StatusIndicator $color={option.color} />
                             {option.label}
                         </FilterOption>
                     ))}
@@ -204,15 +172,12 @@ const FilterOption = styled.div`
     font-family: 'Pretendard';
     font-weight: 500;
     font-size: 14px;
-    color: ${(props) =>
-        props.$isSelected ? '#2de283' : '#333333'};
-    background: ${(props) =>
-        props.$isSelected ? '#f0fdf4' : 'transparent'};
+    color: ${(props) => (props.$isSelected ? '#2de283' : '#333333')};
+    background: ${(props) => (props.$isSelected ? '#f0fdf4' : 'transparent')};
     transition: all 0.2s ease;
 
     &:hover {
-        background: ${(props) =>
-            props.$isSelected ? '#f0fdf4' : '#f8f9fa'};
+        background: ${(props) => (props.$isSelected ? '#f0fdf4' : '#f8f9fa')};
     }
 
     &:first-child {
