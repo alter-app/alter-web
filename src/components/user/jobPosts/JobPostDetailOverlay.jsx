@@ -20,7 +20,8 @@ const JobPostDetailOverlay = ({
     const [postDetail, setPostDetail] = useState(null);
     const [loading, setLoading] = useState(true);
     const [scrapped, setScrapped] = useState(false);
-    const [showApplyOverlay, setShowApplyOverlay] = useState(false);
+    const [showApplyOverlay, setShowApplyOverlay] =
+        useState(false);
 
     useEffect(() => {
         const fetchPostDetail = async () => {
@@ -30,7 +31,9 @@ const JobPostDetailOverlay = ({
                         postId
                     );
                     setPostDetail(result.data);
-                    setScrapped(result.data.scrapped || false);
+                    setScrapped(
+                        result.data.scrapped || false
+                    );
                     console.log(result);
                 }
             } catch (error) {
@@ -55,10 +58,11 @@ const JobPostDetailOverlay = ({
     };
 
     const handleApplySuccess = () => {
+        // 지원 오버레이 닫기
         setShowApplyOverlay(false);
-        if (onApply) {
-            onApply(postDetail);
-        }
+        // 지원 성공 알림
+        alert('지원이 완료되었습니다!');
+        // 지원 성공 시 상세 오버레이는 그대로 유지 (이미 열려있음)
     };
 
     const handleScrapChange = (newScrapped) => {
@@ -164,7 +168,7 @@ const JobPostDetailOverlay = ({
                     onApply={handleApply}
                 />
             </Container>
-            
+
             {/* JobApply 오버레이 */}
             {showApplyOverlay && (
                 <JobApplyOverlay
