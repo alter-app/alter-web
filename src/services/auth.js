@@ -250,7 +250,13 @@ export const loginWithProvider = async (
                 authorizationId,
                 scope,
             });
-            return navigate('/main');
+            // scope에 따라 적절한 페이지로 리다이렉트
+            if (scope === 'APP') {
+                return navigate('/job-lookup-map');
+            } else if (scope === 'MANAGER') {
+                return navigate('/main');
+            }
+            return navigate('/job-lookup-map');
         }
 
         const errorHandlers = {
@@ -334,7 +340,13 @@ export const loginIDPW = async (
                 scope,
             });
 
-            return navigate('/main'); // 로그인 성공 시 메인 페이지 이동
+            // scope에 따라 적절한 페이지로 리다이렉트
+            if (scope === 'APP') {
+                return navigate('/job-lookup-map');
+            } else if (scope === 'MANAGER') {
+                return navigate('/main');
+            }
+            return navigate('/main');
         }
 
         // 실패 시 에러 메시지 처리

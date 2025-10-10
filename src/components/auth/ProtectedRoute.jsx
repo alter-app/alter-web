@@ -15,15 +15,9 @@ const ProtectedRoute = ({ children, requiredScope }) => {
     if (
         scope === 'MANAGER' &&
         !(
-            [
-                '/applicant',
-                '/posting',
-                '/main',
-                '/reputation-write',
-            ].includes(location.pathname) ||
-            location.pathname.startsWith(
-                '/workplace/detail/'
-            )
+            ['/applicant', '/posting', '/main', '/reputation-write'].includes(
+                location.pathname
+            ) || location.pathname.startsWith('/workplace/detail/')
         )
     ) {
         return <Navigate to='/main' replace />;
