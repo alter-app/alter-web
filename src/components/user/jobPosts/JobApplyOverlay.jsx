@@ -9,27 +9,40 @@ import PageHeader from '../../shared/PageHeader';
 import JobApplyWorkInfo from './jobPostDetail/JobApplyWorkInfo';
 import DetailSection from './jobPostDetail/DetailSection';
 import Divider from './jobPostDetail/Divider';
-import { WEEKDAYS_KOR, WEEKDAYS_KOR_ARRAY } from '../../../utils/weekdayUtils';
+import {
+    WEEKDAYS_KOR,
+    WEEKDAYS_KOR_ARRAY,
+} from '../../../utils/weekdayUtils';
 
 const MIN_DESCRIPTION_LENGTH = 15;
 
-
-const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
+const JobApplyOverlay = ({
+    postId,
+    onClose,
+    onApplySuccess,
+}) => {
     const [description, setDescription] = useState('');
     const [detail, setDetail] = useState(null);
-    const [selectedSchedule, setSelectedSchedule] = useState(null);
-    const [descriptionError, setDescriptionError] = useState('');
+    const [selectedSchedule, setSelectedSchedule] =
+        useState(null);
+    const [descriptionError, setDescriptionError] =
+        useState('');
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchPostDetail = async () => {
             try {
                 if (postId) {
-                    const result = await getPostDetail(postId);
+                    const result = await getPostDetail(
+                        postId
+                    );
                     setDetail(result.data);
                 }
             } catch (error) {
-                console.error('공고 상세 조회 오류:', error);
+                console.error(
+                    '공고 상세 조회 오류:',
+                    error
+                );
             } finally {
                 setLoading(false);
             }
@@ -39,7 +52,10 @@ const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
     }, [postId]);
 
     useEffect(() => {
-        if (detail?.schedules && detail.schedules.length > 0) {
+        if (
+            detail?.schedules &&
+            detail.schedules.length > 0
+        ) {
             setSelectedSchedule(detail.schedules[0].id);
         }
     }, [detail]);
@@ -50,12 +66,15 @@ const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
             return;
         }
         if (description.length < MIN_DESCRIPTION_LENGTH) {
-            setDescriptionError(`${MIN_DESCRIPTION_LENGTH}자 이상 작성해주세요`);
+            setDescriptionError(
+                `${MIN_DESCRIPTION_LENGTH}자 이상 작성해주세요`
+            );
             return;
         }
 
         // 제출 확인 알림
-        const isConfirmed = window.confirm('정말 제출하시겠습니까?');
+        const isConfirmed =
+            window.confirm('정말 제출하시겠습니까?');
         if (!isConfirmed) {
             return;
         }
@@ -66,16 +85,15 @@ const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
                 postingScheduleId: selectedSchedule,
                 description: description,
             });
-            
-            // 성공 시 오버레이 닫기
-            onClose();
-            
-            // 성공 콜백 호출
+
+            // 성공 콜백 호출 (상세 오버레이로 돌아가기)
             if (onApplySuccess) {
                 onApplySuccess();
             }
         } catch (error) {
-            alert(error.message || '공고 지원 중 오류 발생');
+            alert(
+                error.message || '공고 지원 중 오류 발생'
+            );
         }
     };
 
@@ -104,10 +122,11 @@ const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
                     <PageHeader
                         title='지원하기'
                         onBack={onClose}
-                        variant='sticky'
                     />
                     <Content>
-                        <LoadingText>공고 정보를 불러오는 중...</LoadingText>
+                        <LoadingText>
+                            공고 정보를 불러오는 중...
+                        </LoadingText>
                     </Content>
                 </Container>
             </Overlay>
@@ -121,10 +140,12 @@ const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
                     <PageHeader
                         title='지원하기'
                         onBack={onClose}
-                        variant='sticky'
                     />
                     <Content>
-                        <ErrorText>요청하신 공고를 찾을 수 없습니다.</ErrorText>
+                        <ErrorText>
+                            요청하신 공고를 찾을 수
+                            없습니다.
+                        </ErrorText>
                     </Content>
                 </Container>
             </Overlay>
@@ -162,7 +183,8 @@ const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
                     <DetailSection
                         title='상세 내용'
                         description={
-                            detail?.description || '업무 내용이 없습니다.'
+                            detail?.description ||
+                            '업무 내용이 없습니다.'
                         }
                     />
 
@@ -170,34 +192,56 @@ const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
 
                     {/* 근무시간 선택 섹션 */}
                     <ScheduleSelectionSection>
-                        <SectionTitle>근무시간 선택</SectionTitle>
+                        <SectionTitle>
+                            근무시간 선택
+                        </SectionTitle>
                         <Gap height={16} />
-                        {detail.schedules && detail.schedules.map((schedule) => (
-                            <ScheduleSection key={schedule.id}>
-                                <ScheduleSelector
-                                    schedule={schedule}
-                                    isSelected={selectedSchedule === schedule.id}
-                                    onClick={() => setSelectedSchedule(schedule.id)}
-                                />
-                                <Gap height={2} />
-                            </ScheduleSection>
-                        ))}
+                        {detail.schedules &&
+                            detail.schedules.map(
+                                (schedule) => (
+                                    <ScheduleSection
+                                        key={schedule.id}
+                                    >
+                                        <ScheduleSelector
+                                            schedule={
+                                                schedule
+                                            }
+                                            isSelected={
+                                                selectedSchedule ===
+                                                schedule.id
+                                            }
+                                            onClick={() =>
+                                                setSelectedSchedule(
+                                                    schedule.id
+                                                )
+                                            }
+                                        />
+                                        <Gap height={2} />
+                                    </ScheduleSection>
+                                )
+                            )}
                     </ScheduleSelectionSection>
 
                     <Divider />
 
                     {/* 자기소개 섹션 */}
                     <SelfIntroSection>
-                        <SectionTitle>자기소개</SectionTitle>
+                        <SectionTitle>
+                            자기소개
+                        </SectionTitle>
                         <Gap height={24} />
                         <SelfIntroTextArea
-                            placeholder="본인을 어필할 수 있는 내용(경험, 성격, 목표 등)을 자유롭게 작성해 주세요."
+                            placeholder='본인을 어필할 수 있는 내용(경험, 성격, 목표 등)을 자유롭게 작성해 주세요.'
                             value={description}
-                            onChange={handleDescriptionChange}
+                            onChange={
+                                handleDescriptionChange
+                            }
                             maxLength={200}
                         />
                         {descriptionError && (
-                            <ErrorMessage>{descriptionError}</ErrorMessage>
+                            <ErrorMessage>
+                                {descriptionError}
+                            </ErrorMessage>
                         )}
                     </SelfIntroSection>
                 </Content>
@@ -217,9 +261,15 @@ const JobApplyOverlay = ({ postId, onClose, onApplySuccess }) => {
 };
 
 // ScheduleSelector 컴포넌트
-const ScheduleSelector = ({ schedule, isSelected, onClick }) => {
-    const daysOfWeek = WEEKDAYS_KOR_ARRAY.map(item => item.label);
-    
+const ScheduleSelector = ({
+    schedule,
+    isSelected,
+    onClick,
+}) => {
+    const daysOfWeek = WEEKDAYS_KOR_ARRAY.map(
+        (item) => item.label
+    );
+
     return (
         <ScheduleSelectorContainer onClick={onClick}>
             <RadioButton>
@@ -227,7 +277,9 @@ const ScheduleSelector = ({ schedule, isSelected, onClick }) => {
             </RadioButton>
             <ScheduleContent>
                 <SchedulePosition>
-                    <PositionValue>{schedule.position}</PositionValue>
+                    <PositionValue>
+                        {schedule.position}
+                    </PositionValue>
                     <Spacer />
                     <PositionAvailable>
                         {schedule.positionsAvailable}명 모집
@@ -236,15 +288,22 @@ const ScheduleSelector = ({ schedule, isSelected, onClick }) => {
                 <Gap height={12} />
                 <ScheduleDays>
                     {daysOfWeek.map((day, index) => {
-                        const isActive = schedule.workingDays
-                            .map(day => WEEKDAYS_KOR[day])
-                            .includes(day);
+                        const isActive =
+                            schedule.workingDays
+                                .map(
+                                    (day) =>
+                                        WEEKDAYS_KOR[day]
+                                )
+                                .includes(day);
                         return (
-                            <DayText 
-                                key={day} 
+                            <DayText
+                                key={day}
                                 $day={day}
                                 $isActive={isActive}
-                                $isLast={index === daysOfWeek.length - 1}
+                                $isLast={
+                                    index ===
+                                    daysOfWeek.length - 1
+                                }
                             >
                                 {day}
                             </DayText>
@@ -254,11 +313,20 @@ const ScheduleSelector = ({ schedule, isSelected, onClick }) => {
                 <Gap height={16} />
                 <ScheduleTime>
                     <TimeText>
-                        {formatTimeToHHMM(schedule.startTime)} ~ {formatTimeToHHMM(schedule.endTime)}
+                        {formatTimeToHHMM(
+                            schedule.startTime
+                        )}{' '}
+                        ~{' '}
+                        {formatTimeToHHMM(schedule.endTime)}
                     </TimeText>
                     <Gap width={8} />
                     <WorkHoursText>
-                        ({calculateWorkHours(schedule.startTime, schedule.endTime)})
+                        (
+                        {calculateWorkHours(
+                            schedule.startTime,
+                            schedule.endTime
+                        )}
+                        )
                     </WorkHoursText>
                 </ScheduleTime>
             </ScheduleContent>
@@ -271,8 +339,10 @@ const calculateWorkHours = (startTime, endTime) => {
     const end = new Date(`2000-01-01T${endTime}`);
     const diffMs = end - start;
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-    
+    const diffMinutes = Math.floor(
+        (diffMs % (1000 * 60 * 60)) / (1000 * 60)
+    );
+
     if (diffMinutes === 0) {
         return `${diffHours}시간`;
     }
@@ -301,8 +371,8 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    padding-top: 60px;
 `;
-
 
 const Content = styled.div`
     flex: 1;
@@ -318,8 +388,8 @@ const SectionTitle = styled.div`
 `;
 
 const Gap = styled.div`
-    height: ${props => props.height || 0}px;
-    width: ${props => props.width || 0}px;
+    height: ${(props) => props.height || 0}px;
+    width: ${(props) => props.width || 0}px;
 `;
 
 const ScheduleSelectionSection = styled.div`
@@ -353,7 +423,10 @@ const RadioCircle = styled.div`
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    border: ${props => props.$isSelected ? '6px solid #2de283' : '1px solid #e5e5e5'};
+    border: ${(props) =>
+        props.$isSelected
+            ? '6px solid #2de283'
+            : '1px solid #e5e5e5'};
     transition: all 0.1s ease;
 `;
 
@@ -375,20 +448,22 @@ const ScheduleDays = styled.div`
 
 const DayText = styled.div`
     font-family: 'Pretendard';
-    font-weight: ${props => props.$isActive ? '700' : '500'};
+    font-weight: ${(props) =>
+        props.$isActive ? '700' : '500'};
     font-size: 14px;
-    background: ${props => {
+    background: ${(props) => {
         if (props.$isActive) return '#2de283';
         return '#ffffff';
     }};
-    color: ${props => {
+    color: ${(props) => {
         if (props.$isActive) return '#ffffff';
         return '#767676';
     }};
-    border: 1px solid ${props => {
-        if (props.$isActive) return '#2de283';
-        return '#e8e8e8';
-    }};
+    border: 1px solid
+        ${(props) => {
+            if (props.$isActive) return '#2de283';
+            return '#e8e8e8';
+        }};
     border-radius: 4px;
     min-width: 32px;
     height: 31px;
@@ -449,11 +524,11 @@ const SelfIntroTextArea = styled.textarea`
     font-weight: 400;
     font-size: 15px;
     line-height: 22px;
-    
+
     &:focus {
         border: 1px solid #2de283;
     }
-    
+
     &::placeholder {
         color: #999999;
     }
@@ -478,7 +553,9 @@ const BottomButtonContainer = styled.div`
     z-index: 100;
 
     @supports (padding: max(0px)) {
-        padding-bottom: calc(16px + max(0px, env(safe-area-inset-bottom)));
+        padding-bottom: calc(
+            16px + max(0px, env(safe-area-inset-bottom))
+        );
     }
 `;
 

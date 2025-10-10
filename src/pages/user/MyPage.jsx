@@ -21,7 +21,6 @@ const MyPage = () => {
         console.log(userInfo);
     }, []);
 
-
     return (
         <>
             <PageHeader
@@ -33,23 +32,31 @@ const MyPage = () => {
                 <TabContainer>
                     <Tab
                         $active={activeTab === 'scrap'}
-                        onClick={() => setActiveTab('scrap')}
+                        onClick={() =>
+                            setActiveTab('scrap')
+                        }
                     >
                         저장한 공고
                     </Tab>
                     <Tab
-                        $active={activeTab === 'certificate'}
-                        onClick={() => setActiveTab('certificate')}
+                        $active={
+                            activeTab === 'certificate'
+                        }
+                        onClick={() =>
+                            setActiveTab('certificate')
+                        }
                     >
                         자격사항 관리
                     </Tab>
                 </TabContainer>
                 <TabPanel>
-                    <ScrappedPostList 
+                    <ScrappedPostList
                         isActive={activeTab === 'scrap'}
                     />
-                    <CertificateList 
-                        isActive={activeTab === 'certificate'}
+                    <CertificateList
+                        isActive={
+                            activeTab === 'certificate'
+                        }
                     />
                 </TabPanel>
             </ContainerColumn>
@@ -64,6 +71,7 @@ const ContainerColumn = styled.div`
     display: flex;
     flex-direction: column;
     min-height: calc(100vh - 80px);
+    padding-top: 60px;
     padding-bottom: 80px;
 
     @media (max-width: 480px) {
@@ -89,11 +97,14 @@ const Tab = styled.button`
     padding: 16px 0;
     background: none;
     border: none;
-    color: ${({ $active }) => ($active ? '#2de283' : '#999999')};
+    color: ${({ $active }) =>
+        $active ? '#2de283' : '#999999'};
     font-size: 16px;
     font-weight: ${({ $active }) => ($active ? 600 : 400)};
     font-family: 'Pretendard';
-    border-bottom: 2px solid ${({ $active }) => ($active ? '#2de283' : 'transparent')};
+    border-bottom: 2px solid
+        ${({ $active }) =>
+            $active ? '#2de283' : 'transparent'};
     cursor: pointer;
     transition: all 0.2s ease;
 

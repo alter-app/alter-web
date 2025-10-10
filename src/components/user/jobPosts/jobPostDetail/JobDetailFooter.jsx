@@ -1,9 +1,6 @@
 import styled from 'styled-components';
 import Bookmark from '../Bookmark';
-import {
-    addPostingScrap,
-    deletePostingScrap,
-} from '../../../../services/post';
+import useScrapStore from '../../../../store/scrapStore';
 
 const JobDetailFooter = ({
     id,
@@ -11,6 +8,8 @@ const JobDetailFooter = ({
     onScrapChange,
     onApply,
 }) => {
+    // 스크랩 전역 상태 사용
+    const { toggleScrap } = useScrapStore();
     const handleApply = () => {
         if (onApply) {
             onApply();
@@ -19,21 +18,11 @@ const JobDetailFooter = ({
 
     const handleBookmark = async (e) => {
         e.stopPropagation();
-        const nextChecked = !checked;
-        
         try {
-            if (nextChecked) {
-                await addPostingScrap({ postingId: id });
-                onScrapChange(true);
-            } else {
-                await deletePostingScrap({
-                    favoritePostingId: id,
-                });
-                onScrapChange(false);
-            }
+            await toggleScrap(id);
         } catch (error) {
             console.error('스크랩 처리 실패:', error);
-            alert(nextChecked ? '스크랩 등록에 실패했습니다.' : '스크랩 제거에 실패했습니다.');
+            alert('스크랩 처리에 실패했습니다.');
         }
     };
 

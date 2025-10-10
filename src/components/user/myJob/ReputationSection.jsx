@@ -59,6 +59,9 @@ const ReputationSection = ({
                                         reputation.rating
                                     }
                                     isNew={reputation.isNew}
+                                    requesterType={
+                                        reputation.requesterType
+                                    }
                                     onAccept={() =>
                                         onAccept &&
                                         onAccept(reputation)

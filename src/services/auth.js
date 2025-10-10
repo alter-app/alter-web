@@ -14,25 +14,19 @@ export function initializeRecaptcha(
     onVerified
 ) {
     if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(
-            auth,
-            containerId,
-            {
-                size: 'invisible',
-                callback: () => {
-                    if (onVerified) onVerified();
-                },
-                'expired-callback': () => {
-                    if (window.recaptchaVerifier) {
-                        window.recaptchaVerifier.clear();
-                        delete window.recaptchaVerifier;
-                    }
-                    alert(
-                        'reCAPTCHA가 만료되었습니다. 다시 시도해주세요.'
-                    );
-                },
-            }
-        );
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
+            size: 'invisible',
+            callback: () => {
+                if (onVerified) onVerified();
+            },
+            'expired-callback': () => {
+                if (window.recaptchaVerifier) {
+                    window.recaptchaVerifier.clear();
+                    delete window.recaptchaVerifier;
+                }
+                alert('reCAPTCHA가 만료되었습니다. 다시 시도해주세요.');
+            },
+        });
         window.recaptchaVerifier.render();
     }
     return window.recaptchaVerifier;
@@ -49,17 +43,14 @@ export function clearRecaptcha() {
 // reCAPTCHA 인증번호 전송
 export async function sendPhoneVerification(phoneNumber) {
     if (!window.recaptchaVerifier)
-        throw new Error(
-            'reCAPTCHA가 초기화되지 않았습니다.'
-        );
+        throw new Error('reCAPTCHA가 초기화되지 않았습니다.');
     try {
         const verifier = window.recaptchaVerifier;
-        const confirmationResult =
-            await signInWithPhoneNumber(
-                auth,
-                phoneNumber,
-                verifier
-            );
+        const confirmationResult = await signInWithPhoneNumber(
+            auth,
+            phoneNumber,
+            verifier
+        );
         return confirmationResult.verificationId;
     } catch (error) {
         throw new Error(getFirebaseErrorMsg(error.code));
@@ -67,19 +58,10 @@ export async function sendPhoneVerification(phoneNumber) {
 }
 
 // reCAPTCHA 인증번호 검증
-export async function verifyPhoneCode(
-    verificationId,
-    code
-) {
+export async function verifyPhoneCode(verificationId, code) {
     try {
-        const credential = PhoneAuthProvider.credential(
-            verificationId,
-            code
-        );
-        const result = await signInWithCredential(
-            auth,
-            credential
-        );
+        const credential = PhoneAuthProvider.credential(verificationId, code);
+        const result = await signInWithCredential(auth, credential);
         return result.user?.phoneNumber;
     } catch (error) {
         throw new Error(getFirebaseErrorMsg(error.code));
@@ -125,25 +107,20 @@ export const checkNicknameDuplicate = async (nickname) => {
         return data.data.duplicated === false;
     } catch (error) {
         console.error('닉네임 중복 검사 오류:', error);
-        throw new Error(
-            '닉네임 중복 검사 중 오류가 발생했습니다.'
-        );
+        throw new Error('닉네임 중복 검사 중 오류가 발생했습니다.');
     }
 };
 
 // 이메일 중복 검사 로직
 export const checkEmailDuplicate = async (email) => {
     try {
-        const response = await fetch(
-            `${backend}/public/users/exists/email`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email }),
-            }
-        );
+        const response = await fetch(`${backend}/public/users/exists/email`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email }),
+        });
 
         const data = await response.json();
 
@@ -183,26 +160,18 @@ export const checkEmailDuplicate = async (email) => {
 // 회원가입 요청을 처리하는 로직
 export const signUp = async (userData) => {
     try {
-        const response = await fetch(
-            `${backend}/public/users/signup`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(userData),
-            }
-        );
+        const response = await fetch(`${backend}/public/users/signup`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData),
+        });
 
         if (!response.ok) {
-            const errorData = await response
-                .json()
-                .catch(() => ({}));
+            const errorData = await response.json().catch(() => ({}));
 
-            throw new Error(
-                errorData.message ||
-                    '회원가입에 실패했습니다.'
-            );
+            throw new Error(errorData.message || '회원가입에 실패했습니다.');
         }
 
         return await response.json();
@@ -220,37 +189,35 @@ export const loginWithProvider = async (
     navigate
 ) => {
     try {
-        const response = await fetch(
-            `${backend}/public/users/login-social`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    provider,
-                    authorizationCode,
-                    platformType: 'WEB',
-                }),
-            }
-        );
+        const response = await fetch(`${backend}/public/users/login-social`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                provider,
+                authorizationCode,
+                platformType: 'WEB',
+            }),
+        });
 
         const data = await response.json();
 
         if (response.ok) {
-            const {
-                accessToken,
-                refreshToken,
-                authorizationId,
-                scope,
-            } = data.data;
+            const { accessToken, refreshToken, authorizationId, scope } =
+                data.data;
             setAuth({
                 accessToken,
                 refreshToken,
                 authorizationId,
                 scope,
             });
-            return navigate('/main');
+            // scope에 따라 적절한 페이지로 리다이렉트
+            if (scope === 'APP') {
+                return navigate('/job-lookup-map');
+            } else if (scope === 'MANAGER') {
+                return navigate('/main');
+            }
         }
 
         const errorHandlers = {
@@ -271,9 +238,7 @@ export const loginWithProvider = async (
                 navigate('/login');
             },
             A007: () => {
-                alert(
-                    '소셜 로그인 인증이 만료되었습니다. 다시 시도해 주세요.'
-                );
+                alert('소셜 로그인 인증이 만료되었습니다. 다시 시도해 주세요.');
                 navigate('/login');
             },
             B011: () => {
@@ -287,10 +252,7 @@ export const loginWithProvider = async (
             },
         };
 
-        (
-            errorHandlers[data.code] ||
-            errorHandlers.default
-        )();
+        (errorHandlers[data.code] || errorHandlers.default)();
     } catch (error) {
         console.error('백엔드로 code 전송 실패:', error);
         alert('네트워크 오류가 발생했습니다.');
@@ -299,32 +261,21 @@ export const loginWithProvider = async (
 };
 
 // ID/PW 로그인 요청을 처리하는 로직
-export const loginIDPW = async (
-    userData,
-    setAuth,
-    navigate
-) => {
+export const loginIDPW = async (userData, setAuth, navigate) => {
     try {
-        const response = await fetch(
-            `${backend}/public/users/login`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(userData),
-            }
-        );
+        const response = await fetch(`${backend}/public/users/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData),
+        });
 
         const data = await response.json();
 
         if (response.ok) {
-            const {
-                accessToken,
-                refreshToken,
-                authorizationId,
-                scope,
-            } = data.data;
+            const { accessToken, refreshToken, authorizationId, scope } =
+                data.data;
 
             // 토큰/인증 정보 상태에 저장
             setAuth({
@@ -334,12 +285,16 @@ export const loginIDPW = async (
                 scope,
             });
 
-            return navigate('/main'); // 로그인 성공 시 메인 페이지 이동
+            // scope에 따라 적절한 페이지로 리다이렉트
+            if (scope === 'APP') {
+                return navigate('/job-lookup-map');
+            } else if (scope === 'MANAGER') {
+                return navigate('/main');
+            }
         }
 
         // 실패 시 에러 메시지 처리
-        const errorMessage =
-            data.message || '로그인에 실패했습니다.';
+        const errorMessage = data.message || '로그인에 실패했습니다.';
         alert(errorMessage);
         throw new Error(errorMessage);
     } catch (error) {
@@ -352,16 +307,13 @@ export const loginIDPW = async (
 // IDPW 회원가입 세션 생성 로직
 export const createSignupSession = async (phone) => {
     try {
-        const response = await fetch(
-            `${backend}/public/users/signup-session`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ contact: phone }),
-            }
-        );
+        const response = await fetch(`${backend}/public/users/signup-session`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ contact: phone }),
+        });
 
         if (!response.ok) {
             throw new Error('서버 응답 오류');
@@ -371,8 +323,6 @@ export const createSignupSession = async (phone) => {
         return data.data.signupSessionId;
     } catch (error) {
         console.error('회원가입 세션 생성 중 오류:', error);
-        throw new Error(
-            '회원가입 세션 생성 중 오류가 발생했습니다.'
-        );
+        throw new Error('회원가입 세션 생성 중 오류가 발생했습니다.');
     }
 };

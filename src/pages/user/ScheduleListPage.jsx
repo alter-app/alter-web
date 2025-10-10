@@ -12,9 +12,14 @@ const ScheduleListPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
     const [nextCursor, setNextCursor] = useState(null);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-    const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
+    const [isLoadingMore, setIsLoadingMore] =
+        useState(false);
+    const [currentYear, setCurrentYear] = useState(
+        new Date().getFullYear()
+    );
+    const [currentMonth, setCurrentMonth] = useState(
+        new Date().getMonth() + 1
+    );
     const navigate = useNavigate();
 
     // 데이터 변환 함수
@@ -34,11 +39,16 @@ const ScheduleListPage = () => {
                     weekday: 'short',
                 }),
                 date: startDate.getDate().toString(),
-                workplace: item.workspace?.workspaceName || '알 수 없는 업장',
-                time: `${startDate.toLocaleTimeString('ko-KR', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                })} ~ ${endDate.toLocaleTimeString('ko-KR', {
+                workplace:
+                    item.workspace?.workspaceName ||
+                    '알 수 없는 업장',
+                time: `${startDate.toLocaleTimeString(
+                    'ko-KR',
+                    {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                    }
+                )} ~ ${endDate.toLocaleTimeString('ko-KR', {
                     hour: '2-digit',
                     minute: '2-digit',
                 })}`,
@@ -55,23 +65,30 @@ const ScheduleListPage = () => {
 
                 // 현재 월 스케줄 조회
                 const currentDate = new Date();
-                const currentYear = currentDate.getFullYear();
-                const currentMonth = currentDate.getMonth() + 1;
+                const currentYear =
+                    currentDate.getFullYear();
+                const currentMonth =
+                    currentDate.getMonth() + 1;
 
-                const scheduleData = await getUserScheduleSelf(
-                    currentYear,
-                    currentMonth
-                );
-                const formattedSchedules = transformScheduleData(
-                    scheduleData.data
-                );
+                const scheduleData =
+                    await getUserScheduleSelf(
+                        currentYear,
+                        currentMonth
+                    );
+                const formattedSchedules =
+                    transformScheduleData(
+                        scheduleData.data
+                    );
 
                 setSchedules(formattedSchedules);
                 setCurrentYear(currentYear);
                 setCurrentMonth(currentMonth);
                 setHasMore(false);
             } catch (error) {
-                console.error('스케줄 목록 조회 실패:', error);
+                console.error(
+                    '스케줄 목록 조회 실패:',
+                    error
+                );
                 setSchedules([]);
                 setHasMore(false);
             } finally {
@@ -83,35 +100,53 @@ const ScheduleListPage = () => {
     }, []);
 
     // 월별 스케줄 로드
-    const fetchMonthlySchedules = useCallback(async (year, month) => {
-        try {
-            setIsLoading(true);
+    const fetchMonthlySchedules = useCallback(
+        async (year, month) => {
+            try {
+                setIsLoading(true);
 
-            const scheduleData = await getUserScheduleSelf(year, month);
-            const formattedSchedules = transformScheduleData(scheduleData.data);
+                const scheduleData =
+                    await getUserScheduleSelf(year, month);
+                const formattedSchedules =
+                    transformScheduleData(
+                        scheduleData.data
+                    );
 
-            setSchedules(formattedSchedules);
-            setCurrentYear(year);
-            setCurrentMonth(month);
-        } catch (error) {
-            console.error('월별 스케줄 조회 실패:', error);
-            setSchedules([]);
-        } finally {
-            setIsLoading(false);
-        }
-    }, []);
+                setSchedules(formattedSchedules);
+                setCurrentYear(year);
+                setCurrentMonth(month);
+            } catch (error) {
+                console.error(
+                    '월별 스케줄 조회 실패:',
+                    error
+                );
+                setSchedules([]);
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        []
+    );
 
     // 이전 달
     const handlePreviousMonth = () => {
-        const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
-        const prevYear = currentMonth === 1 ? currentYear - 1 : currentYear;
+        const prevMonth =
+            currentMonth === 1 ? 12 : currentMonth - 1;
+        const prevYear =
+            currentMonth === 1
+                ? currentYear - 1
+                : currentYear;
         fetchMonthlySchedules(prevYear, prevMonth);
     };
 
     // 다음 달
     const handleNextMonth = () => {
-        const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
-        const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
+        const nextMonth =
+            currentMonth === 12 ? 1 : currentMonth + 1;
+        const nextYear =
+            currentMonth === 12
+                ? currentYear + 1
+                : currentYear;
         fetchMonthlySchedules(nextYear, nextMonth);
     };
 
@@ -138,7 +173,9 @@ const ScheduleListPage = () => {
             <ContentContainer>
                 {/* 월별 네비게이션 */}
                 <MonthNavigation>
-                    <MonthButton onClick={handlePreviousMonth}>
+                    <MonthButton
+                        onClick={handlePreviousMonth}
+                    >
                         <svg
                             width='20'
                             height='20'
@@ -183,11 +220,15 @@ const ScheduleListPage = () => {
                                     key={schedule.id}
                                     day={schedule.day}
                                     date={schedule.date}
-                                    workplace={schedule.workplace}
+                                    workplace={
+                                        schedule.workplace
+                                    }
                                     time={schedule.time}
                                     hours={schedule.hours}
                                     onClick={() =>
-                                        handleScheduleClick(schedule)
+                                        handleScheduleClick(
+                                            schedule
+                                        )
                                     }
                                 />
                             ))}
@@ -211,7 +252,9 @@ const ScheduleListPage = () => {
                                 />
                             </svg>
                         </EmptyIcon>
-                        <EmptyTitle>일정이 없습니다</EmptyTitle>
+                        <EmptyTitle>
+                            일정이 없습니다
+                        </EmptyTitle>
                         <EmptyDescription>
                             {currentYear}년 {currentMonth}
                             월에는
@@ -230,6 +273,7 @@ export default ScheduleListPage;
 const PageContainer = styled.div`
     min-height: 100vh;
     background: #f8f9fa;
+    padding-top: 60px;
 `;
 
 const ContentContainer = styled.div`

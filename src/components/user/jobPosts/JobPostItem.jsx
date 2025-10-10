@@ -9,10 +9,7 @@ import {
     formatTimeToHHMM,
     timeAgo,
 } from '../../../utils/timeUtil';
-import {
-    addPostingScrap,
-    deletePostingScrap,
-} from '../../../services/post';
+import useScrapStore from '../../../store/scrapStore';
 
 const JobPostItem = ({
     title,
@@ -27,6 +24,8 @@ const JobPostItem = ({
     checked,
     onScrapChange,
 }) => {
+    // 스크랩 전역 상태 사용
+    const { toggleScrap } = useScrapStore();
     const startTime =
         schedules && schedules.length > 0
             ? formatTimeToHHMM(schedules[0].startTime)
@@ -38,20 +37,10 @@ const JobPostItem = ({
 
     const handleBookmark = async (e) => {
         e.stopPropagation();
-        const nextChecked = !checked;
-        onScrapChange(nextChecked);
-
         try {
-            if (nextChecked) {
-                await addPostingScrap({ postingId: id });
-            } else {
-                await deletePostingScrap({
-                    favoritePostingId: id,
-                });
-            }
+            await toggleScrap(id);
         } catch (err) {
             alert('스크랩 실패');
-            onScrapChange(checked);
         }
     };
 

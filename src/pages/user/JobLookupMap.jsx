@@ -7,6 +7,7 @@ import MarkerJobPostList from '../../components/user/jobPosts/MarkerJobPostList'
 import JobPostDetailOverlay from '../../components/user/jobPosts/JobPostDetailOverlay';
 import JobApplyOverlay from '../../components/user/jobPosts/JobApplyOverlay';
 import BottomNavigation from '../../layouts/BottomNavigation';
+import useScrapStore from '../../store/scrapStore';
 
 const JobLookupMap = () => {
     const navigate = useNavigate();
@@ -14,7 +15,9 @@ const JobLookupMap = () => {
     const [isDragging, setIsDragging] = useState(false);
     const [startY, setStartY] = useState(0);
     const [startHeight, setStartHeight] = useState(0);
-    const [scrapMap, setScrapMap] = useState({});
+    // 스크랩 전역 상태 사용
+    const { scrapMap, initializeScrapMap, toggleScrap } =
+        useScrapStore();
     const [velocity, setVelocity] = useState(0);
     const [lastY, setLastY] = useState(0);
     const [lastTime, setLastTime] = useState(0);
@@ -183,9 +186,12 @@ const JobLookupMap = () => {
         }
     };
 
-    const handleScrapChange = (id, value) => {
-        setScrapMap((prev) => ({ ...prev, [id]: value }));
-    };
+    // 스크랩 상태 초기화 (공고 데이터 로드 시)
+    useEffect(() => {
+        if (jobPostings.length > 0) {
+            initializeScrapMap(jobPostings);
+        }
+    }, [jobPostings, initializeScrapMap]);
 
     const handleTouchStart = (e) => {
         setIsDragging(true);
@@ -532,9 +538,7 @@ const JobLookupMap = () => {
                             posts={jobPostings}
                             onSelect={handlePostSelect}
                             scrapMap={scrapMap}
-                            onScrapChange={
-                                handleScrapChange
-                            }
+                            onScrapChange={toggleScrap}
                         />
                     ) : (
                         // 전체 조회 모드: 검색, 필터링, 무한스크롤 포함
@@ -557,9 +561,7 @@ const JobLookupMap = () => {
                             }}
                             onSelect={handlePostSelect}
                             scrapMap={scrapMap}
-                            onScrapChange={
-                                handleScrapChange
-                            }
+                            onScrapChange={toggleScrap}
                         />
                     )}
                 </JobListContent>

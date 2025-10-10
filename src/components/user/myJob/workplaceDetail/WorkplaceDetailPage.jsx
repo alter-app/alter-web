@@ -438,11 +438,11 @@ export default WorkplaceDetailPage;
 
 const Container = styled.div`
     min-height: calc(100vh - 80px);
-    padding: 20px 16px 100px 16px;
+    padding: 80px 16px 100px 16px;
     background: #f8f9fa;
 
     @media (max-width: 480px) {
-        padding: 16px 12px 80px 12px;
+        padding: 76px 12px 80px 12px;
     }
 `;
 

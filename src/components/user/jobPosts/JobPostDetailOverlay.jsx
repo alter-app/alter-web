@@ -11,16 +11,34 @@ import Divider from './jobPostDetail/Divider';
 import PageHeader from '../../shared/PageHeader';
 import JobApplyOverlay from './JobApplyOverlay';
 import { getPostDetail } from '../../../services/post';
+import useScrapStore from '../../../store/scrapStore';
 
 const JobPostDetailOverlay = ({
     postId,
     onClose,
     onApply,
+    onScrapChange,
 }) => {
     const [postDetail, setPostDetail] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [scrapped, setScrapped] = useState(false);
-    const [showApplyOverlay, setShowApplyOverlay] = useState(false);
+    const [showApplyOverlay, setShowApplyOverlay] =
+        useState(false);
+
+    // 스크랩 전역 상태 사용
+    const { isScrapped, toggleScrap } = useScrapStore();
+
+    // 스크랩 상태 변경 핸들러
+    const handleScrapChange = async (postId) => {
+        try {
+            await toggleScrap(postId);
+            // 상위 컴포넌트에 스크랩 상태 변경 알림
+            if (onScrapChange) {
+                onScrapChange(postId, isScrapped(postId));
+            }
+        } catch (error) {
+            console.error('스크랩 처리 실패:', error);
+        }
+    };
 
     useEffect(() => {
         const fetchPostDetail = async () => {
@@ -30,7 +48,6 @@ const JobPostDetailOverlay = ({
                         postId
                     );
                     setPostDetail(result.data);
-                    setScrapped(result.data.scrapped || false);
                     console.log(result);
                 }
             } catch (error) {
@@ -55,15 +72,15 @@ const JobPostDetailOverlay = ({
     };
 
     const handleApplySuccess = () => {
+        // 지원 오버레이 닫기
         setShowApplyOverlay(false);
-        if (onApply) {
-            onApply(postDetail);
-        }
+        // 지원 성공 알림
+        alert('지원이 완료되었습니다!');
+        // 지원 성공 시 상세 오버레이는 그대로 유지 (이미 열려있음)
     };
 
-    const handleScrapChange = (newScrapped) => {
-        setScrapped(newScrapped);
-    };
+    // 스크랩 상태를 store에서 가져옴
+    const scrapped = isScrapped(postId);
 
     if (loading) {
         return (
@@ -72,7 +89,6 @@ const JobPostDetailOverlay = ({
                     <PageHeader
                         title='알바 상세'
                         onBack={onClose}
-                        variant='sticky'
                     />
                     <Content>
                         <LoadingText>
@@ -91,7 +107,6 @@ const JobPostDetailOverlay = ({
                     <PageHeader
                         title='알바 상세'
                         onBack={onClose}
-                        variant='sticky'
                     />
                     <Content>
                         <ErrorText>
@@ -164,7 +179,7 @@ const JobPostDetailOverlay = ({
                     onApply={handleApply}
                 />
             </Container>
-            
+
             {/* JobApply 오버레이 */}
             {showApplyOverlay && (
                 <JobApplyOverlay
@@ -198,6 +213,7 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    padding-top: 60px;
 `;
 
 const Content = styled.div`
