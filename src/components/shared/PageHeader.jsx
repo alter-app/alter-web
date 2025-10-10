@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 const PageHeader = ({
     title,
     onBack,
-    variant = 'sticky',
     showBackButton = true,
 }) => {
     const navigate = useNavigate();
@@ -18,10 +17,7 @@ const PageHeader = ({
     };
 
     return (
-        <Header
-            variant={variant}
-            $showBackButton={showBackButton}
-        >
+        <Header $showBackButton={showBackButton}>
             {showBackButton && (
                 <BackButton onClick={handleBack}>
                     <svg
@@ -50,8 +46,7 @@ const PageHeader = ({
 export default PageHeader;
 
 const Header = styled.div`
-    position: ${(props) =>
-        props.variant === 'sticky' ? 'sticky' : 'fixed'};
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;

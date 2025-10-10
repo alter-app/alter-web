@@ -260,6 +260,7 @@ export default ApplicationListPage;
 const PageContainer = styled.div`
     min-height: 100vh;
     background: #f8f9fa;
+    padding-top: 60px;
 `;
 
 const ContentContainer = styled.div`

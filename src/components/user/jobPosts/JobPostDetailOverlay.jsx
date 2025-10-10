@@ -89,7 +89,6 @@ const JobPostDetailOverlay = ({
                     <PageHeader
                         title='알바 상세'
                         onBack={onClose}
-                        variant='sticky'
                     />
                     <Content>
                         <LoadingText>
@@ -108,7 +107,6 @@ const JobPostDetailOverlay = ({
                     <PageHeader
                         title='알바 상세'
                         onBack={onClose}
-                        variant='sticky'
                     />
                     <Content>
                         <ErrorText>
@@ -215,6 +213,7 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    padding-top: 60px;
 `;
 
 const Content = styled.div`

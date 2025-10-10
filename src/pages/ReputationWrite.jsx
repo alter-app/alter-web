@@ -231,6 +231,7 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    padding-top: 60px;
 
     @media (max-width: 480px) {
         /* border-radius: 16px 16px 0 0; */

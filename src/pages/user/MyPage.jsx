@@ -71,6 +71,7 @@ const ContainerColumn = styled.div`
     display: flex;
     flex-direction: column;
     min-height: calc(100vh - 80px);
+    padding-top: 60px;
     padding-bottom: 80px;
 
     @media (max-width: 480px) {
