@@ -6,6 +6,25 @@ const BottomNavigation = () => {
     const location = useLocation();
 
     const isActive = (path) => {
+        if (path === '/my-applications') {
+            // 내알바 관련 모든 하위 경로들
+            return (
+                location.pathname === '/my-applications' ||
+                location.pathname === '/reputation-list' ||
+                location.pathname === '/schedule-list' ||
+                location.pathname === '/application-list' ||
+                location.pathname.startsWith(
+                    '/my-job/workplace/'
+                )
+            );
+        }
+        if (path === '/mypage') {
+            // 마이페이지 관련 모든 하위 경로들
+            return (
+                location.pathname === '/mypage' ||
+                location.pathname.startsWith('/mypage/')
+            );
+        }
         return location.pathname === path;
     };
 
