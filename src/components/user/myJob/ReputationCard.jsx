@@ -41,13 +41,21 @@ const ReputationCard = ({
     return (
         <CardContainer>
             <CardContent>
-                <WorkplaceName>{displayInfo.title}</WorkplaceName>
-                <ReviewerName>{displayInfo.subtitle}</ReviewerName>
+                <WorkplaceName>
+                    {displayInfo.title}
+                </WorkplaceName>
+                <ReviewerName>
+                    {displayInfo.subtitle}
+                </ReviewerName>
                 <TimeAgo>{timeAgo}</TimeAgo>
             </CardContent>
             <ButtonContainer>
-                <AcceptButton onClick={onAccept}>수락</AcceptButton>
-                <RejectButton onClick={onReject}>거절</RejectButton>
+                <AcceptButton onClick={onAccept}>
+                    수락
+                </AcceptButton>
+                <RejectButton onClick={onReject}>
+                    거절
+                </RejectButton>
             </ButtonContainer>
         </CardContainer>
     );

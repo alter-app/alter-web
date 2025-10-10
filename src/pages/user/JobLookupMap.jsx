@@ -573,6 +573,8 @@ const JobLookupMap = () => {
                     postId={selectedPostId}
                     onClose={handleCloseDetailOverlay}
                     onApply={handleApply}
+                    scrapMap={scrapMap}
+                    onScrapChange={handleScrapChange}
                 />
             )}
 

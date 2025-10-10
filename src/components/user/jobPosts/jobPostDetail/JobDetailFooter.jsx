@@ -21,18 +21,21 @@ const JobDetailFooter = ({
         e.stopPropagation();
         const nextChecked = !checked;
 
+        // 낙관적 업데이트: UI를 먼저 업데이트
+        onScrapChange(nextChecked);
+
         try {
             if (nextChecked) {
                 await addPostingScrap({ postingId: id });
-                onScrapChange(true);
             } else {
                 await deletePostingScrap({
                     favoritePostingId: id,
                 });
-                onScrapChange(false);
             }
         } catch (error) {
             console.error('스크랩 처리 실패:', error);
+            // 실패 시 이전 상태로 롤백
+            onScrapChange(checked);
             alert(
                 nextChecked
                     ? '스크랩 등록에 실패했습니다.'

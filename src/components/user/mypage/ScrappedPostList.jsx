@@ -11,9 +11,12 @@ const ScrappedPostList = ({ isActive }) => {
     const [scrappedPosts, setScrappedPosts] = useState([]);
     const [cursorInfo, setCursorInfo] = useState('');
     const [totalCount, setTotalCount] = useState(0);
-    const [hasInitialLoad, setHasInitialLoad] = useState(false);
-    const [showDetailOverlay, setShowDetailOverlay] = useState(false);
-    const [selectedPostId, setSelectedPostId] = useState(null);
+    const [hasInitialLoad, setHasInitialLoad] =
+        useState(false);
+    const [showDetailOverlay, setShowDetailOverlay] =
+        useState(false);
+    const [selectedPostId, setSelectedPostId] =
+        useState(null);
     const containerRef = useRef(null);
 
     useEffect(() => {
@@ -23,13 +26,12 @@ const ScrappedPostList = ({ isActive }) => {
         }
     }, [hasInitialLoad]);
 
-
     const fetchData = async (isRefresh = false) => {
         try {
             const result = await getScrapPostList({
                 cursorInfo: isRefresh ? '' : cursorInfo,
             });
-            
+
             if (isRefresh) {
                 setScrappedPosts(result.data);
             } else {
@@ -45,7 +47,6 @@ const ScrappedPostList = ({ isActive }) => {
             console.error('공고 리스트 조회 오류:', error);
         }
     };
-
 
     const formatPaymentType = (paymentType) => {
         return paymentType === 'HOURLY' ? '시급' : '일급';
@@ -73,7 +74,9 @@ const ScrappedPostList = ({ isActive }) => {
         return (
             <EmptyContainer>
                 <EmptyIcon>📄</EmptyIcon>
-                <EmptyText>스크랩한 공고가 없습니다.</EmptyText>
+                <EmptyText>
+                    스크랩한 공고가 없습니다.
+                </EmptyText>
             </EmptyContainer>
         );
     }
@@ -84,11 +87,16 @@ const ScrappedPostList = ({ isActive }) => {
 
     return (
         <Container>
-            <ListArea id='scrollableListArea' ref={containerRef}>
+            <ListArea
+                id='scrollableListArea'
+                ref={containerRef}
+            >
                 <InfiniteScroll
                     dataLength={scrappedPosts.length}
                     next={() => fetchData(false)}
-                    hasMore={scrappedPosts.length < totalCount}
+                    hasMore={
+                        scrappedPosts.length < totalCount
+                    }
                     loader={
                         <CenteredDiv>
                             <Loader />
@@ -98,24 +106,46 @@ const ScrappedPostList = ({ isActive }) => {
                     scrollableTarget='scrollableListArea'
                 >
                     {scrappedPosts.map((scrap) => (
-                        <ScrapCard 
+                        <ScrapCard
                             key={scrap.id}
-                            onClick={() => handleOpenDetailOverlay(scrap.posting.id)}
+                            onClick={() =>
+                                handleOpenDetailOverlay(
+                                    scrap.posting.id
+                                )
+                            }
                         >
                             <ScrapContent>
-                                <BusinessName>{scrap.posting.businessName}</BusinessName>
-                                <JobTitle>{scrap.posting.title}</JobTitle>
+                                <BusinessName>
+                                    {
+                                        scrap.posting
+                                            .businessName
+                                    }
+                                </BusinessName>
+                                <JobTitle>
+                                    {scrap.posting.title}
+                                </JobTitle>
                                 <JobInfo>
-                                    {formatPaymentType(scrap.posting.paymentType)}{' '}
-                                    <Amount>{formatNumber(scrap.posting.payAmount)}</Amount>원 ·{' '}
-                                    {timeAgo(scrap.createdAt)}
+                                    {formatPaymentType(
+                                        scrap.posting
+                                            .paymentType
+                                    )}{' '}
+                                    <Amount>
+                                        {formatNumber(
+                                            scrap.posting
+                                                .payAmount
+                                        )}
+                                    </Amount>
+                                    원 ·{' '}
+                                    {timeAgo(
+                                        scrap.createdAt
+                                    )}
                                 </JobInfo>
                             </ScrapContent>
                         </ScrapCard>
                     ))}
                 </InfiniteScroll>
             </ListArea>
-            
+
             {/* JobPostDetail 오버레이 */}
             {showDetailOverlay && selectedPostId && (
                 <JobPostDetailOverlay
@@ -219,5 +249,3 @@ const Amount = styled.span`
     color: #2de283;
     font-weight: 700;
 `;
-
-

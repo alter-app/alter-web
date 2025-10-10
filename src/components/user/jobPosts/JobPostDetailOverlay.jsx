@@ -16,10 +16,11 @@ const JobPostDetailOverlay = ({
     postId,
     onClose,
     onApply,
+    scrapMap,
+    onScrapChange,
 }) => {
     const [postDetail, setPostDetail] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [scrapped, setScrapped] = useState(false);
     const [showApplyOverlay, setShowApplyOverlay] =
         useState(false);
 
@@ -31,9 +32,6 @@ const JobPostDetailOverlay = ({
                         postId
                     );
                     setPostDetail(result.data);
-                    setScrapped(
-                        result.data.scrapped || false
-                    );
                     console.log(result);
                 }
             } catch (error) {
@@ -65,9 +63,9 @@ const JobPostDetailOverlay = ({
         // 지원 성공 시 상세 오버레이는 그대로 유지 (이미 열려있음)
     };
 
-    const handleScrapChange = (newScrapped) => {
-        setScrapped(newScrapped);
-    };
+    // scrapMap에서 현재 포스트의 스크랩 상태를 가져옴
+    const scrapped =
+        scrapMap?.[postId] ?? postDetail?.scrapped ?? false;
 
     if (loading) {
         return (
@@ -164,7 +162,7 @@ const JobPostDetailOverlay = ({
                 <JobDetailFooter
                     id={postDetail.id}
                     checked={scrapped}
-                    onScrapChange={handleScrapChange}
+                    onScrapChange={onScrapChange}
                     onApply={handleApply}
                 />
             </Container>
