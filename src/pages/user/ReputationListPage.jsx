@@ -22,22 +22,58 @@ const ReputationListPage = () => {
 
     // 데이터 변환 함수
     const transformReputationData = (data) => {
-        return (data || []).map((item) => ({
-            id: item.id,
-            workplaceName:
-                item.workplaceName ||
-                item.target?.name ||
-                '알 수 없는 업장',
-            reviewerName:
-                item.requesterName ||
-                item.requester?.name ||
-                '알 수 없는 요청자',
-            timeAgo: item.createdAt
-                ? timeAgo(item.createdAt)
-                : '알 수 없음',
-            rating: item.rating || 0,
-            isNew: item.isNew || false,
-        }));
+        return (data || []).map((item) => {
+            // 요청자 타입에 따른 로직 처리
+            let workplaceName = '알 수 없는 업장';
+            let reviewerName = '알 수 없는 요청자';
+
+            if (item.requester?.type === 'USER') {
+                // 요청자가 USER인 경우: 요청자 이름 + 근무한 업장 이름
+                workplaceName =
+                    item.workspace?.businessName ||
+                    item.target?.name ||
+                    '알 수 없는 업장';
+                reviewerName =
+                    item.requester?.name ||
+                    item.requesterName ||
+                    '알 수 없는 요청자';
+            } else if (
+                item.requester?.type === 'WORKSPACE'
+            ) {
+                // 요청자가 WORKSPACE인 경우: 요청자 이름이 workspace 이름
+                workplaceName =
+                    item.requester?.name ||
+                    item.requesterName ||
+                    '알 수 없는 업장';
+                reviewerName =
+                    item.requester?.name ||
+                    item.requesterName ||
+                    '알 수 없는 요청자';
+            } else {
+                // 기존 로직 (타입 정보가 없는 경우)
+                workplaceName =
+                    item.workplaceName ||
+                    item.target?.name ||
+                    '알 수 없는 업장';
+                reviewerName =
+                    item.requesterName ||
+                    item.requester?.name ||
+                    '알 수 없는 요청자';
+            }
+
+            return {
+                id: item.id,
+                workplaceName,
+                reviewerName,
+                timeAgo: item.createdAt
+                    ? timeAgo(item.createdAt)
+                    : '알 수 없음',
+                rating: item.rating || 0,
+                isNew: item.isNew || false,
+                requesterType:
+                    item.requester?.type || 'UNKNOWN',
+            };
+        });
     };
 
     // 초기 데이터 로드
@@ -189,6 +225,9 @@ const ReputationListPage = () => {
                                             }
                                             isNew={
                                                 reputation.isNew
+                                            }
+                                            requesterType={
+                                                reputation.requesterType
                                             }
                                             onAccept={() =>
                                                 handleAccept(

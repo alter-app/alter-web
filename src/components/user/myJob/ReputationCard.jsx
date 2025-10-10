@@ -6,14 +6,43 @@ const ReputationCard = ({
     timeAgo,
     rating,
     isNew = false,
+    requesterType = 'UNKNOWN',
     onAccept,
     onReject,
 }) => {
+    // 요청자 타입에 따른 표시 로직
+    const getDisplayInfo = () => {
+        if (requesterType === 'USER') {
+            // USER인 경우: "요청자 이름이 근무한 업장 이름에서 평판을 요청했습니다"
+            return {
+                title: `${reviewerName}`,
+                subtitle: workplaceName,
+                description: `${reviewerName}님이 ${workplaceName}에서 평판을 요청했습니다`,
+            };
+        } else if (requesterType === 'WORKSPACE') {
+            // WORKSPACE인 경우: "업장 이름이 평판을 요청했습니다"
+            return {
+                title: workplaceName,
+                subtitle: '업장에서 평판 요청',
+                description: `${workplaceName}에서 평판을 요청했습니다`,
+            };
+        } else {
+            // 기존 로직
+            return {
+                title: workplaceName,
+                subtitle: reviewerName,
+                description: `${reviewerName}님이 평판을 요청했습니다`,
+            };
+        }
+    };
+
+    const displayInfo = getDisplayInfo();
+
     return (
         <CardContainer>
             <CardContent>
-                <WorkplaceName>{workplaceName}</WorkplaceName>
-                <ReviewerName>{reviewerName}</ReviewerName>
+                <WorkplaceName>{displayInfo.title}</WorkplaceName>
+                <ReviewerName>{displayInfo.subtitle}</ReviewerName>
                 <TimeAgo>{timeAgo}</TimeAgo>
             </CardContent>
             <ButtonContainer>

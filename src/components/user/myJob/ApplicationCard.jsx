@@ -11,9 +11,14 @@ const ApplicationCard = ({
 }) => {
     const getStatusInfo = (status) => {
         // status가 객체인 경우 value와 description 추출
-        const statusValue = typeof status === 'object' ? status.value : status;
+        const statusValue =
+            typeof status === 'object'
+                ? status.value
+                : status;
         const statusDescription =
-            typeof status === 'object' ? status.description : status;
+            typeof status === 'object'
+                ? status.description
+                : status;
 
         switch (statusValue) {
             case 'SUBMITTED':
@@ -53,7 +58,10 @@ const ApplicationCard = ({
                 };
             default:
                 return {
-                    text: statusDescription || statusValue || status,
+                    text:
+                        statusDescription ||
+                        statusValue ||
+                        status,
                     color: '#666666',
                 };
         }
@@ -65,7 +73,9 @@ const ApplicationCard = ({
         <CardContainer onClick={onClick}>
             <CardContent>
                 <CardHeader>
-                    <WorkplaceName>{workplaceName}</WorkplaceName>
+                    <WorkplaceName>
+                        {workplaceName}
+                    </WorkplaceName>
                     <StatusBadge $color={statusInfo.color}>
                         {statusInfo.text}
                     </StatusBadge>
@@ -74,7 +84,9 @@ const ApplicationCard = ({
                     <Position>{position}</Position>
                     <Wage>{formatNumber(wage)}원</Wage>
                 </JobInfo>
-                <ApplicationDate>{applicationDate}</ApplicationDate>
+                <ApplicationDate>
+                    {applicationDate}
+                </ApplicationDate>
             </CardContent>
             <ArrowIcon />
         </CardContainer>

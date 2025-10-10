@@ -20,7 +20,7 @@ const JobDetailFooter = ({
     const handleBookmark = async (e) => {
         e.stopPropagation();
         const nextChecked = !checked;
-        
+
         try {
             if (nextChecked) {
                 await addPostingScrap({ postingId: id });
@@ -33,7 +33,11 @@ const JobDetailFooter = ({
             }
         } catch (error) {
             console.error('스크랩 처리 실패:', error);
-            alert(nextChecked ? '스크랩 등록에 실패했습니다.' : '스크랩 제거에 실패했습니다.');
+            alert(
+                nextChecked
+                    ? '스크랩 등록에 실패했습니다.'
+                    : '스크랩 제거에 실패했습니다.'
+            );
         }
     };
 
