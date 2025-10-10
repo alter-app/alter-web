@@ -19,8 +19,7 @@ const SignUpStep1 = ({
     <Container>
         <InfoTitle>회원님의 정보를 알려주세요!</InfoTitle>
         <InfoDesc>
-            알터가 회원님이 동의해 주신 내용을 바탕으로
-            작성했어요.
+            알터가 회원님이 동의해 주신 내용을 바탕으로 작성했어요.
             <br />
             틀리거나 빈 정보가 있다면 알려주시겠어요?
         </InfoDesc>
@@ -28,39 +27,28 @@ const SignUpStep1 = ({
             <Row>
                 <AuthInput
                     type='text'
-                    placeholder='박알바'
+                    placeholder='이름'
                     value={name}
-                    onChange={(e) =>
-                        setName(e.target.value)
-                    }
+                    onChange={(e) => setName(e.target.value)}
                 />
-                <GenderSelector
-                    value={gender}
-                    onChange={setGender}
-                />
+                <GenderSelector value={gender} onChange={setGender} />
             </Row>
             <AuthInput
                 type='tel'
                 maxLength={13}
-                placeholder='010-1234-5678'
+                placeholder='전화번호'
                 value={phone}
-                onChange={(e) =>
-                    setPhone(
-                        formatPhoneNumber(e.target.value)
-                    )
-                }
+                onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
             />
             <AuthInput
                 type='text'
-                placeholder='19450815'
+                placeholder='생년월일 8자리'
                 value={birth}
                 maxLength={8}
                 onChange={(e) => setBirth(e.target.value)}
             />
         </InputSection>
-        <InfoGuide>
-            만약 내용이 없다면 모든 내용을 기입해 주세요!
-        </InfoGuide>
+        <InfoGuide>만약 내용이 없다면 모든 내용을 기입해 주세요!</InfoGuide>
         <NextButton disabled={!isValid} onClick={onNext}>
             다 했어요.
         </NextButton>
@@ -95,15 +83,9 @@ const Container = styled.div`
     /* iOS Safari safe area */
     @supports (padding: max(0px)) {
         padding-left: max(20px, env(safe-area-inset-left));
-        padding-right: max(
-            20px,
-            env(safe-area-inset-right)
-        );
+        padding-right: max(20px, env(safe-area-inset-right));
         padding-top: max(24px, env(safe-area-inset-top));
-        padding-bottom: max(
-            24px,
-            env(safe-area-inset-bottom)
-        );
+        padding-bottom: max(24px, env(safe-area-inset-bottom));
     }
 `;
 
