@@ -6,6 +6,7 @@ import Loader from '../../Loader';
 import { formatNumber } from '../../../utils/formatNumber';
 import { timeAgo } from '../../../utils/timeUtil';
 import JobPostDetailOverlay from '../jobPosts/JobPostDetailOverlay';
+import useScrapStore from '../../../store/scrapStore';
 
 const ScrappedPostList = ({ isActive }) => {
     const [scrappedPosts, setScrappedPosts] = useState([]);
@@ -19,12 +20,26 @@ const ScrappedPostList = ({ isActive }) => {
         useState(null);
     const containerRef = useRef(null);
 
+    // 스크랩 전역 상태 사용
+    const { scrapMap, initializeScrapMap } =
+        useScrapStore();
+
     useEffect(() => {
         if (!hasInitialLoad) {
             fetchData();
             setHasInitialLoad(true);
         }
     }, [hasInitialLoad]);
+
+    // 스크랩 상태 변경 시 리스트 필터링
+    useEffect(() => {
+        setScrappedPosts((prev) =>
+            prev.filter(
+                (scrap) =>
+                    scrapMap[scrap.posting.id] !== false
+            )
+        );
+    }, [scrapMap]);
 
     const fetchData = async (isRefresh = false) => {
         try {
@@ -42,6 +57,14 @@ const ScrappedPostList = ({ isActive }) => {
             }
             setCursorInfo(result.page.cursor);
             setTotalCount(result.page.totalCount);
+
+            // 스크랩 상태 초기화 (모든 스크랩된 포스트는 true로 설정)
+            const posts = result.data.map((scrap) => ({
+                ...scrap.posting,
+                scrapped: true,
+            }));
+            initializeScrapMap(posts);
+
             console.log(result);
         } catch (error) {
             console.error('공고 리스트 조회 오류:', error);
@@ -68,6 +91,18 @@ const ScrappedPostList = ({ isActive }) => {
     const handleApply = (postDetail) => {
         console.log('지원하기:', postDetail);
         // 지원 로직은 필요에 따라 구현
+    };
+
+    // 스크랩 상태 변경 핸들러
+    const handleScrapChange = (postId, isScrapped) => {
+        if (!isScrapped) {
+            // 스크랩 해제 시 해당 아이템을 리스트에서 제거
+            setScrappedPosts((prev) =>
+                prev.filter(
+                    (scrap) => scrap.posting.id !== postId
+                )
+            );
+        }
     };
 
     if (scrappedPosts.length === 0) {
@@ -152,6 +187,7 @@ const ScrappedPostList = ({ isActive }) => {
                     postId={selectedPostId}
                     onClose={handleCloseDetailOverlay}
                     onApply={handleApply}
+                    onScrapChange={handleScrapChange}
                 />
             )}
         </Container>

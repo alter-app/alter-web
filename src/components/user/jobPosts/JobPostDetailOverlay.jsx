@@ -11,18 +11,34 @@ import Divider from './jobPostDetail/Divider';
 import PageHeader from '../../shared/PageHeader';
 import JobApplyOverlay from './JobApplyOverlay';
 import { getPostDetail } from '../../../services/post';
+import useScrapStore from '../../../store/scrapStore';
 
 const JobPostDetailOverlay = ({
     postId,
     onClose,
     onApply,
-    scrapMap,
     onScrapChange,
 }) => {
     const [postDetail, setPostDetail] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showApplyOverlay, setShowApplyOverlay] =
         useState(false);
+
+    // 스크랩 전역 상태 사용
+    const { isScrapped, toggleScrap } = useScrapStore();
+
+    // 스크랩 상태 변경 핸들러
+    const handleScrapChange = async (postId) => {
+        try {
+            await toggleScrap(postId);
+            // 상위 컴포넌트에 스크랩 상태 변경 알림
+            if (onScrapChange) {
+                onScrapChange(postId, isScrapped(postId));
+            }
+        } catch (error) {
+            console.error('스크랩 처리 실패:', error);
+        }
+    };
 
     useEffect(() => {
         const fetchPostDetail = async () => {
@@ -63,9 +79,8 @@ const JobPostDetailOverlay = ({
         // 지원 성공 시 상세 오버레이는 그대로 유지 (이미 열려있음)
     };
 
-    // scrapMap에서 현재 포스트의 스크랩 상태를 가져옴
-    const scrapped =
-        scrapMap?.[postId] ?? postDetail?.scrapped ?? false;
+    // 스크랩 상태를 store에서 가져옴
+    const scrapped = isScrapped(postId);
 
     if (loading) {
         return (
@@ -162,7 +177,7 @@ const JobPostDetailOverlay = ({
                 <JobDetailFooter
                     id={postDetail.id}
                     checked={scrapped}
-                    onScrapChange={onScrapChange}
+                    onScrapChange={handleScrapChange}
                     onApply={handleApply}
                 />
             </Container>

@@ -1,13 +1,20 @@
 import styled from 'styled-components';
 import JobPostItem from './JobPostItem';
 
-const MarkerJobPostList = ({ posts, onSelect, scrapMap, onScrapChange }) => {
+const MarkerJobPostList = ({
+    posts,
+    onSelect,
+    scrapMap,
+    onScrapChange,
+}) => {
     if (!posts || posts.length === 0) {
         return (
             <EmptyMessage>
                 <EmptyIcon>✓</EmptyIcon>
                 <EmptyText>공고가 없습니다</EmptyText>
-                <EmptySubText>다른 업장을 선택해보세요</EmptySubText>
+                <EmptySubText>
+                    다른 업장을 선택해보세요
+                </EmptySubText>
             </EmptyMessage>
         );
     }
@@ -19,8 +26,12 @@ const MarkerJobPostList = ({ posts, onSelect, scrapMap, onScrapChange }) => {
                     key={post.id}
                     {...post}
                     onClick={() => onSelect(post)}
-                    checked={scrapMap[post.id] ?? post.scrapped}
-                    onScrapChange={(value) => onScrapChange(post.id, value)}
+                    checked={
+                        scrapMap[post.id] ?? post.scrapped
+                    }
+                    onScrapChange={(value) =>
+                        onScrapChange(post.id, value)
+                    }
                 />
             ))}
         </ListArea>
