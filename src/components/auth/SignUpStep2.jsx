@@ -62,9 +62,16 @@ const SignUpStep2 = ({
                     placeholder='닉네임'
                     value={nickname}
                     onChange={(e) => {
-                        setNickname(e.target.value);
-                        setNicknameChecked(false);
-                        setNicknameCheckMessage('');
+                        const value = e.target.value;
+                        // 한글, 영문, 숫자만 허용하는 정규식 (한글 유니코드 범위 수정)
+                        const allowedPattern =
+                            /^[ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9]*$/;
+
+                        if (allowedPattern.test(value)) {
+                            setNickname(value);
+                            setNicknameChecked(false);
+                            setNicknameCheckMessage('');
+                        }
                     }}
                     borderColor={
                         nicknameChecked
