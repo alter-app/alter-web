@@ -105,6 +105,10 @@ const ScrappedPostList = ({ isActive }) => {
         }
     };
 
+    if (!isActive) {
+        return null;
+    }
+
     if (scrappedPosts.length === 0) {
         return (
             <EmptyContainer>
@@ -114,10 +118,6 @@ const ScrappedPostList = ({ isActive }) => {
                 </EmptyText>
             </EmptyContainer>
         );
-    }
-
-    if (!isActive) {
-        return null;
     }
 
     return (
