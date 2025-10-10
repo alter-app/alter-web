@@ -18,7 +18,10 @@ const PageHeader = ({
     };
 
     return (
-        <Header variant={variant} $showBackButton={showBackButton}>
+        <Header
+            variant={variant}
+            $showBackButton={showBackButton}
+        >
             {showBackButton && (
                 <BackButton onClick={handleBack}>
                     <svg
@@ -37,7 +40,9 @@ const PageHeader = ({
                     </svg>
                 </BackButton>
             )}
-            <HeaderTitle $hasBackButton={showBackButton}>{title}</HeaderTitle>
+            <HeaderTitle $hasBackButton={showBackButton}>
+                {title}
+            </HeaderTitle>
         </Header>
     );
 };
@@ -55,7 +60,8 @@ const Header = styled.div`
     border-bottom: 1px solid #e0e0e0;
     display: flex;
     align-items: center;
-    padding-left: ${props => props.$showBackButton ? '16px' : '24px'};
+    padding-left: ${(props) =>
+        props.$showBackButton ? '16px' : '24px'};
     z-index: 100;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
@@ -68,7 +74,8 @@ const Header = styled.div`
 
     @media (max-width: 480px) {
         height: 56px;
-        padding-left: ${props => props.$showBackButton ? '12px' : '24px'};
+        padding-left: ${(props) =>
+            props.$showBackButton ? '12px' : '24px'};
 
         @supports (padding: max(0px)) {
             height: calc(
@@ -79,7 +86,8 @@ const Header = styled.div`
 
     @media (max-width: 360px) {
         height: 52px;
-        padding-left: ${props => props.$showBackButton ? '10px' : '24px'};
+        padding-left: ${(props) =>
+            props.$showBackButton ? '10px' : '24px'};
 
         @supports (padding: max(0px)) {
             height: calc(
@@ -128,15 +136,18 @@ const HeaderTitle = styled.h1`
     font-size: 24px;
     color: #333333;
     margin: 0;
-    margin-left: ${props => props.$hasBackButton ? '12px' : '0'};
+    margin-left: ${(props) =>
+        props.$hasBackButton ? '12px' : '0'};
 
     @media (max-width: 480px) {
         font-size: 20px;
-        margin-left: ${props => props.$hasBackButton ? '10px' : '0'};
+        margin-left: ${(props) =>
+            props.$hasBackButton ? '10px' : '0'};
     }
 
     @media (max-width: 360px) {
         font-size: 18px;
-        margin-left: ${props => props.$hasBackButton ? '8px' : '0'};
+        margin-left: ${(props) =>
+            props.$hasBackButton ? '8px' : '0'};
     }
 `;

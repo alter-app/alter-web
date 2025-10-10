@@ -38,6 +38,28 @@ const BottomNavigation = () => {
                 </NavLabel>
             </NavItem>
             <NavItem
+                $active={isActive('/chat')}
+                onClick={() => navigate('/chat')}
+            >
+                <ChatIcon $active={isActive('/chat')} />
+                <NavLabel $active={isActive('/chat')}>
+                    채팅
+                </NavLabel>
+            </NavItem>
+            <NavItem
+                $active={isActive('/notifications')}
+                onClick={() => navigate('/notifications')}
+            >
+                <NotificationIcon
+                    $active={isActive('/notifications')}
+                />
+                <NavLabel
+                    $active={isActive('/notifications')}
+                >
+                    알림
+                </NavLabel>
+            </NavItem>
+            <NavItem
                 $active={isActive('/mypage')}
                 onClick={() => navigate('/mypage')}
             >
@@ -107,10 +129,11 @@ const NavItem = styled.div`
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    padding: 8px 12px;
+    padding: 8px 8px;
     border-radius: 8px;
     transition: all 0.2s ease;
-    min-width: 60px;
+    min-width: 50px;
+    flex: 1;
 
     &:hover {
         background: ${(props) =>
@@ -122,13 +145,13 @@ const NavItem = styled.div`
     }
 
     @media (max-width: 480px) {
-        padding: 6px 10px;
-        min-width: 50px;
+        padding: 6px 6px;
+        min-width: 40px;
     }
 
     @media (max-width: 360px) {
-        padding: 4px 8px;
-        min-width: 45px;
+        padding: 4px 4px;
+        min-width: 35px;
     }
 `;
 
@@ -168,6 +191,64 @@ const CalendarIcon = styled.div`
     background: ${(props) =>
         props.$active ? '#399982' : '#666666'};
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z'/%3E%3C/svg%3E")
+        no-repeat center;
+    mask-size: contain;
+    transition: all 0.2s ease;
+
+    @media (max-width: 480px) {
+        width: 22px;
+        height: 22px;
+        margin-bottom: 3px;
+    }
+
+    @media (max-width: 360px) {
+        width: 20px;
+        height: 20px;
+        margin-bottom: 2px;
+    }
+
+    @media (max-width: 320px) {
+        width: 18px;
+        height: 18px;
+    }
+`;
+
+const ChatIcon = styled.div`
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+    background: ${(props) =>
+        props.$active ? '#399982' : '#666666'};
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z'/%3E%3C/svg%3E")
+        no-repeat center;
+    mask-size: contain;
+    transition: all 0.2s ease;
+
+    @media (max-width: 480px) {
+        width: 22px;
+        height: 22px;
+        margin-bottom: 3px;
+    }
+
+    @media (max-width: 360px) {
+        width: 20px;
+        height: 20px;
+        margin-bottom: 2px;
+    }
+
+    @media (max-width: 320px) {
+        width: 18px;
+        height: 18px;
+    }
+`;
+
+const NotificationIcon = styled.div`
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+    background: ${(props) =>
+        props.$active ? '#399982' : '#666666'};
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z'/%3E%3C/svg%3E")
         no-repeat center;
     mask-size: contain;
     transition: all 0.2s ease;
