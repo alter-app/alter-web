@@ -106,9 +106,14 @@ const BottomNavContainer = styled.div`
     display: flex;
     justify-content: space-around;
     align-items: center;
-    z-index: 100;
+    z-index: 1000;
     padding: 12px 0;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 
     @supports (padding: max(0px)) {
         padding-bottom: max(
@@ -120,6 +125,10 @@ const BottomNavContainer = styled.div`
     @media (max-width: 480px) {
         height: 60px;
         padding: 14px 0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
 
         @supports (padding: max(0px)) {
             padding-bottom: max(
@@ -132,6 +141,10 @@ const BottomNavContainer = styled.div`
     @media (max-width: 360px) {
         height: 50px;
         padding: 12px 0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
 
         @supports (padding: max(0px)) {
             padding-bottom: max(
