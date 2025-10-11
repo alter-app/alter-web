@@ -36,34 +36,15 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
-                    <Route
-                        path='/oauth/kakao/callback'
-                        element={<KakaoCallback />}
-                    />
-                    <Route
-                        path='/auth/apple/callback'
-                        element={<AppleCallback />}
-                    />
-                    <Route
-                        path='*'
-                        element={<NotFound />}
-                    />
+
+                    <Route path='*' element={<NotFound />} />
                 </Route>
 
                 <Route element={<MainLayout />}>
                     <Route path='/' element={<Home />} />
-                    <Route
-                        path='/login'
-                        element={<Login />}
-                    />
-                    <Route
-                        path='/signup'
-                        element={<SignUp />}
-                    />
-                    <Route
-                        path='/phoneauth'
-                        element={<PhoneAuthPage />}
-                    />
+                    <Route path='/login' element={<Login />} />
+                    <Route path='/signup' element={<SignUp />} />
+                    <Route path='/phoneauth' element={<PhoneAuthPage />} />
                     <Route
                         path='/mypage'
                         element={
@@ -151,6 +132,14 @@ function App() {
                                 <WorkplaceDetailPage />
                             </ProtectedRoute>
                         }
+                    />
+                    <Route
+                        path='/oauth/kakao/callback'
+                        element={<KakaoCallback />}
+                    />
+                    <Route
+                        path='/auth/apple/callback'
+                        element={<AppleCallback />}
                     />
                 </Route>
             </Routes>
