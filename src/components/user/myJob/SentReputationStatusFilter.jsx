@@ -4,7 +4,6 @@ import { useState } from 'react';
 const SentReputationStatusFilter = ({
     selectedStatuses,
     onStatusChange,
-    availableStatuses = [],
 }) => {
     const [isOpen, setIsOpen] = useState(false);
 
@@ -26,38 +25,54 @@ const SentReputationStatusFilter = ({
         }
     };
 
-    // 사용 가능한 상태 옵션 생성
-    const statusOptions = availableStatuses.map(
-        (status) => ({
-            value: status.value,
-            label: status.description,
-            color: getStatusColor(status.value),
-        })
-    );
+    // 고정된 상태 옵션 정의
+    const statusOptions = [
+        {
+            value: 'REQUESTED',
+            label: '요청됨',
+            color: getStatusColor('REQUESTED'),
+        },
+        {
+            value: 'COMPLETED',
+            label: '완료됨',
+            color: getStatusColor('COMPLETED'),
+        },
+        {
+            value: 'DECLINED',
+            label: '거절됨',
+            color: getStatusColor('DECLINED'),
+        },
+        {
+            value: 'EXPIRED',
+            label: '만료됨',
+            color: getStatusColor('EXPIRED'),
+        },
+        {
+            value: 'CANCELED',
+            label: '취소됨',
+            color: getStatusColor('CANCELED'),
+        },
+    ];
 
-    const handleStatusToggle = (status) => {
-        const newStatuses = selectedStatuses.includes(
-            status
-        )
-            ? selectedStatuses.filter((s) => s !== status)
-            : [...selectedStatuses, status];
-        onStatusChange(newStatuses);
+    const handleStatusSelect = (status) => {
+        // 하나의 상태만 선택 가능
+        if (selectedStatuses.includes(status)) {
+            // 이미 선택된 상태를 클릭하면 선택 해제
+            onStatusChange([]);
+        } else {
+            // 새로운 상태 선택
+            onStatusChange([status]);
+        }
     };
 
     const getSelectedLabels = () => {
         if (selectedStatuses.length === 0) return '전체';
-        if (
-            selectedStatuses.length === statusOptions.length
-        )
-            return '전체';
-        return selectedStatuses
-            .map(
-                (status) =>
-                    statusOptions.find(
-                        (opt) => opt.value === status
-                    )?.label
-            )
-            .join(', ');
+        const selectedOption = statusOptions.find(
+            (opt) => opt.value === selectedStatuses[0]
+        );
+        return selectedOption
+            ? selectedOption.label
+            : '전체';
     };
 
     return (
@@ -100,7 +115,7 @@ const SentReputationStatusFilter = ({
                         <FilterOption
                             key={option.value}
                             onClick={() =>
-                                handleStatusToggle(
+                                handleStatusSelect(
                                     option.value
                                 )
                             }

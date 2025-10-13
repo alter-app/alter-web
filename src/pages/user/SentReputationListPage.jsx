@@ -23,8 +23,6 @@ const SentReputationListPage = () => {
         useState(false);
     const [selectedStatuses, setSelectedStatuses] =
         useState([]);
-    const [availableStatuses, setAvailableStatuses] =
-        useState([]);
     const navigate = useNavigate();
 
     // 데이터 변환 함수
@@ -71,7 +69,7 @@ const SentReputationListPage = () => {
                         10,
                         null,
                         selectedStatuses.length > 0
-                            ? selectedStatuses.join(',')
+                            ? selectedStatuses[0]
                             : null
                     );
                 const formattedSentReputations =
@@ -88,31 +86,6 @@ const SentReputationListPage = () => {
                 setHasMore(
                     formattedSentReputations.length === 20
                 );
-
-                // 사용 가능한 상태들 추출
-                const uniqueStatuses = [];
-                const statusMap = new Map();
-
-                (sentReputationData.data || []).forEach(
-                    (item) => {
-                        if (
-                            item.status &&
-                            !statusMap.has(
-                                item.status.value
-                            )
-                        ) {
-                            statusMap.set(
-                                item.status.value,
-                                item.status
-                            );
-                            uniqueStatuses.push(
-                                item.status
-                            );
-                        }
-                    }
-                );
-
-                setAvailableStatuses(uniqueStatuses);
             } catch (error) {
                 console.error(
                     '보낸 평판 목록 조회 실패:',
@@ -142,7 +115,7 @@ const SentReputationListPage = () => {
                         20,
                         nextCursor,
                         selectedStatuses.length > 0
-                            ? selectedStatuses.join(',')
+                            ? selectedStatuses[0]
                             : null
                     );
                 const newSentReputations =
@@ -204,27 +177,6 @@ const SentReputationListPage = () => {
             setHasMore(
                 formattedSentReputations.length === 20
             );
-
-            // 사용 가능한 상태들 추출
-            const uniqueStatuses = [];
-            const statusMap = new Map();
-
-            (sentReputationData.data || []).forEach(
-                (item) => {
-                    if (
-                        item.status &&
-                        !statusMap.has(item.status.value)
-                    ) {
-                        statusMap.set(
-                            item.status.value,
-                            item.status
-                        );
-                        uniqueStatuses.push(item.status);
-                    }
-                }
-            );
-
-            setAvailableStatuses(uniqueStatuses);
         } catch (error) {
             console.error('보낸 평판 취소 오류:', error);
             alert('평판 취소 중 오류가 발생했습니다.');
@@ -249,7 +201,6 @@ const SentReputationListPage = () => {
                 <SentReputationStatusFilter
                     selectedStatuses={selectedStatuses}
                     onStatusChange={setSelectedStatuses}
-                    availableStatuses={availableStatuses}
                 />
                 {sentReputations.length > 0 ? (
                     <InfiniteScroll
