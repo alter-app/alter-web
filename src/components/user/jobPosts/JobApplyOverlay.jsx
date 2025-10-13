@@ -9,6 +9,7 @@ import PageHeader from '../../shared/PageHeader';
 import JobApplyWorkInfo from './jobPostDetail/JobApplyWorkInfo';
 import DetailSection from './jobPostDetail/DetailSection';
 import Divider from './jobPostDetail/Divider';
+import ConfirmModal from '../../shared/ConfirmModal';
 import {
     WEEKDAYS_KOR,
     WEEKDAYS_KOR_ARRAY,
@@ -28,6 +29,8 @@ const JobApplyOverlay = ({
     const [descriptionError, setDescriptionError] =
         useState('');
     const [loading, setLoading] = useState(true);
+    const [showConfirmModal, setShowConfirmModal] =
+        useState(false);
 
     useEffect(() => {
         const fetchPostDetail = async () => {
@@ -60,7 +63,7 @@ const JobApplyOverlay = ({
         }
     }, [detail]);
 
-    const handleApply = async () => {
+    const handleApply = () => {
         if (description.trim().length === 0) {
             setDescriptionError('자기소개를 입력해주세요.');
             return;
@@ -72,13 +75,11 @@ const JobApplyOverlay = ({
             return;
         }
 
-        // 제출 확인 알림
-        const isConfirmed =
-            window.confirm('정말 제출하시겠습니까?');
-        if (!isConfirmed) {
-            return;
-        }
+        // 제출 확인 모달 표시
+        setShowConfirmModal(true);
+    };
 
+    const handleConfirmApply = async () => {
         try {
             await postingApply({
                 postingId: postId,
@@ -95,6 +96,10 @@ const JobApplyOverlay = ({
                 error.message || '공고 지원 중 오류 발생'
             );
         }
+    };
+
+    const handleCloseConfirmModal = () => {
+        setShowConfirmModal(false);
     };
 
     const handleDescriptionChange = (e) => {
@@ -256,6 +261,18 @@ const JobApplyOverlay = ({
                     </ApplyButton>
                 </BottomButtonContainer>
             </Container>
+
+            {/* 제출 확인 모달 */}
+            <ConfirmModal
+                isOpen={showConfirmModal}
+                onClose={handleCloseConfirmModal}
+                onConfirm={handleConfirmApply}
+                title='지원 제출'
+                message='정말 제출하시겠습니까?'
+                confirmText='제출하기'
+                cancelText='취소'
+                confirmColor='#2de283'
+            />
         </Overlay>
     );
 };

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 import { useState } from 'react';
-import CancelReputationModal from './CancelReputationModal';
+import ConfirmModal from '../../shared/ConfirmModal';
 
 const SentReputationCard = ({
     targetName,
@@ -115,12 +115,19 @@ const SentReputationCard = ({
                 </CardFooter>
             </CardContainer>
 
-            <CancelReputationModal
+            <ConfirmModal
                 isOpen={showModal}
+                onClose={handleModalCancel}
                 onConfirm={handleModalConfirm}
-                onCancel={handleModalCancel}
-                targetName={targetName}
-                workplaceName={workplaceName}
+                title='평판 요청 취소'
+                message={`${
+                    targetName === '업장'
+                        ? workplaceName
+                        : targetName
+                }님에게 보낸 평판 요청을 취소하시겠습니까?`}
+                confirmText='취소하기'
+                cancelText='아니오'
+                confirmColor='#ff4444'
             />
         </>
     );
