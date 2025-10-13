@@ -7,6 +7,7 @@ const ApplicationSection = ({
     applications,
     onApplicationClick,
     onViewAllClick,
+    onCancel,
 }) => {
     const documentIcon = (
         <svg
@@ -88,6 +89,12 @@ const ApplicationSection = ({
                                     onClick={() =>
                                         onApplicationClick &&
                                         onApplicationClick(
+                                            application
+                                        )
+                                    }
+                                    onCancel={() =>
+                                        onCancel &&
+                                        onCancel(
                                             application
                                         )
                                     }

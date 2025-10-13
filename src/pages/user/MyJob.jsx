@@ -14,6 +14,7 @@ import {
     getUserScheduleSelf,
     userDeclineReputation,
     cancelSentReputationRequest,
+    cancelApplication,
 } from '../../services/myJob';
 import { getApplicationList } from '../../services/myPage';
 import { timeAgo } from '../../utils/timeUtil';
@@ -151,10 +152,11 @@ const MyJob = () => {
                     formattedSentReputations
                 );
 
-                // 지원 현황 데이터 조회
+                // 지원 현황 데이터 조회 (지원완료 상태만)
                 const applicationData =
                     await getApplicationList({
                         pageSize: 3,
+                        status: ['SUBMITTED'], // 지원완료 상태만 조회
                     });
 
                 // API 데이터를 컴포넌트에 맞게 변환
@@ -404,6 +406,43 @@ const MyJob = () => {
         }
     };
 
+    // 지원 취소 핸들러
+    const handleApplicationCancel = async (application) => {
+        try {
+            console.log('지원 취소:', application);
+            await cancelApplication(application.id);
+
+            // 최신 지원 목록 다시 가져오기 (지원완료 상태만)
+            const applicationData =
+                await getApplicationList({
+                    pageSize: 3,
+                    status: ['SUBMITTED'], // 지원완료 상태만 조회
+                });
+            const formattedApplications = (
+                applicationData.data || []
+            ).map((item) => ({
+                id: item.id,
+                workplaceName:
+                    item.posting?.workspace?.name ||
+                    '알 수 없는 업장',
+                status: item.status,
+                position:
+                    item.postingSchedule?.position ||
+                    '알 수 없는 직책',
+                wage: item.posting?.payAmount || '0',
+                applicationDate: item.createdAt
+                    ? timeAgo(item.createdAt)
+                    : '알 수 없음',
+            }));
+
+            setApplications(formattedApplications);
+            console.log('지원 취소 성공');
+        } catch (error) {
+            console.error('지원 취소 오류:', error);
+            alert('지원 취소 중 오류가 발생했습니다.');
+        }
+    };
+
     const handleApplicationViewAll = () => {
         console.log('전체 지원 보기');
         navigate('/application-list');
@@ -496,6 +535,7 @@ const MyJob = () => {
                     onViewAllClick={
                         handleApplicationViewAll
                     }
+                    onCancel={handleApplicationCancel}
                 />
                 <ScheduleSection
                     schedules={schedules}

@@ -522,3 +522,31 @@ export const cancelSentReputationRequest = async (
         );
     }
 };
+
+// 지원 취소 API
+export const cancelApplication = async (applicationId) => {
+    const accessToken = useAuthStore.getState().accessToken;
+    try {
+        const response = await fetch(
+            `${backend}/app/users/me/postings/applications/${applicationId}/status`,
+            {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({
+                    status: 'CANCELLED',
+                }),
+            }
+        );
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+    } catch (error) {
+        console.error('지원 취소 오류:', error);
+        throw new Error(
+            '지원 취소 중 오류가 발생했습니다.'
+        );
+    }
+};
