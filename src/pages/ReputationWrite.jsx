@@ -12,7 +12,7 @@ import useAuthStore from '../store/authStore';
 import KeywordList from '../components/owner/reputation/KeywordList';
 import EpisodeInputCard from '../components/owner/reputation/EpisodeInputCard';
 import PageHeader from '../components/shared/PageHeader';
-import ReputationCompletionModal from '../components/user/myJob/workplaceDetail/ReputationCompletionModal';
+import CompletionModal from '../components/shared/CompletionModal';
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -202,9 +202,13 @@ const ReputationWrite = () => {
                 </StyledButton>
             </Container>
 
-            <ReputationCompletionModal
+            <CompletionModal
                 isOpen={isCompletionModalOpen}
                 onClose={handleCompletionModalClose}
+                icon='✅'
+                title='평판 작성 완료!'
+                description='평판이 성공적으로 작성되었습니다. 다른 사용자들에게 도움이 될 거예요.'
+                buttonText='확인'
             />
         </Overlay>
     );

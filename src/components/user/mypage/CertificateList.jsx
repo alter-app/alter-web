@@ -11,14 +11,23 @@ import { formatDateInput } from '../../../utils/weekUtil';
 import CertificateInputForm from './CertificateInputForm';
 import Loader from '../../Loader';
 import { formatJoinDate } from '../../../utils/timeUtil';
+import ConfirmModal from '../../shared/ConfirmModal';
 
 const CertificateList = ({ isActive }) => {
     const [certificates, setCertificates] = useState([]);
     const [addStatus, setAddStatus] = useState(false);
     const [editingId, setEditingId] = useState(null);
-    const [detailLoading, setDetailLoading] = useState(false);
-    const [hasInitialLoad, setHasInitialLoad] = useState(false);
+    const [detailLoading, setDetailLoading] =
+        useState(false);
+    const [hasInitialLoad, setHasInitialLoad] =
+        useState(false);
     const containerRef = useRef(null);
+    const [showDeleteModal, setShowDeleteModal] =
+        useState(false);
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [showEditModal, setShowEditModal] =
+        useState(false);
+    const [deleteId, setDeleteId] = useState(null);
 
     // 수정할 자격 정보
     const [editCertificate, setEditCertificate] = useState({
@@ -52,20 +61,29 @@ const CertificateList = ({ isActive }) => {
     }, [hasInitialLoad]);
 
     // 자격 삭제 처리 함수
-    const handleDelete = async (id) => {
-        const isConfirmed = window.confirm('정말 삭제하시겠습니까?');
-        if (!isConfirmed) {
-            return;
-        }
+    const handleDelete = (id) => {
+        setDeleteId(id);
+        setShowDeleteModal(true);
+    };
 
+    const handleConfirmDelete = async () => {
         try {
-            await deleteCertificates({ certificateId: id });
+            await deleteCertificates({
+                certificateId: deleteId,
+            });
             setCertificates((prev) =>
-                prev.filter((cert) => cert.id !== id)
+                prev.filter((cert) => cert.id !== deleteId)
             );
+            setShowDeleteModal(false);
+            setDeleteId(null);
         } catch (e) {
             console.log('삭제에 실패했습니다.');
         }
+    };
+
+    const handleCloseDeleteModal = () => {
+        setShowDeleteModal(false);
+        setDeleteId(null);
     };
 
     // 모든 추가할 자격 정보 하나의 onChange로 처리
@@ -102,25 +120,31 @@ const CertificateList = ({ isActive }) => {
         const requiredFields = [
             { key: 'certificateName', label: '이름' },
             { key: 'publisherName', label: '발행 기관' },
-            { key: 'issuedAt', label: '취득일' }
+            { key: 'issuedAt', label: '취득일' },
         ];
 
-        const missingFields = requiredFields.filter(field => {
-            const fieldValue = addCertificate[field.key];
-            return !fieldValue || fieldValue.trim() === '';
-        });
+        const missingFields = requiredFields.filter(
+            (field) => {
+                const fieldValue =
+                    addCertificate[field.key];
+                return (
+                    !fieldValue || fieldValue.trim() === ''
+                );
+            }
+        );
 
         if (missingFields.length > 0) {
-            const fieldNames = missingFields.map(field => field.label).join(', ');
+            const fieldNames = missingFields
+                .map((field) => field.label)
+                .join(', ');
             alert(`${fieldNames}을(를) 입력해주세요.`);
             return;
         }
 
-        const isConfirmed = window.confirm('정말 등록하시겠습니까?');
-        if (!isConfirmed) {
-            return;
-        }
+        setShowAddModal(true);
+    };
 
+    const handleConfirmAdd = async () => {
         try {
             await addCertificates(addCertificate);
             // 등록 성공 후 전체 리스트 다시 불러오기
@@ -134,9 +158,14 @@ const CertificateList = ({ isActive }) => {
                 expiresAt: '',
             });
             setAddStatus(false);
+            setShowAddModal(false);
         } catch (e) {
             console.log('등록에 실패했습니다.');
         }
+    };
+
+    const handleCloseAddModal = () => {
+        setShowAddModal(false);
     };
 
     // 수정 버튼 클릭 핸들러 (기존 내용 가져옴, 상세 요청)
@@ -192,25 +221,31 @@ const CertificateList = ({ isActive }) => {
         const requiredFields = [
             { key: 'certificateName', label: '이름' },
             { key: 'publisherName', label: '발행 기관' },
-            { key: 'issuedAt', label: '취득일' }
+            { key: 'issuedAt', label: '취득일' },
         ];
 
-        const missingFields = requiredFields.filter(field => {
-            const fieldValue = editCertificate[field.key];
-            return !fieldValue || fieldValue.trim() === '';
-        });
+        const missingFields = requiredFields.filter(
+            (field) => {
+                const fieldValue =
+                    editCertificate[field.key];
+                return (
+                    !fieldValue || fieldValue.trim() === ''
+                );
+            }
+        );
 
         if (missingFields.length > 0) {
-            const fieldNames = missingFields.map(field => field.label).join(', ');
+            const fieldNames = missingFields
+                .map((field) => field.label)
+                .join(', ');
             alert(`${fieldNames}을(를) 입력해주세요.`);
             return;
         }
 
-        const isConfirmed = window.confirm('정말 수정하시겠습니까?');
-        if (!isConfirmed) {
-            return;
-        }
+        setShowEditModal(true);
+    };
 
+    const handleConfirmEdit = async () => {
         try {
             await eidtCertificates(
                 editCertificate,
@@ -219,9 +254,14 @@ const CertificateList = ({ isActive }) => {
             const result = await getCertificates();
             setCertificates(result.data);
             setEditingId(null);
+            setShowEditModal(false);
         } catch (e) {
             console.log('수정에 실패했습니다.');
         }
+    };
+
+    const handleCloseEditModal = () => {
+        setShowEditModal(false);
     };
 
     if (!isActive) {
@@ -236,14 +276,16 @@ const CertificateList = ({ isActive }) => {
                     {addStatus ? '취소' : '추가'}
                 </AddButton>
             </Header>
-            
+
             {addStatus && (
                 <AddFormContainer>
                     <CertificateInputForm
                         value={addCertificate}
                         onChange={handleInputChange}
                     />
-                    <RegisterButton onClick={handleAddCertificate}>
+                    <RegisterButton
+                        onClick={handleAddCertificate}
+                    >
                         등록하기
                     </RegisterButton>
                 </AddFormContainer>
@@ -252,29 +294,47 @@ const CertificateList = ({ isActive }) => {
             {certificates.length === 0 && !addStatus ? (
                 <EmptyContainer>
                     <EmptyIcon>📜</EmptyIcon>
-                    <EmptyText>등록된 자격사항이 없습니다.</EmptyText>
+                    <EmptyText>
+                        등록된 자격사항이 없습니다.
+                    </EmptyText>
                 </EmptyContainer>
             ) : (
                 certificates.map((cert) => (
                     <CertificateCard key={cert.id}>
                         <CertificateHeader
-                            onClick={() => handleToggleEdit(cert)}
+                            onClick={() =>
+                                handleToggleEdit(cert)
+                            }
                         >
                             <CertificateInfo>
-                                <CertificateName>{cert.certificateName}</CertificateName>
-                                <PublisherName>{cert.publisherName}</PublisherName>
+                                <CertificateName>
+                                    {cert.certificateName}
+                                </CertificateName>
+                                <PublisherName>
+                                    {cert.publisherName}
+                                </PublisherName>
                                 <IssuedDate>
-                                    발급일 : {formatJoinDate(cert.issuedAt)}
+                                    발급일 :{' '}
+                                    {formatJoinDate(
+                                        cert.issuedAt
+                                    )}
                                 </IssuedDate>
                                 {cert.expiresAt && (
                                     <ExpiredDate>
-                                        만료일 : {formatJoinDate(cert.expiresAt)}
+                                        만료일 :{' '}
+                                        {formatJoinDate(
+                                            cert.expiresAt
+                                        )}
                                     </ExpiredDate>
                                 )}
                             </CertificateInfo>
                             <ExpandIcon>
-                                <EditIcon viewBox="0 0 24 24" width="20" height="20">
-                                    <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                                <EditIcon
+                                    viewBox='0 0 24 24'
+                                    width='20'
+                                    height='20'
+                                >
+                                    <path d='M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z' />
                                 </EditIcon>
                             </ExpandIcon>
                             <DeleteButton
@@ -283,12 +343,16 @@ const CertificateList = ({ isActive }) => {
                                     handleDelete(cert.id);
                                 }}
                             >
-                                <DeleteIcon viewBox="0 0 24 24" width="20" height="20">
-                                    <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                <DeleteIcon
+                                    viewBox='0 0 24 24'
+                                    width='20'
+                                    height='20'
+                                >
+                                    <path d='M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z' />
                                 </DeleteIcon>
                             </DeleteButton>
                         </CertificateHeader>
-                        
+
                         {editingId === cert.id && (
                             <EditFormContainer>
                                 {detailLoading ? (
@@ -298,23 +362,72 @@ const CertificateList = ({ isActive }) => {
                                 ) : (
                                     <>
                                         <CertificateInputForm
-                                            value={editCertificate}
-                                            onChange={handleEditInputChange}
+                                            value={
+                                                editCertificate
+                                            }
+                                            onChange={
+                                                handleEditInputChange
+                                            }
                                         />
-                                        <EditButton onClick={handleEditSave}>
+                                        <EditButton
+                                            onClick={
+                                                handleEditSave
+                                            }
+                                        >
                                             수정하기
                                         </EditButton>
-                                        <CancelButton onClick={() => setEditingId(null)}>
+                                        <CancelButton
+                                            onClick={() =>
+                                                setEditingId(
+                                                    null
+                                                )
+                                            }
+                                        >
                                             취소
                                         </CancelButton>
                                     </>
                                 )}
                             </EditFormContainer>
                         )}
-                        
                     </CertificateCard>
                 ))
             )}
+
+            {/* 삭제 확인 모달 */}
+            <ConfirmModal
+                isOpen={showDeleteModal}
+                onClose={handleCloseDeleteModal}
+                onConfirm={handleConfirmDelete}
+                title='자격사항 삭제'
+                message='정말 삭제하시겠습니까?'
+                confirmText='삭제하기'
+                cancelText='취소'
+                confirmColor='#ff4444'
+            />
+
+            {/* 추가 확인 모달 */}
+            <ConfirmModal
+                isOpen={showAddModal}
+                onClose={handleCloseAddModal}
+                onConfirm={handleConfirmAdd}
+                title='자격사항 등록'
+                message='정말 등록하시겠습니까?'
+                confirmText='등록하기'
+                cancelText='취소'
+                confirmColor='#2de283'
+            />
+
+            {/* 수정 확인 모달 */}
+            <ConfirmModal
+                isOpen={showEditModal}
+                onClose={handleCloseEditModal}
+                onConfirm={handleConfirmEdit}
+                title='자격사항 수정'
+                message='정말 수정하시겠습니까?'
+                confirmText='수정하기'
+                cancelText='취소'
+                confirmColor='#2de283'
+            />
         </Container>
     );
 };

@@ -1,83 +1,61 @@
 import styled from 'styled-components';
 import { useState } from 'react';
-import { formatNumber } from '../../../utils/formatNumber';
 import ConfirmModal from '../../shared/ConfirmModal';
 
-const ApplicationCard = ({
+const SentReputationCard = ({
+    targetName,
     workplaceName,
+    timeAgo,
     status,
-    position,
-    wage,
-    applicationDate,
-    onClick,
+    statusDescription,
     onCancel,
 }) => {
     const [showModal, setShowModal] = useState(false);
-    const getStatusInfo = (status) => {
-        // status가 객체인 경우 value와 description 추출
-        const statusValue =
-            typeof status === 'object'
-                ? status.value
-                : status;
-        const statusDescription =
-            typeof status === 'object'
-                ? status.description
-                : status;
+    // 상태에 따른 표시 로직
+    const getStatusInfo = () => {
+        const getStatusColor = (statusValue) => {
+            switch (statusValue) {
+                case 'REQUESTED':
+                    return '#2de283';
+                case 'COMPLETED':
+                    return '#3b82f6';
+                case 'DECLINED':
+                    return '#ef4444';
+                case 'EXPIRED':
+                    return '#6b7280';
+                case 'CANCELED':
+                    return '#6b7280';
+                default:
+                    return '#6b7280';
+            }
+        };
 
-        switch (statusValue) {
-            case 'SUBMITTED':
-                return {
-                    text: statusDescription || '제출됨',
-                    color: '#666666',
-                };
-            case 'SHORTLISTED':
-                return {
-                    text: statusDescription || '서류 통과',
-                    color: '#ffa726',
-                };
-            case 'ACCEPTED':
-                return {
-                    text: statusDescription || '수락됨',
-                    color: '#2de283',
-                };
-            case 'REJECTED':
-                return {
-                    text: statusDescription || '거절됨',
-                    color: '#ff4444',
-                };
-            case 'CANCELLED':
-                return {
-                    text: statusDescription || '지원 취소',
-                    color: '#999999',
-                };
-            case 'EXPIRED':
-                return {
-                    text: statusDescription || '기간 만료',
-                    color: '#999999',
-                };
-            case 'DELETED':
-                return {
-                    text: statusDescription || '삭제됨',
-                    color: '#999999',
-                };
-            default:
-                return {
-                    text:
-                        statusDescription ||
-                        statusValue ||
-                        status,
-                    color: '#666666',
-                };
-        }
+        const getStatusBgColor = (statusValue) => {
+            switch (statusValue) {
+                case 'REQUESTED':
+                    return '#f0fdf4';
+                case 'COMPLETED':
+                    return '#eff6ff';
+                case 'DECLINED':
+                    return '#fef2f2';
+                case 'EXPIRED':
+                    return '#f9fafb';
+                case 'CANCELED':
+                    return '#f9fafb';
+                default:
+                    return '#f9fafb';
+            }
+        };
+
+        return {
+            text: statusDescription || '알 수 없음',
+            color: getStatusColor(status),
+            bgColor: getStatusBgColor(status),
+        };
     };
 
-    const statusInfo = getStatusInfo(status);
-
-    // 취소 가능한 상태 확인
-    const canCancel =
-        status === 'SUBMITTED' ||
-        (typeof status === 'object' &&
-            status.value === 'SUBMITTED');
+    const statusInfo = getStatusInfo();
+    const canCancel = status === 'REQUESTED';
 
     const handleCancelClick = () => {
         setShowModal(true);
@@ -94,18 +72,15 @@ const ApplicationCard = ({
 
     return (
         <>
-            <CardContainer onClick={onClick}>
+            <CardContainer>
                 <CardHeader>
                     <WorkplaceName>
                         {workplaceName}
                     </WorkplaceName>
-                    {canCancel && onCancel && (
+                    {canCancel && (
                         <CancelButton
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleCancelClick();
-                            }}
-                            title='지원 취소'
+                            onClick={handleCancelClick}
+                            title='평판 요청 취소'
                         >
                             <svg
                                 width='14'
@@ -125,13 +100,16 @@ const ApplicationCard = ({
                     )}
                 </CardHeader>
                 <CardSubtitle>
-                    <SubtitleText>{position}</SubtitleText>
+                    <SubtitleText>
+                        {targetName}
+                    </SubtitleText>
                 </CardSubtitle>
                 <CardFooter>
-                    <ApplicationDate>
-                        {applicationDate}
-                    </ApplicationDate>
-                    <StatusBadge $color={statusInfo.color}>
+                    <TimeAgo>{timeAgo}</TimeAgo>
+                    <StatusBadge
+                        $color={statusInfo.color}
+                        $bgColor={statusInfo.bgColor}
+                    >
                         {statusInfo.text}
                     </StatusBadge>
                 </CardFooter>
@@ -141,8 +119,12 @@ const ApplicationCard = ({
                 isOpen={showModal}
                 onClose={handleModalCancel}
                 onConfirm={handleModalConfirm}
-                title='지원 취소'
-                message={`${workplaceName}에 대한 지원을 취소하시겠습니까?`}
+                title='평판 요청 취소'
+                message={`${
+                    targetName === '업장'
+                        ? workplaceName
+                        : targetName
+                }님에게 보낸 평판 요청을 취소하시겠습니까?`}
                 confirmText='취소하기'
                 cancelText='아니오'
                 confirmColor='#ff4444'
@@ -151,7 +133,7 @@ const ApplicationCard = ({
     );
 };
 
-export default ApplicationCard;
+export default SentReputationCard;
 
 const CardContainer = styled.div`
     background: #ffffff;
@@ -160,19 +142,6 @@ const CardContainer = styled.div`
     border: 1px solid #e9ecef;
     display: flex;
     flex-direction: column;
-    gap: 5px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-
-    &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        border-color: #2de283;
-    }
-
-    &:active {
-        transform: translateY(0);
-    }
 `;
 
 const CardHeader = styled.div`
@@ -207,7 +176,7 @@ const CardFooter = styled.div`
     align-items: center;
 `;
 
-const ApplicationDate = styled.span`
+const TimeAgo = styled.span`
     font-family: 'Pretendard';
     font-weight: 400;
     font-size: 12px;
@@ -220,8 +189,9 @@ const StatusBadge = styled.div`
     font-family: 'Pretendard';
     font-weight: 600;
     font-size: 12px;
-    color: #ffffff;
-    background: ${(props) => props.$color};
+    color: ${(props) => props.$color};
+    background-color: ${(props) => props.$bgColor};
+    border: 1px solid ${(props) => props.$color}20;
     white-space: nowrap;
 `;
 

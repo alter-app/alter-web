@@ -453,3 +453,100 @@ export const createWorkerReputation = async (
         );
     }
 };
+
+// 사용자가 보낸 평판 요청 목록 조회 (커서 페이징 지원)
+export const getUserSentReputationRequestsList = async (
+    pageSize = 10,
+    cursor = null,
+    status = null
+) => {
+    const accessToken = useAuthStore.getState().accessToken;
+    try {
+        let url = `${backend}/app/reputations/requests/sent?pageSize=${pageSize}`;
+        if (cursor) {
+            url += `&cursor=${cursor}`;
+        }
+        if (status) {
+            url += `&status=${status}`;
+        }
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(
+            '보낸 평판 요청 목록 조회 오류:',
+            error
+        );
+        throw new Error(
+            '보낸 평판 요청 목록 조회 중 오류가 발생했습니다.'
+        );
+    }
+};
+
+// 보낸 평판 요청 취소
+export const cancelSentReputationRequest = async (
+    requestId
+) => {
+    const accessToken = useAuthStore.getState().accessToken;
+    try {
+        const response = await fetch(
+            `${backend}/app/reputations/requests/sent/${requestId}/cancel`,
+            {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+    } catch (error) {
+        console.error('보낸 평판 요청 취소 오류:', error);
+        throw new Error(
+            '보낸 평판 요청 취소 중 오류가 발생했습니다.'
+        );
+    }
+};
+
+// 지원 취소 API
+export const cancelApplication = async (applicationId) => {
+    const accessToken = useAuthStore.getState().accessToken;
+    try {
+        const response = await fetch(
+            `${backend}/app/users/me/postings/applications/${applicationId}/status`,
+            {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({
+                    status: 'CANCELLED',
+                }),
+            }
+        );
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+    } catch (error) {
+        console.error('지원 취소 오류:', error);
+        throw new Error(
+            '지원 취소 중 오류가 발생했습니다.'
+        );
+    }
+};

@@ -6,6 +6,7 @@ import PageHeader from '../../components/shared/PageHeader';
 import ApplicationCard from '../../components/user/myJob/ApplicationCard';
 import StatusFilter from '../../components/user/myJob/StatusFilter';
 import { getApplicationList } from '../../services/myPage';
+import { cancelApplication } from '../../services/myJob';
 import { timeAgo } from '../../utils/timeUtil';
 import Loader from '../../components/Loader';
 
@@ -131,6 +132,40 @@ const ApplicationListPage = () => {
         // 지원 상세 페이지로 이동하는 로직 (필요시 구현)
     };
 
+    // 지원 취소 핸들러
+    const handleApplicationCancel = async (application) => {
+        try {
+            console.log('지원 취소:', application);
+            await cancelApplication(application.id);
+
+            // 최신 지원 목록 다시 가져오기
+            const applicationData =
+                await getApplicationList({
+                    pageSize: 20,
+                    cursor: null,
+                    status:
+                        selectedStatuses.length > 0
+                            ? selectedStatuses.join(',')
+                            : null,
+                });
+            const formattedApplications =
+                transformApplicationData(
+                    applicationData.data
+                );
+
+            setApplications(formattedApplications);
+            setNextCursor(
+                applicationData.page?.cursor || null
+            );
+            setHasMore(formattedApplications.length === 20);
+
+            console.log('지원 취소 성공');
+        } catch (error) {
+            console.error('지원 취소 오류:', error);
+            alert('지원 취소 중 오류가 발생했습니다.');
+        }
+    };
+
     if (isLoading) {
         return (
             <PageContainer>
@@ -186,6 +221,11 @@ const ApplicationListPage = () => {
                                             }
                                             onClick={() =>
                                                 handleApplicationClick(
+                                                    application
+                                                )
+                                            }
+                                            onCancel={() =>
+                                                handleApplicationCancel(
                                                     application
                                                 )
                                             }

@@ -20,6 +20,7 @@ import WorkplaceDetail from './components/owner/workplace/WorkplaceDetail';
 import WorkplaceDetailPage from './components/user/myJob/workplaceDetail/WorkplaceDetailPage';
 import ReputationWrite from './pages/ReputationWrite';
 import ReputationListPage from './pages/user/ReputationListPage';
+import SentReputationListPage from './pages/user/SentReputationListPage';
 import ScheduleListPage from './pages/user/ScheduleListPage';
 import ApplicationListPage from './pages/user/ApplicationListPage';
 
@@ -37,14 +38,26 @@ function App() {
                         }
                     />
 
-                    <Route path='*' element={<NotFound />} />
+                    <Route
+                        path='*'
+                        element={<NotFound />}
+                    />
                 </Route>
 
                 <Route element={<MainLayout />}>
                     <Route path='/' element={<Home />} />
-                    <Route path='/login' element={<Login />} />
-                    <Route path='/signup' element={<SignUp />} />
-                    <Route path='/phoneauth' element={<PhoneAuthPage />} />
+                    <Route
+                        path='/login'
+                        element={<Login />}
+                    />
+                    <Route
+                        path='/signup'
+                        element={<SignUp />}
+                    />
+                    <Route
+                        path='/phoneauth'
+                        element={<PhoneAuthPage />}
+                    />
                     <Route
                         path='/mypage'
                         element={
@@ -74,6 +87,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <ReputationListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/sent-reputation-list'
+                        element={
+                            <ProtectedRoute>
+                                <SentReputationListPage />
                             </ProtectedRoute>
                         }
                     />
