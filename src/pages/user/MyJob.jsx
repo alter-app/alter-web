@@ -4,13 +4,16 @@ import PageHeader from '../../components/shared/PageHeader';
 import BottomNavigation from '../../layouts/BottomNavigation';
 import WorkplaceSection from '../../components/user/myJob/WorkplaceSection';
 import ReputationSection from '../../components/user/myJob/ReputationSection';
+import SentReputationSection from '../../components/user/myJob/SentReputationSection';
 import ApplicationSection from '../../components/user/myJob/ApplicationSection';
 import ScheduleSection from '../../components/user/myJob/ScheduleSection';
 import {
     getUserReputationRequestsList,
+    getUserSentReputationRequestsList,
     getUserWorkplaceList,
     getUserScheduleSelf,
     userDeclineReputation,
+    cancelSentReputationRequest,
 } from '../../services/myJob';
 import { getApplicationList } from '../../services/myPage';
 import { timeAgo } from '../../utils/timeUtil';
@@ -20,6 +23,9 @@ import Loader from '../../components/Loader';
 const MyJob = () => {
     const [workplaces, setWorkplaces] = useState([]);
     const [reputations, setReputations] = useState([]);
+    const [sentReputations, setSentReputations] = useState(
+        []
+    );
     const [applications, setApplications] = useState([]);
     const [schedules, setSchedules] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -93,6 +99,57 @@ const MyJob = () => {
                 });
 
                 setReputations(formattedReputations);
+
+                // 보낸 평판 요청 목록 조회 (요청 중인 것만)
+                const sentReputationData =
+                    await getUserSentReputationRequestsList(
+                        3,
+                        null,
+                        'REQUESTED'
+                    );
+
+                // API 데이터를 컴포넌트에 맞게 변환
+                const formattedSentReputations = (
+                    sentReputationData.data || []
+                ).map((item) => {
+                    let targetName = '알 수 없는 대상';
+                    let workplaceName = '알 수 없는 업장';
+
+                    if (item.target?.type === 'USER') {
+                        targetName =
+                            item.target?.name ||
+                            '알 수 없는 대상';
+                        workplaceName =
+                            item.workspace?.businessName ||
+                            '알 수 없는 업장';
+                    } else if (
+                        item.target?.type === 'WORKSPACE'
+                    ) {
+                        targetName = '업장';
+                        workplaceName =
+                            item.workspace?.businessName ||
+                            '알 수 없는 업장';
+                    }
+
+                    return {
+                        id: item.id,
+                        targetName,
+                        workplaceName,
+                        timeAgo: item.createdAt
+                            ? timeAgo(item.createdAt)
+                            : '알 수 없음',
+                        status:
+                            item.status?.value ||
+                            'REQUESTED',
+                        statusDescription:
+                            item.status?.description ||
+                            '요청됨',
+                    };
+                });
+
+                setSentReputations(
+                    formattedSentReputations
+                );
 
                 // 지원 현황 데이터 조회
                 const applicationData =
@@ -249,6 +306,7 @@ const MyJob = () => {
                 console.error('데이터 로딩 오류:', error);
                 // 에러 발생 시 빈 배열로 초기화
                 setReputations([]);
+                setSentReputations([]);
             } finally {
                 setIsLoading(false);
             }
@@ -279,6 +337,71 @@ const MyJob = () => {
     const handleReputationViewAll = () => {
         console.log('전체 평판 보기');
         navigate('/reputation-list');
+    };
+
+    const handleSentReputationViewAll = () => {
+        console.log('전체 보낸 평판 보기');
+        navigate('/sent-reputation-list');
+    };
+
+    const handleSentReputationCancel = async (
+        reputation
+    ) => {
+        try {
+            console.log('보낸 평판 취소:', reputation);
+            await cancelSentReputationRequest(
+                reputation.id
+            );
+
+            // 최신 데이터 다시 가져오기 (요청 중인 것만)
+            const sentReputationData =
+                await getUserSentReputationRequestsList(
+                    3,
+                    null,
+                    'REQUESTED'
+                );
+            const formattedSentReputations = (
+                sentReputationData.data || []
+            ).map((item) => {
+                let targetName = '알 수 없는 대상';
+                let workplaceName = '알 수 없는 업장';
+
+                if (item.target?.type === 'USER') {
+                    targetName =
+                        item.target?.name ||
+                        '알 수 없는 대상';
+                    workplaceName =
+                        item.workspace?.businessName ||
+                        '알 수 없는 업장';
+                } else if (
+                    item.target?.type === 'WORKSPACE'
+                ) {
+                    targetName = '업장';
+                    workplaceName =
+                        item.target?.name ||
+                        '알 수 없는 업장';
+                }
+
+                return {
+                    id: item.id,
+                    targetName,
+                    workplaceName,
+                    timeAgo: item.createdAt
+                        ? timeAgo(item.createdAt)
+                        : '알 수 없음',
+                    status:
+                        item.status?.value || 'REQUESTED',
+                    statusDescription:
+                        item.status?.description ||
+                        '요청됨',
+                };
+            });
+
+            setSentReputations(formattedSentReputations);
+        } catch (error) {
+            console.error('보낸 평판 취소 오류:', error);
+            alert('평판 취소 중 오류가 발생했습니다.');
+        }
     };
 
     const handleApplicationViewAll = () => {
@@ -357,6 +480,13 @@ const MyJob = () => {
                     onViewAllClick={handleReputationViewAll}
                     onAccept={handleReputationAccept}
                     onReject={handleReputationReject}
+                />
+                <SentReputationSection
+                    sentReputations={sentReputations}
+                    onViewAllClick={
+                        handleSentReputationViewAll
+                    }
+                    onCancel={handleSentReputationCancel}
                 />
                 <ApplicationSection
                     applications={applications}
