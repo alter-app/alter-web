@@ -1,24 +1,27 @@
 import styled from 'styled-components';
 
-const ReputationCompletionModal = ({ isOpen, onClose }) => {
+const CompletionModal = ({
+    isOpen,
+    onClose,
+    icon = '✅',
+    title = '작업 완료!',
+    description = '작업이 성공적으로 완료되었습니다.',
+    buttonText = '확인',
+}) => {
     if (!isOpen) return null;
 
     return (
         <Overlay onClick={onClose}>
             <Modal onClick={(e) => e.stopPropagation()}>
                 <Content>
-                    <SuccessIcon>✅</SuccessIcon>
-                    <Title>평판 작성 완료!</Title>
-                    <Description>
-                        평판이 성공적으로 작성되었습니다.
-                        <br />
-                        다른 사용자들에게 도움이 될 거예요.
-                    </Description>
+                    <SuccessIcon>{icon}</SuccessIcon>
+                    <Title>{title}</Title>
+                    <Description>{description}</Description>
                 </Content>
 
                 <ButtonGroup>
                     <ConfirmButton onClick={onClose}>
-                        확인
+                        {buttonText}
                     </ConfirmButton>
                 </ButtonGroup>
             </Modal>
@@ -26,7 +29,7 @@ const ReputationCompletionModal = ({ isOpen, onClose }) => {
     );
 };
 
-export default ReputationCompletionModal;
+export default CompletionModal;
 
 const Overlay = styled.div`
     position: fixed;
