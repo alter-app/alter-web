@@ -22,13 +22,13 @@ const WorkplaceItem = ({
                 <WorkplaceName>
                     {businessName}
                 </WorkplaceName>
-                <StatusBadge>
-                    {status.description}
-                </StatusBadge>
             </TopSection>
             <InfoSection>
                 <img src={Location} alt='업장 주소' />
-                <Address>{fullAddress}</Address>
+                <AddressRow>
+                    <Address>{fullAddress}</Address>
+                    <Chevron>{'>'}</Chevron>
+                </AddressRow>
             </InfoSection>
             <InfoSection>
                 <img src={Calendar} alt='등록일' />
@@ -43,58 +43,68 @@ export default WorkplaceItem;
 const WorkplaceContainer = styled.div`
     display: flex;
     flex-direction: column;
-    flex-shrink: 0;
-    gap: 10px;
-    padding: 20px;
-    width: 350px;
+    gap: 5px;
+    padding: 16px;
     background: #ffffff;
-    border-radius: 25px;
-    box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.25);
-    cursor: pointer;
-`;
-
-const WorkplaceName = styled.div`
-    color: #767676;
-    font-family: 'Pretendard';
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 24px;
-`;
-
-const StatusBadge = styled.div`
     border-radius: 12px;
-    border: 1px solid #d9d9d9;
-    padding: 1px 8px;
-    color: #2de283;
-    font-family: 'Pretendard';
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 20px;
-    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.18);
+    border: 1px solid #e9ecef;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-color: #2de283;
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
 `;
 
-const Address = styled.div`
-    color: #111111;
+const WorkplaceName = styled.h4`
     font-family: 'Pretendard';
-    font-weight: 400;
+    font-weight: 600;
     font-size: 16px;
-    line-height: 20px;
-`;
-
-const Date = styled.div`
-    color: #111111;
-    font-family: 'Pretendard';
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 20px;
-`;
-
-const InfoSection = styled.div`
-    display: flex;
-    gap: 3px;
+    color: #333333;
+    margin: 0;
 `;
 
 const TopSection = styled.div`
     display: flex;
+    align-items: center;
+`;
+
+const InfoSection = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+`;
+
+const Address = styled.span`
+    color: #666666;
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 14px;
+`;
+
+const Date = styled.span`
+    color: #999999;
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 12px;
+`;
+
+const AddressRow = styled.div`
+    display: flex;
+    align-items: center;
     justify-content: space-between;
+    gap: 8px;
+    width: 100%;
+`;
+
+const Chevron = styled.span`
+    color: #cccccc;
+    font-size: 16px;
+    line-height: 1;
 `;

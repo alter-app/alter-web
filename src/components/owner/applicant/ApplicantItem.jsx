@@ -79,84 +79,94 @@ export default ApplicantItem;
 const ApplicantContainer = styled.div`
     display: flex;
     flex-direction: column;
-    flex-shrink: 0;
-    gap: 10px;
-    padding: 20px;
-    width: 350px;
+    gap: 12px;
+    padding: 16px;
     background: #ffffff;
-    border-radius: 25px;
-    box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.25);
-`;
-
-const WorkplaceName = styled.div`
-    color: #767676;
-    font-family: 'Pretendard';
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 24px;
-`;
-
-const StatusBadge = styled.div`
     border-radius: 12px;
-    border: 1px solid #d9d9d9;
-    padding: 1px 8px;
-    color: #2de283;
-    font-family: 'Pretendard';
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 20px;
-    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.18);
-`;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
 
-const Name = styled.div`
-    color: #111111;
-    font-family: 'Pretendard';
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 20px;
-`;
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        border-color: #2de283;
+    }
 
-const Time = styled.div`
-    color: #111111;
-    font-family: 'Pretendard';
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 20px;
-`;
-
-const Date = styled.div`
-    color: #111111;
-    font-family: 'Pretendard';
-    font-weight: 400;
-    font-size: 16px;
-    line-height: 20px;
-`;
-
-const ProfileInfoSection = styled.div`
-    display: flex;
-    justify-content: space-between;
-`;
-
-const ScheduleInfoSection = styled.div`
-    display: flex;
-    gap: 10px;
-`;
-
-const InfoGroup = styled.div`
-    display: flex;
-    gap: 3px;
+    &:active {
+        transform: translateY(0);
+    }
 `;
 
 const TopSection = styled.div`
     display: flex;
     justify-content: space-between;
+    align-items: center;
 `;
 
-const TimeAgo = styled.div`
-    color: #999999;
+const WorkplaceName = styled.h4`
+    font-family: 'Pretendard';
+    font-weight: 600;
+    font-size: 16px;
+    color: #333333;
+    margin: 0;
+    flex: 1;
+`;
+
+const StatusBadge = styled.div`
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-family: 'Pretendard';
+    font-weight: 600;
+    font-size: 12px;
+    color: #ffffff;
+    background: #2de283;
+    white-space: nowrap;
+`;
+
+const ProfileInfoSection = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+`;
+
+const ScheduleInfoSection = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+`;
+
+const InfoGroup = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+`;
+
+const Name = styled.span`
+    color: #333333;
+    font-family: 'Pretendard';
+    font-weight: 500;
+    font-size: 14px;
+`;
+
+const Time = styled.span`
+    color: #666666;
     font-family: 'Pretendard';
     font-weight: 400;
     font-size: 14px;
+`;
+
+const Date = styled.span`
+    color: #666666;
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 14px;
+`;
+
+const TimeAgo = styled.span`
+    color: #999999;
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 12px;
     line-height: 20px;
 `;
 
