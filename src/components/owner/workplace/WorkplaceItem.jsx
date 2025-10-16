@@ -13,7 +13,11 @@ const WorkplaceItem = ({
 }) => {
     const navigate = useNavigate();
     const goToWorkplaceDetail = () => {
-        navigate(`/workplace/detail/${id}`);
+        navigate(
+            `/owner/workplace/${id}/${encodeURIComponent(
+                businessName
+            )}`
+        );
     };
 
     return (

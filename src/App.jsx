@@ -18,6 +18,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 import Main from './pages/owner/Main';
 import WorkplaceDetail from './components/owner/workplace/WorkplaceDetail';
 import WorkplaceDetailPage from './components/user/myJob/workplaceDetail/WorkplaceDetailPage';
+import OwnerWorkplaceDetailPage from './components/owner/workplace/workplaceDetail/WorkplaceDetailPage';
 import ReputationWrite from './pages/ReputationWrite';
 import ReputationListPage from './pages/user/ReputationListPage';
 import SentReputationListPage from './pages/user/SentReputationListPage';
@@ -143,6 +144,14 @@ function App() {
                         element={
                             <ProtectedRoute requiredScope='MANAGER'>
                                 <WorkplaceDetail />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/owner/workplace/:workplaceId/:workplaceName'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <OwnerWorkplaceDetailPage />
                             </ProtectedRoute>
                         }
                     />
