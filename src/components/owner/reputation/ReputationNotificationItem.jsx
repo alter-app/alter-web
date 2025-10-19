@@ -8,17 +8,23 @@ import ConfirmModal from '../../shared/ConfirmModal';
 
 const ReputationNotificationItem = ({
     id,
-    requester,
-    target,
-    createdAt,
+    workspaceName,
+    targetName,
+    timeAgo: timeAgoText,
+    onAccept,
+    onReject,
 }) => {
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
 
     const handleAccept = () => {
-        navigate('/reputation-write', {
-            state: { requestId: id },
-        });
+        if (onAccept) {
+            onAccept();
+        } else {
+            navigate('/reputation-write', {
+                state: { requestId: id },
+            });
+        }
     };
 
     const handleDeclineClick = () => {
@@ -27,10 +33,13 @@ const ReputationNotificationItem = ({
 
     const handleModalConfirm = async () => {
         try {
-            await declineReputation(id);
+            if (onReject) {
+                onReject();
+            } else {
+                await declineReputation(id);
+                window.location.reload();
+            }
             setShowModal(false);
-            // 성공 시 페이지 새로고침 또는 목록에서 제거
-            window.location.reload();
         } catch (error) {
             console.error('평판 거절 오류:', error);
             alert(error.message);
@@ -46,13 +55,13 @@ const ReputationNotificationItem = ({
             <ReputationContainer>
                 <TopSection>
                     <WorkplaceName>
-                        {target.name}
+                        {workspaceName}
                     </WorkplaceName>
-                    <TimeAgo>{timeAgo(createdAt)}</TimeAgo>
+                    <TimeAgo>{timeAgoText}</TimeAgo>
                 </TopSection>
                 <InfoGroup>
                     <img src={Profile} alt='이름' />
-                    <Name>{requester.name}</Name>
+                    <Name>{targetName}</Name>
                 </InfoGroup>
                 <ButtonSection>
                     <AcceptButton onClick={handleAccept}>
@@ -71,7 +80,7 @@ const ReputationNotificationItem = ({
                 onClose={handleModalCancel}
                 onConfirm={handleModalConfirm}
                 title='평판 요청 거절'
-                message={`${requester.name}님의 평판 요청을 거절하시겠습니까?`}
+                message={`${targetName}님의 평판 요청을 거절하시겠습니까?`}
                 confirmText='거절하기'
                 cancelText='취소'
                 confirmColor='#ff4444'

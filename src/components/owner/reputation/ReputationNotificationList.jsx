@@ -1,9 +1,12 @@
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import ReputationNotificationItem from './ReputationNotificationItem';
 import { useState, useEffect } from 'react';
 import { getReputationRequestList } from '../../../services/mainPageService';
+import { timeAgo } from '../../../utils/timeUtil';
 
 const ReputationNotificationList = () => {
+    const navigate = useNavigate();
     const [reputationRequest, setReputationRequest] =
         useState([]);
 
@@ -26,11 +29,17 @@ const ReputationNotificationList = () => {
         }
     };
 
+    const handleViewAll = () => {
+        navigate('/owner/reputation-notification');
+    };
+
     return (
         <SectionContainer>
             <SectionHeader>
                 <SectionTitle>평판 알림</SectionTitle>
-                <ViewAllButton>전체보기</ViewAllButton>
+                <ViewAllButton onClick={handleViewAll}>
+                    전체보기
+                </ViewAllButton>
             </SectionHeader>
             {reputationRequest.length > 0 ? (
                 <CardList>
@@ -39,7 +48,19 @@ const ReputationNotificationList = () => {
                         .map((item) => (
                             <ReputationNotificationItem
                                 key={item.id}
-                                {...item}
+                                id={item.id}
+                                workspaceName={
+                                    item.workspace
+                                        ?.businessName ||
+                                    '업장 정보 없음'
+                                }
+                                targetName={
+                                    item.requester?.name ||
+                                    '알 수 없음'
+                                }
+                                timeAgo={timeAgo(
+                                    item.createdAt
+                                )}
                             />
                         ))}
                 </CardList>

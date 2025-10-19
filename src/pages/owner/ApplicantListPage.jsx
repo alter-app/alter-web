@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PageHeader from '../../components/shared/PageHeader';
-import OwnerBottomNavigation from '../../layouts/OwnerBottomNavigation';
 import ApplicantCard from '../../components/owner/applicant/ApplicantCard';
 import StatusFilter from '../../components/owner/applicant/StatusFilter';
 import { getPostingsApplications } from '../../services/managerPage';
@@ -14,10 +13,8 @@ const ApplicantListPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
     const [cursorInfo, setCursorInfo] = useState('');
-    const [selectedStatus, setSelectedStatus] =
-        useState('');
-    const [selectedWorkplace, setSelectedWorkplace] =
-        useState('');
+    const [selectedStatus, setSelectedStatus] = useState('');
+    const [selectedWorkplace, setSelectedWorkplace] = useState('');
     const [workplaceList, setWorkplaceList] = useState([]);
     const [totalCount, setTotalCount] = useState(0);
 
@@ -31,10 +28,7 @@ const ApplicantListPage = () => {
                     ...result.data,
                 ]);
             } catch (error) {
-                console.error(
-                    '업장 목록 조회 오류:',
-                    error
-                );
+                console.error('업장 목록 조회 오류:', error);
             }
         };
         fetchWorkplaceList();
@@ -46,17 +40,14 @@ const ApplicantListPage = () => {
             try {
                 setIsLoading(true);
 
-                const result =
-                    await getPostingsApplications({
-                        cursorInfo: '',
-                        checkedWorkplaceId:
-                            selectedWorkplace,
-                        checkedStatusId: selectedStatus,
-                    });
+                const result = await getPostingsApplications({
+                    cursorInfo: '',
+                    checkedWorkplaceId: selectedWorkplace,
+                    checkedStatusId: selectedStatus,
+                });
 
                 const applicationsData = result.data || [];
-                const newCursorInfo =
-                    result.page?.cursor || '';
+                const newCursorInfo = result.page?.cursor || '';
 
                 setApplications(applicationsData);
                 setCursorInfo(newCursorInfo);
@@ -64,14 +55,10 @@ const ApplicantListPage = () => {
 
                 // 데이터가 10개 미만이거나 cursorInfo가 없으면 더 이상 데이터가 없음
                 setHasMore(
-                    applicationsData.length >= 10 &&
-                        newCursorInfo !== ''
+                    applicationsData.length >= 10 && newCursorInfo !== ''
                 );
             } catch (error) {
-                console.error(
-                    '지원 목록 조회 실패:',
-                    error
-                );
+                console.error('지원 목록 조회 실패:', error);
                 setApplications([]);
                 setHasMore(false);
             } finally {
@@ -96,30 +83,16 @@ const ApplicantListPage = () => {
             const newApplications = result.data || [];
             const newCursorInfo = result.page?.cursor || '';
 
-            setApplications((prev) => [
-                ...prev,
-                ...newApplications,
-            ]);
+            setApplications((prev) => [...prev, ...newApplications]);
             setCursorInfo(newCursorInfo);
 
             // 데이터가 10개 미만이거나 cursorInfo가 없으면 더 이상 데이터가 없음
-            setHasMore(
-                newApplications.length >= 10 &&
-                    newCursorInfo !== ''
-            );
+            setHasMore(newApplications.length >= 10 && newCursorInfo !== '');
         } catch (error) {
-            console.error(
-                '추가 지원 목록 조회 실패:',
-                error
-            );
+            console.error('추가 지원 목록 조회 실패:', error);
             setHasMore(false);
         }
-    }, [
-        hasMore,
-        cursorInfo,
-        selectedStatus,
-        selectedWorkplace,
-    ]);
+    }, [hasMore, cursorInfo, selectedStatus, selectedWorkplace]);
 
     if (isLoading) {
         return (
@@ -128,7 +101,6 @@ const ApplicantListPage = () => {
                 <LoadingContainer>
                     <Loader />
                 </LoadingContainer>
-                <OwnerBottomNavigation />
             </PageContainer>
         );
     }
@@ -158,18 +130,12 @@ const ApplicantListPage = () => {
                     >
                         <SectionCard>
                             <ApplicationList>
-                                {applications.map(
-                                    (application) => (
-                                        <ApplicantCard
-                                            key={
-                                                application.id
-                                            }
-                                            application={
-                                                application
-                                            }
-                                        />
-                                    )
-                                )}
+                                {applications.map((application) => (
+                                    <ApplicantCard
+                                        key={application.id}
+                                        application={application}
+                                    />
+                                ))}
                             </ApplicationList>
                         </SectionCard>
                     </InfiniteScroll>
@@ -218,19 +184,15 @@ const ApplicantListPage = () => {
                                 />
                             </svg>
                         </EmptyIcon>
-                        <EmptyTitle>
-                            지원자가 없습니다
-                        </EmptyTitle>
+                        <EmptyTitle>지원자가 없습니다</EmptyTitle>
                         <EmptyDescription>
                             아직 지원자가 없습니다.
                             <br />
-                            공고를 등록하고 지원자를
-                            기다려보세요.
+                            공고를 등록하고 지원자를 기다려보세요.
                         </EmptyDescription>
                     </EmptyContainer>
                 )}
             </ContentContainer>
-            <OwnerBottomNavigation />
         </PageContainer>
     );
 };
@@ -246,7 +208,6 @@ const PageContainer = styled.div`
 const ContentContainer = styled.div`
     padding: 12px;
     padding-top: 20px;
-    padding-bottom: 80px;
 `;
 
 const SectionCard = styled.div`

@@ -171,3 +171,38 @@ export const cancelReputationRequest = async (
         );
     }
 };
+
+// 받은 평판 요청 목록 조회
+export const getManagerReputationRequests = async ({
+    cursorInfo,
+    pageSize = 10,
+}) => {
+    const accessToken = useAuthStore.getState().accessToken;
+    try {
+        const response = await fetch(
+            `${backend}/manager/reputations/requests?cursor=${cursorInfo}&pageSize=${pageSize}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error(
+            '받은 평판 요청 목록 조회 오류:',
+            error
+        );
+        throw new Error(
+            '받은 평판 요청 목록 조회 중 오류가 발생했습니다.'
+        );
+    }
+};

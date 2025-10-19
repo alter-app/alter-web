@@ -15,6 +15,7 @@ import MyPage from './pages/user/MyPage';
 import MyJob from './pages/user/MyJob';
 import ApplicantListPage from './pages/owner/ApplicantListPage';
 import SentReputationListPageOwner from './pages/owner/SentReputationListPage';
+import ReputationNotificationListPage from './pages/owner/ReputationNotificationListPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Main from './pages/owner/Main';
 import WorkplaceDetail from './components/owner/workplace/WorkplaceDetail';
@@ -176,6 +177,14 @@ function App() {
                         element={
                             <ProtectedRoute requiredScope='MANAGER'>
                                 <SentReputationListPageOwner />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/owner/reputation-notification'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <ReputationNotificationListPage />
                             </ProtectedRoute>
                         }
                     />

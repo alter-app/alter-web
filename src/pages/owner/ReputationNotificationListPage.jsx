@@ -1,22 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PageHeader from '../../components/shared/PageHeader';
-import SentReputationCard from '../../components/user/myJob/SentReputationCard';
-import SentReputationStatusFilter from '../../components/user/myJob/SentReputationStatusFilter';
-import {
-    getSentReputationRequests,
-    cancelReputationRequest,
-} from '../../services/managerPage';
-import Loader from '../../components/Loader';
+import ReputationNotificationItem from '../../components/owner/reputation/ReputationNotificationItem';
+import { getManagerReputationRequests } from '../../services/managerPage';
 import { timeAgo } from '../../utils/timeUtil';
+import Loader from '../../components/Loader';
 
-const SentReputationListPage = () => {
+const ReputationNotificationListPage = () => {
+    const navigate = useNavigate();
     const [requests, setRequests] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
     const [cursorInfo, setCursorInfo] = useState('');
-    const [selectedStatuses, setSelectedStatuses] = useState([]);
     const [totalCount, setTotalCount] = useState(0);
 
     // 초기 데이터 로드
@@ -25,9 +22,9 @@ const SentReputationListPage = () => {
             try {
                 setIsLoading(true);
 
-                const result = await getSentReputationRequests({
+                const result = await getManagerReputationRequests({
                     cursorInfo: '',
-                    status: selectedStatuses,
+                    pageSize: 10,
                 });
 
                 const requestsData = result.data || [];
@@ -40,7 +37,7 @@ const SentReputationListPage = () => {
                 // 데이터가 10개 미만이거나 cursorInfo가 없으면 더 이상 데이터가 없음
                 setHasMore(requestsData.length >= 10 && newCursorInfo !== '');
             } catch (error) {
-                console.error('보낸 평판 요청 목록 조회 실패:', error);
+                console.error('받은 평판 요청 목록 조회 실패:', error);
                 setRequests([]);
                 setHasMore(false);
             } finally {
@@ -49,16 +46,16 @@ const SentReputationListPage = () => {
         };
 
         fetchInitialRequests();
-    }, [selectedStatuses]);
+    }, []);
 
     // 더 많은 데이터 로드
     const fetchMoreRequests = useCallback(async () => {
         if (!hasMore || !cursorInfo) return;
 
         try {
-            const result = await getSentReputationRequests({
+            const result = await getManagerReputationRequests({
                 cursorInfo,
-                status: selectedStatuses,
+                pageSize: 10,
             });
 
             const newRequests = result.data || [];
@@ -73,38 +70,42 @@ const SentReputationListPage = () => {
             console.error('추가 평판 요청 목록 조회 실패:', error);
             setHasMore(false);
         }
-    }, [hasMore, cursorInfo, selectedStatuses]);
+    }, [hasMore, cursorInfo]);
 
-    const handleCancelRequest = async (request) => {
+    const handleAccept = (request) => {
         try {
-            console.log('보낸 평판 취소:', request);
-            await cancelReputationRequest(request.id);
-
-            // 최신 데이터 다시 가져오기
-            const result = await getSentReputationRequests({
-                cursorInfo: '',
-                status: selectedStatuses,
+            console.log('평판 수락:', request);
+            // 평판 작성 페이지로 이동
+            navigate('/reputation-write', {
+                state: { requestId: request.id },
             });
-
-            const requestsData = result.data || [];
-            const newCursorInfo = result.page?.cursor || '';
-
-            setRequests(requestsData);
-            setCursorInfo(newCursorInfo);
-            setTotalCount(result.page?.totalCount || 0);
-
-            // 데이터가 10개 미만이거나 cursorInfo가 없으면 더 이상 데이터가 없음
-            setHasMore(requestsData.length >= 10 && newCursorInfo !== '');
         } catch (error) {
-            console.error('보낸 평판 취소 오류:', error);
-            alert('평판 취소 중 오류가 발생했습니다.');
+            console.error('평판 수락 오류:', error);
+            alert('평판 수락 중 오류가 발생했습니다.');
+        }
+    };
+
+    const handleReject = async (request) => {
+        try {
+            console.log('평판 거절:', request);
+            // TODO: 거절 API 호출
+            // await declineReputation(request.id);
+
+            // 성공 시 목록에서 제거
+            setRequests((prev) => prev.filter((req) => req.id !== request.id));
+            setTotalCount((prev) => prev - 1);
+
+            alert('평판이 거절되었습니다.');
+        } catch (error) {
+            console.error('평판 거절 오류:', error);
+            alert('평판 거절 중 오류가 발생했습니다.');
         }
     };
 
     if (isLoading) {
         return (
             <PageContainer>
-                <PageHeader title='보낸 평판 요청' />
+                <PageHeader title='평판 알림' />
                 <LoadingContainer>
                     <Loader />
                 </LoadingContainer>
@@ -114,18 +115,8 @@ const SentReputationListPage = () => {
 
     return (
         <PageContainer>
-            <PageHeader title='보낸 평판 요청' />
+            <PageHeader title='평판 알림' />
             <ContentContainer>
-                <FilterWrapper>
-                    <TotalCountText>
-                        총 <TotalCount>{totalCount}</TotalCount>건
-                    </TotalCountText>
-                    <SentReputationStatusFilter
-                        selectedStatuses={selectedStatuses}
-                        onStatusChange={setSelectedStatuses}
-                    />
-                </FilterWrapper>
-
                 {requests.length > 0 ? (
                     <InfiniteScroll
                         dataLength={requests.length}
@@ -140,23 +131,20 @@ const SentReputationListPage = () => {
                         <SectionCard>
                             <RequestList>
                                 {requests.map((request) => (
-                                    <SentReputationCard
+                                    <ReputationNotificationItem
                                         key={request.id}
-                                        targetName={
-                                            request.target?.name || '알 수 없음'
-                                        }
-                                        workplaceName={
-                                            request.requester?.name ||
+                                        id={request.id}
+                                        workspaceName={
+                                            request.workspace?.businessName ||
                                             '업장 정보 없음'
                                         }
+                                        targetName={
+                                            request.requester?.name ||
+                                            '알 수 없음'
+                                        }
                                         timeAgo={timeAgo(request.createdAt)}
-                                        status={request.status.value}
-                                        statusDescription={
-                                            request.status.description
-                                        }
-                                        onCancel={() =>
-                                            handleCancelRequest(request)
-                                        }
+                                        onAccept={() => handleAccept(request)}
+                                        onReject={() => handleReject(request)}
                                     />
                                 ))}
                             </RequestList>
@@ -172,34 +160,14 @@ const SentReputationListPage = () => {
                                 fill='none'
                             >
                                 <path
-                                    d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'
+                                    d='M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9'
                                     stroke='#cccccc'
                                     strokeWidth='2'
                                     strokeLinecap='round'
                                     strokeLinejoin='round'
                                 />
-                                <polyline
-                                    points='14,2 14,8 20,8'
-                                    stroke='#cccccc'
-                                    strokeWidth='2'
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                />
-                                <line
-                                    x1='16'
-                                    y1='13'
-                                    x2='8'
-                                    y2='13'
-                                    stroke='#cccccc'
-                                    strokeWidth='2'
-                                    strokeLinecap='round'
-                                    strokeLinejoin='round'
-                                />
-                                <line
-                                    x1='16'
-                                    y1='17'
-                                    x2='8'
-                                    y2='17'
+                                <path
+                                    d='M13.73 21a2 2 0 0 1-3.46 0'
                                     stroke='#cccccc'
                                     strokeWidth='2'
                                     strokeLinecap='round'
@@ -207,11 +175,11 @@ const SentReputationListPage = () => {
                                 />
                             </svg>
                         </EmptyIcon>
-                        <EmptyTitle>보낸 평판 요청이 없습니다</EmptyTitle>
+                        <EmptyTitle>받은 평판 요청이 없습니다</EmptyTitle>
                         <EmptyDescription>
-                            아직 보낸 평판 요청이 없습니다.
+                            아직 받은 평판 요청이 없습니다.
                             <br />
-                            평판을 요청하고 응답을 기다려보세요.
+                            근무를 완료하면 평판을 받을 수 있습니다.
                         </EmptyDescription>
                     </EmptyContainer>
                 )}
@@ -220,7 +188,7 @@ const SentReputationListPage = () => {
     );
 };
 
-export default SentReputationListPage;
+export default ReputationNotificationListPage;
 
 const PageContainer = styled.div`
     min-height: 100vh;
@@ -233,36 +201,12 @@ const ContentContainer = styled.div`
     padding-top: 20px;
 `;
 
-const FilterWrapper = styled.div`
-    margin-bottom: 16px;
+const SectionCard = styled.div`
     background: #ffffff;
     border-radius: 16px;
-    padding: 16px 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    padding: 20px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
     border: 1px solid #f0f0f0;
-`;
-
-const TotalCountText = styled.div`
-    font-family: 'Pretendard';
-    font-weight: 400;
-    font-size: 14px;
-    color: #666666;
-    margin-bottom: 12px;
-
-    @media (max-width: 480px) {
-        font-size: 13px;
-    }
-`;
-
-const TotalCount = styled.span`
-    font-weight: 600;
-    color: #333333;
-`;
-
-const SectionCard = styled.div`
-    background: transparent;
-    border-radius: 16px;
-    padding: 0;
 `;
 
 const RequestList = styled.div`
