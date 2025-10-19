@@ -10,6 +10,8 @@ body {
     padding: 0;
     overflow: hidden;
     background: #f4f4f4;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
 }
 
 body {
@@ -21,12 +23,15 @@ body {
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
+    position: fixed;
+    width: 100%;
 }
 
 #root {
     height: 100%;
     width: 100%;
     overflow: hidden;
+    overscroll-behavior: none;
 }
 
 header {

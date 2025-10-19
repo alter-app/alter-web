@@ -78,6 +78,8 @@ const ContainerColumn = styled.div`
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    overscroll-behavior-y: contain;
 
     @media (max-width: 480px) {
         top: 56px;

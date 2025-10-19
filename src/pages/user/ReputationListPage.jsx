@@ -297,6 +297,8 @@ const PageContainer = styled.div`
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    overscroll-behavior-y: contain;
     background: #f8f9fa;
 
     @media (max-width: 480px) {

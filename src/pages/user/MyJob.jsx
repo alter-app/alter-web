@@ -558,6 +558,8 @@ const Container = styled.div`
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    overscroll-behavior-y: contain;
     padding: 20px 16px;
     background: #f8f9fa;
 
