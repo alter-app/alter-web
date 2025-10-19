@@ -14,6 +14,7 @@ import JobPosting from './pages/owner/JobPosting';
 import MyPage from './pages/user/MyPage';
 import MyJob from './pages/user/MyJob';
 import ApplicantListPage from './pages/owner/ApplicantListPage';
+import SentReputationListPageOwner from './pages/owner/SentReputationListPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Main from './pages/owner/Main';
 import WorkplaceDetail from './components/owner/workplace/WorkplaceDetail';
@@ -30,14 +31,26 @@ function App() {
         <>
             <Routes>
                 <Route element={<FooterLayout />}>
-                    <Route path='*' element={<NotFound />} />
+                    <Route
+                        path='*'
+                        element={<NotFound />}
+                    />
                 </Route>
 
                 <Route element={<MainLayout />}>
                     <Route path='/' element={<Home />} />
-                    <Route path='/login' element={<Login />} />
-                    <Route path='/signup' element={<SignUp />} />
-                    <Route path='/phoneauth' element={<PhoneAuthPage />} />
+                    <Route
+                        path='/login'
+                        element={<Login />}
+                    />
+                    <Route
+                        path='/signup'
+                        element={<SignUp />}
+                    />
+                    <Route
+                        path='/phoneauth'
+                        element={<PhoneAuthPage />}
+                    />
                     <Route
                         path='/mypage'
                         element={
@@ -155,6 +168,14 @@ function App() {
                         element={
                             <ProtectedRoute requiredScope='MANAGER'>
                                 <ApplicantListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/owner/sent-reputation'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <SentReputationListPageOwner />
                             </ProtectedRoute>
                         }
                     />

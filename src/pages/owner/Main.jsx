@@ -1,5 +1,6 @@
 import ApplicantList from '../../components/owner/applicant/ApplicantList';
 import ReputationNotificationList from '../../components/owner/reputation/ReputationNotificationList';
+import SentReputationList from '../../components/owner/reputation/SentReputationList';
 import WorkplaceList from '../../components/owner/workplace/WorkplaceList';
 import PageHeader from '../../components/shared/PageHeader';
 import OwnerBottomNavigation from '../../layouts/OwnerBottomNavigation';
@@ -16,6 +17,7 @@ const Main = () => {
                 <WorkplaceList />
                 <ApplicantList />
                 <ReputationNotificationList />
+                <SentReputationList />
             </MainContentWrapper>
             <OwnerBottomNavigation />
         </>

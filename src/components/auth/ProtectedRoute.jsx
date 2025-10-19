@@ -20,6 +20,7 @@ const ProtectedRoute = ({ children, requiredScope }) => {
                 '/posting',
                 '/main',
                 '/reputation-write',
+                '/owner/sent-reputation',
             ].includes(location.pathname) ||
             location.pathname.startsWith(
                 '/workplace/detail/'
