@@ -30,35 +30,14 @@ function App() {
         <>
             <Routes>
                 <Route element={<FooterLayout />}>
-                    <Route
-                        path='/applicant'
-                        element={
-                            <ProtectedRoute requiredScope='MANAGER'>
-                                <ApplicantListPage />
-                            </ProtectedRoute>
-                        }
-                    />
-
-                    <Route
-                        path='*'
-                        element={<NotFound />}
-                    />
+                    <Route path='*' element={<NotFound />} />
                 </Route>
 
                 <Route element={<MainLayout />}>
                     <Route path='/' element={<Home />} />
-                    <Route
-                        path='/login'
-                        element={<Login />}
-                    />
-                    <Route
-                        path='/signup'
-                        element={<SignUp />}
-                    />
-                    <Route
-                        path='/phoneauth'
-                        element={<PhoneAuthPage />}
-                    />
+                    <Route path='/login' element={<Login />} />
+                    <Route path='/signup' element={<SignUp />} />
+                    <Route path='/phoneauth' element={<PhoneAuthPage />} />
                     <Route
                         path='/mypage'
                         element={
@@ -170,6 +149,14 @@ function App() {
                     <Route
                         path='/auth/apple/callback'
                         element={<AppleCallback />}
+                    />
+                    <Route
+                        path='/applicant'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <ApplicantListPage />
+                            </ProtectedRoute>
+                        }
                     />
                 </Route>
             </Routes>

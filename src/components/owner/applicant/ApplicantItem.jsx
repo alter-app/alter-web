@@ -2,10 +2,7 @@ import styled from 'styled-components';
 import Profile from '../../../assets/icons/applicant/Profile.svg';
 import TimeCircle from '../../../assets/icons/applicant/TimeCircle.svg';
 import Calendar from '../../../assets/icons/workplace/Calendar.svg';
-import {
-    timeAgo,
-    formatTimeToHHMM,
-} from '../../../utils/timeUtil';
+import { timeAgo, formatTimeToHHMM } from '../../../utils/timeUtil';
 import { getKoreanDays } from '../../../utils/weekUtil';
 
 const ApplicantItem = ({
@@ -18,18 +15,13 @@ const ApplicantItem = ({
     const startTime = formatTimeToHHMM(schedule.startTime);
     const endTime = formatTimeToHHMM(schedule.endTime);
 
-    const keywords =
-        applicant.reputationSummary?.topKeywords || [];
+    const keywords = applicant.reputationSummary?.topKeywords || [];
 
     return (
         <ApplicantContainer>
             <TopSection>
-                <WorkplaceName>
-                    {workspace.name}
-                </WorkplaceName>
-                <StatusBadge>
-                    {status.description}
-                </StatusBadge>
+                <WorkplaceName>{workspace.name}</WorkplaceName>
+                <StatusBadge>{status.description}</StatusBadge>
             </TopSection>
             <ProfileInfoSection>
                 <InfoGroup>
@@ -40,32 +32,21 @@ const ApplicantItem = ({
             </ProfileInfoSection>
             <ScheduleInfoSection>
                 <InfoGroup>
-                    <img
-                        src={TimeCircle}
-                        alt='희망 근무 시간'
-                    />
+                    <img src={TimeCircle} alt='희망 근무 시간' />
                     <Time>
                         {startTime} ~ {endTime}
                     </Time>
                 </InfoGroup>
                 <InfoGroup>
-                    <img
-                        src={Calendar}
-                        alt='희망 근무 요일'
-                    />
-                    <Date>
-                        {getKoreanDays(
-                            schedule.workingDays
-                        )}
-                    </Date>
+                    <img src={Calendar} alt='희망 근무 요일' />
+                    <Date>{getKoreanDays(schedule.workingDays)}</Date>
                 </InfoGroup>
             </ScheduleInfoSection>
             <Row>
                 <KeywordArea count={keywords.length}>
                     {keywords.map((keyword) => (
                         <KeywordTag key={keyword.id}>
-                            {keyword.emoji}{' '}
-                            {keyword.description}
+                            {keyword.emoji} {keyword.description}
                         </KeywordTag>
                     ))}
                 </KeywordArea>
@@ -131,14 +112,13 @@ const ProfileInfoSection = styled.div`
 
 const ScheduleInfoSection = styled.div`
     display: flex;
-    flex-direction: column;
     gap: 8px;
 `;
 
 const InfoGroup = styled.div`
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 5px;
 `;
 
 const Name = styled.span`
@@ -180,8 +160,7 @@ const KeywordArea = styled.div`
     display: flex;
     gap: 5px 5px;
     flex-wrap: wrap;
-    max-width: ${({ count }) =>
-        count === 2 ? '100px' : '350px'};
+    max-width: ${({ count }) => (count === 2 ? '100px' : '350px')};
 `;
 const KeywordTag = styled.div`
     color: #111111;

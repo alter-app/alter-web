@@ -15,10 +15,7 @@ const ApplicantList = () => {
 
     const fetchData = async () => {
         try {
-            const result = await getApplicants(
-                3,
-                'SUBMITTED'
-            );
+            const result = await getApplicants(3, 'SUBMITTED');
             setApplicants(result.data);
             console.log(result.data);
         } catch (error) {
@@ -37,16 +34,11 @@ const ApplicantList = () => {
             {applicants.length > 0 ? (
                 <CardList>
                     {applicants.slice(0, 3).map((item) => (
-                        <ApplicantItem
-                            key={item.id}
-                            {...item}
-                        />
+                        <ApplicantItem key={item.id} {...item} />
                     ))}
                 </CardList>
             ) : (
-                <EmptyMessage>
-                    지원자가 없습니다.
-                </EmptyMessage>
+                <EmptyMessage>지원자가 없습니다.</EmptyMessage>
             )}
         </SectionContainer>
     );

@@ -3,13 +3,13 @@ export const statusToStyle = (status) => {
     switch (status) {
         case 'SUBMITTED':
             return {
-                color: '#999999',
-                background: '#ffffff',
+                color: '#ffffff',
+                background: '#4a90e2',
             };
         case 'SHORTLISTED':
             return {
-                color: '#999999',
-                background: '#ffffff',
+                color: '#ffffff',
+                background: '#9b59b6',
             };
         case 'ACCEPTED':
             return {
@@ -18,29 +18,28 @@ export const statusToStyle = (status) => {
             };
         case 'REJECTED':
             return {
-                color: '#dc0000',
-                background: '#ffffff',
+                color: '#ffffff',
+                background: '#dc0000',
             };
         case 'CANCELLED':
             return {
-                color: '#999999',
-                background: '#ffffff',
-                disable: true,
+                color: '#666666',
+                background: '#e9ecef',
             };
         case 'EXPIRED':
             return {
-                color: '#999999',
-                background: '#ffffff',
+                color: '#666666',
+                background: '#e9ecef',
             };
         case 'DELETED':
             return {
-                color: '#999999',
-                background: '#ffffff',
+                color: '#666666',
+                background: '#e9ecef',
             };
         default:
             return {
-                color: '#999999',
-                background: '#ffffff',
+                color: '#666666',
+                background: '#e9ecef',
             };
     }
 };
