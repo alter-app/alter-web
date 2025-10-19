@@ -298,14 +298,27 @@ const ApplicationListPage = () => {
 export default ApplicationListPage;
 
 const PageContainer = styled.div`
-    min-height: 100vh;
+    position: fixed;
+    top: 60px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
     background: #f8f9fa;
-    padding-top: 60px;
+
+    @media (max-width: 480px) {
+        top: 56px;
+    }
+
+    @media (max-width: 360px) {
+        top: 52px;
+    }
 `;
 
 const ContentContainer = styled.div`
-    padding: 12px;
-    padding-top: 20px;
+    padding: 20px 12px 12px 12px;
 `;
 
 const SectionCard = styled.div`

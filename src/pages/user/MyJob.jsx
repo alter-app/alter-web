@@ -550,16 +550,26 @@ const MyJob = () => {
 export default MyJob;
 
 const Container = styled.div`
-    min-height: calc(100vh - 80px);
-    padding: 80px 16px 100px 16px;
+    position: fixed;
+    top: 60px;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 20px 16px;
     background: #f8f9fa;
 
     @media (max-width: 480px) {
-        padding: 76px 12px 80px 12px;
+        top: 56px;
+        padding: 16px 12px;
     }
 
     @media (max-width: 360px) {
-        padding: 72px 8px 70px 8px;
+        top: 52px;
+        bottom: 50px;
+        padding: 12px 8px;
     }
 `;
 

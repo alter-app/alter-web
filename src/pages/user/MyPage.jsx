@@ -68,20 +68,24 @@ const MyPage = () => {
 export default MyPage;
 
 const ContainerColumn = styled.div`
+    position: fixed;
+    top: 60px;
+    bottom: 60px;
+    left: 0;
+    right: 0;
     display: flex;
     flex-direction: column;
-    min-height: calc(100vh - 80px);
-    padding-top: 60px;
-    padding-bottom: 80px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 
     @media (max-width: 480px) {
-        min-height: calc(100vh - 70px);
-        padding-bottom: 70px;
+        top: 56px;
     }
 
     @media (max-width: 360px) {
-        min-height: calc(100vh - 60px);
-        padding-bottom: 60px;
+        top: 52px;
+        bottom: 50px;
     }
 `;
 
