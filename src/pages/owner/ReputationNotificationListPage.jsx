@@ -22,22 +22,30 @@ const ReputationNotificationListPage = () => {
             try {
                 setIsLoading(true);
 
-                const result = await getManagerReputationRequests({
-                    cursorInfo: '',
-                    pageSize: 10,
-                });
+                const result =
+                    await getManagerReputationRequests({
+                        cursorInfo: '',
+                        pageSize: 10,
+                    });
 
                 const requestsData = result.data || [];
-                const newCursorInfo = result.page?.cursor || '';
+                const newCursorInfo =
+                    result.page?.cursor || '';
 
                 setRequests(requestsData);
                 setCursorInfo(newCursorInfo);
                 setTotalCount(result.page?.totalCount || 0);
 
                 // 데이터가 10개 미만이거나 cursorInfo가 없으면 더 이상 데이터가 없음
-                setHasMore(requestsData.length >= 10 && newCursorInfo !== '');
+                setHasMore(
+                    requestsData.length >= 10 &&
+                        newCursorInfo !== ''
+                );
             } catch (error) {
-                console.error('받은 평판 요청 목록 조회 실패:', error);
+                console.error(
+                    '받은 평판 요청 목록 조회 실패:',
+                    error
+                );
                 setRequests([]);
                 setHasMore(false);
             } finally {
@@ -53,21 +61,31 @@ const ReputationNotificationListPage = () => {
         if (!hasMore || !cursorInfo) return;
 
         try {
-            const result = await getManagerReputationRequests({
-                cursorInfo,
-                pageSize: 10,
-            });
+            const result =
+                await getManagerReputationRequests({
+                    cursorInfo,
+                    pageSize: 10,
+                });
 
             const newRequests = result.data || [];
             const newCursorInfo = result.page?.cursor || '';
 
-            setRequests((prev) => [...prev, ...newRequests]);
+            setRequests((prev) => [
+                ...prev,
+                ...newRequests,
+            ]);
             setCursorInfo(newCursorInfo);
 
             // 데이터가 10개 미만이거나 cursorInfo가 없으면 더 이상 데이터가 없음
-            setHasMore(newRequests.length >= 10 && newCursorInfo !== '');
+            setHasMore(
+                newRequests.length >= 10 &&
+                    newCursorInfo !== ''
+            );
         } catch (error) {
-            console.error('추가 평판 요청 목록 조회 실패:', error);
+            console.error(
+                '추가 평판 요청 목록 조회 실패:',
+                error
+            );
             setHasMore(false);
         }
     }, [hasMore, cursorInfo]);
@@ -92,7 +110,9 @@ const ReputationNotificationListPage = () => {
             // await declineReputation(request.id);
 
             // 성공 시 목록에서 제거
-            setRequests((prev) => prev.filter((req) => req.id !== request.id));
+            setRequests((prev) =>
+                prev.filter((req) => req.id !== request.id)
+            );
             setTotalCount((prev) => prev - 1);
 
             alert('평판이 거절되었습니다.');
@@ -135,16 +155,30 @@ const ReputationNotificationListPage = () => {
                                         key={request.id}
                                         id={request.id}
                                         workspaceName={
-                                            request.workspace?.businessName ||
+                                            request
+                                                .workspace
+                                                ?.businessName ||
                                             '업장 정보 없음'
                                         }
                                         targetName={
-                                            request.requester?.name ||
+                                            request
+                                                .requester
+                                                ?.name ||
                                             '알 수 없음'
                                         }
-                                        timeAgo={timeAgo(request.createdAt)}
-                                        onAccept={() => handleAccept(request)}
-                                        onReject={() => handleReject(request)}
+                                        timeAgo={timeAgo(
+                                            request.createdAt
+                                        )}
+                                        onAccept={() =>
+                                            handleAccept(
+                                                request
+                                            )
+                                        }
+                                        onReject={() =>
+                                            handleReject(
+                                                request
+                                            )
+                                        }
                                     />
                                 ))}
                             </RequestList>
@@ -175,11 +209,14 @@ const ReputationNotificationListPage = () => {
                                 />
                             </svg>
                         </EmptyIcon>
-                        <EmptyTitle>받은 평판 요청이 없습니다</EmptyTitle>
+                        <EmptyTitle>
+                            받은 평판 요청이 없습니다
+                        </EmptyTitle>
                         <EmptyDescription>
                             아직 받은 평판 요청이 없습니다.
                             <br />
-                            근무를 완료하면 평판을 받을 수 있습니다.
+                            근무를 완료하면 평판을 받을 수
+                            있습니다.
                         </EmptyDescription>
                     </EmptyContainer>
                 )}

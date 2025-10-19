@@ -206,3 +206,42 @@ export const getManagerReputationRequests = async ({
         );
     }
 };
+
+// 근무자에게 평판 생성
+export const createWorkerReputationByManager = async ({
+    workspaceId,
+    targetUserId,
+    keywordsPayload,
+}) => {
+    const accessToken = useAuthStore.getState().accessToken;
+    try {
+        const response = await fetch(
+            `${backend}/manager/reputations/requests/users`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({
+                    workspaceId: workspaceId,
+                    requestType: 'WORKSPACE_TO_USER',
+                    targetUserId: targetUserId,
+                    keywords: keywordsPayload,
+                }),
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('근무자 평판 생성 오류:', error);
+        throw new Error(
+            '근무자 평판 생성 중 오류가 발생했습니다.'
+        );
+    }
+};

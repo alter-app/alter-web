@@ -235,9 +235,12 @@ const WorkplaceDetailPage = () => {
                     const formattedManagers =
                         managersArray.map((manager) => ({
                             id: manager.id,
-                            name:
-                                manager.user?.name ||
-                                '알 수 없는 점주/매니저',
+                            user: {
+                                id: manager.user?.id,
+                                name:
+                                    manager.user?.name ||
+                                    '알 수 없는 점주/매니저',
+                            },
                             position: {
                                 description:
                                     manager.position
@@ -260,9 +263,12 @@ const WorkplaceDetailPage = () => {
                     const formattedWorkers =
                         workersArray.map((worker) => ({
                             id: worker.id,
-                            name:
-                                worker.user?.name ||
-                                '알 수 없는 알바생',
+                            user: {
+                                id: worker.user?.id,
+                                name:
+                                    worker.user?.name ||
+                                    '알 수 없는 알바생',
+                            },
                             position: {
                                 description:
                                     worker.position

@@ -13,7 +13,7 @@ const EmployeeCard = ({ employee, workplaceId }) => {
 
     const handleMenuClick = (e) => {
         e.stopPropagation();
-        console.log('메뉴 클릭:', employee.name);
+        console.log('메뉴 클릭:', employee.user.name);
         setIsMenuOpen(!isMenuOpen);
     };
 
@@ -24,8 +24,8 @@ const EmployeeCard = ({ employee, workplaceId }) => {
     const handleRequestReputation = () => {
         navigate('/reputation-write', {
             state: {
-                employeeId: employee.id,
-                employeeName: employee.name,
+                employeeId: employee.user.id,
+                employeeName: employee.user.name,
                 workplaceId: workplaceId,
                 type: 'worker',
             },
@@ -42,12 +42,15 @@ const EmployeeCard = ({ employee, workplaceId }) => {
             case 'changeWork':
                 console.log(
                     '근무 바꾸기 클릭:',
-                    employee.name
+                    employee.user.name
                 );
                 // TODO: 근무 바꾸기 기능 구현
                 break;
             case 'report':
-                console.log('신고 클릭:', employee.name);
+                console.log(
+                    '신고 클릭:',
+                    employee.user.name
+                );
                 // TODO: 신고 기능 구현
                 break;
             default:
@@ -90,7 +93,9 @@ const EmployeeCard = ({ employee, workplaceId }) => {
                     </Avatar>
                     <EmployeeInfo>
                         <NameRow>
-                            <Name>{employee.name}</Name>
+                            <Name>
+                                {employee.user.name}
+                            </Name>
                             <PositionTag>
                                 {employee.position
                                     ?.description || '직원'}
@@ -189,7 +194,7 @@ const EmployeeCard = ({ employee, workplaceId }) => {
                 onClose={handleCloseModal}
                 onConfirm={handleRequestReputation}
                 title='평판 요청'
-                message={`${employee.name}님에 대한 평판을 작성하시겠습니까?`}
+                message={`${employee.user.name}님에 대한 평판을 작성하시겠습니까?`}
                 confirmText='평판 작성하기'
                 cancelText='취소'
                 confirmColor='#2de283'
