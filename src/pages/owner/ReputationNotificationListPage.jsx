@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PageHeader from '../../components/shared/PageHeader';
 import ReputationNotificationItem from '../../components/owner/reputation/ReputationNotificationItem';
+import ReputationNotificationStatusFilter from '../../components/owner/reputation/ReputationNotificationStatusFilter';
 import { getManagerReputationRequests } from '../../services/managerPage';
 import { timeAgo } from '../../utils/timeUtil';
 import Loader from '../../components/Loader';
@@ -15,6 +16,8 @@ const ReputationNotificationListPage = () => {
     const [hasMore, setHasMore] = useState(true);
     const [cursorInfo, setCursorInfo] = useState('');
     const [totalCount, setTotalCount] = useState(0);
+    const [selectedStatuses, setSelectedStatuses] =
+        useState([]);
 
     // 초기 데이터 로드
     useEffect(() => {
@@ -26,6 +29,7 @@ const ReputationNotificationListPage = () => {
                     await getManagerReputationRequests({
                         cursorInfo: '',
                         pageSize: 10,
+                        status: selectedStatuses,
                     });
 
                 const requestsData = result.data || [];
@@ -54,7 +58,7 @@ const ReputationNotificationListPage = () => {
         };
 
         fetchInitialRequests();
-    }, []);
+    }, [selectedStatuses]);
 
     // 더 많은 데이터 로드
     const fetchMoreRequests = useCallback(async () => {
@@ -65,6 +69,7 @@ const ReputationNotificationListPage = () => {
                 await getManagerReputationRequests({
                     cursorInfo,
                     pageSize: 10,
+                    status: selectedStatuses,
                 });
 
             const newRequests = result.data || [];
@@ -88,7 +93,7 @@ const ReputationNotificationListPage = () => {
             );
             setHasMore(false);
         }
-    }, [hasMore, cursorInfo]);
+    }, [hasMore, cursorInfo, selectedStatuses]);
 
     const handleAccept = (request) => {
         try {
@@ -137,6 +142,20 @@ const ReputationNotificationListPage = () => {
         <PageContainer>
             <PageHeader title='평판 알림' />
             <ContentContainer>
+                <FilterWrapper>
+                    <TotalCountText>
+                        총{' '}
+                        <TotalCount>
+                            {totalCount}
+                        </TotalCount>
+                        건
+                    </TotalCountText>
+                    <ReputationNotificationStatusFilter
+                        selectedStatuses={selectedStatuses}
+                        onStatusChange={setSelectedStatuses}
+                    />
+                </FilterWrapper>
+
                 {requests.length > 0 ? (
                     <InfiniteScroll
                         dataLength={requests.length}
@@ -169,6 +188,9 @@ const ReputationNotificationListPage = () => {
                                         timeAgo={timeAgo(
                                             request.createdAt
                                         )}
+                                        status={
+                                            request.status
+                                        }
                                         onAccept={() =>
                                             handleAccept(
                                                 request
@@ -236,6 +258,32 @@ const PageContainer = styled.div`
 const ContentContainer = styled.div`
     padding: 12px;
     padding-top: 20px;
+`;
+
+const FilterWrapper = styled.div`
+    margin-bottom: 16px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f0f0f0;
+`;
+
+const TotalCountText = styled.div`
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 14px;
+    color: #666666;
+    margin-bottom: 12px;
+
+    @media (max-width: 480px) {
+        font-size: 13px;
+    }
+`;
+
+const TotalCount = styled.span`
+    font-weight: 600;
+    color: #333333;
 `;
 
 const SectionCard = styled.div`

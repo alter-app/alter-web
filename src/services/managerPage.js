@@ -176,11 +176,18 @@ export const cancelReputationRequest = async (
 export const getManagerReputationRequests = async ({
     cursorInfo,
     pageSize = 10,
+    status = [],
 }) => {
     const accessToken = useAuthStore.getState().accessToken;
     try {
+        // status 배열을 쿼리 파라미터로 변환
+        const statusParam =
+            status.length > 0
+                ? `&status=${status.join(',')}`
+                : '';
+
         const response = await fetch(
-            `${backend}/manager/reputations/requests?cursor=${cursorInfo}&pageSize=${pageSize}`,
+            `${backend}/manager/reputations/requests?cursor=${cursorInfo}&pageSize=${pageSize}${statusParam}`,
             {
                 method: 'GET',
                 headers: {

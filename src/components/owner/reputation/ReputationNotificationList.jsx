@@ -61,6 +61,7 @@ const ReputationNotificationList = () => {
                                 timeAgo={timeAgo(
                                     item.createdAt
                                 )}
+                                status={item.status}
                             />
                         ))}
                 </CardList>

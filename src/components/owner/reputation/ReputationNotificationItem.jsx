@@ -11,11 +11,55 @@ const ReputationNotificationItem = ({
     workspaceName,
     targetName,
     timeAgo: timeAgoText,
+    status,
     onAccept,
     onReject,
 }) => {
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
+
+    // 상태별 색상 및 스타일 설정
+    const getStatusConfig = () => {
+        if (!status) return null;
+
+        switch (status.value) {
+            case 'REQUESTED':
+                return {
+                    color: '#2de283',
+                    bgColor: '#f0fdf4',
+                    label: '요청됨',
+                };
+            case 'COMPLETED':
+                return {
+                    color: '#3b82f6',
+                    bgColor: '#eff6ff',
+                    label: '완료됨',
+                };
+            case 'DECLINED':
+                return {
+                    color: '#ef4444',
+                    bgColor: '#fef2f2',
+                    label: '거절됨',
+                };
+            case 'EXPIRED':
+                return {
+                    color: '#6b7280',
+                    bgColor: '#f9fafb',
+                    label: '만료됨',
+                };
+            case 'CANCELED':
+                return {
+                    color: '#6b7280',
+                    bgColor: '#f9fafb',
+                    label: '취소됨',
+                };
+            default:
+                return null;
+        }
+    };
+
+    const statusConfig = getStatusConfig();
+    const isRequested = status?.value === 'REQUESTED';
 
     const handleAccept = () => {
         if (onAccept) {
@@ -60,19 +104,33 @@ const ReputationNotificationItem = ({
                     <TimeAgo>{timeAgoText}</TimeAgo>
                 </TopSection>
                 <InfoGroup>
-                    <img src={Profile} alt='이름' />
-                    <Name>{targetName}</Name>
+                    <NameGroup>
+                        <img src={Profile} alt='이름' />
+                        <Name>{targetName}</Name>
+                    </NameGroup>
+                    {statusConfig && (
+                        <StatusBadge
+                            $color={statusConfig.color}
+                            $bgColor={statusConfig.bgColor}
+                        >
+                            {statusConfig.label}
+                        </StatusBadge>
+                    )}
                 </InfoGroup>
-                <ButtonSection>
-                    <AcceptButton onClick={handleAccept}>
-                        수락
-                    </AcceptButton>
-                    <RejectButton
-                        onClick={handleDeclineClick}
-                    >
-                        거절
-                    </RejectButton>
-                </ButtonSection>
+                {isRequested && (
+                    <ButtonSection>
+                        <AcceptButton
+                            onClick={handleAccept}
+                        >
+                            수락
+                        </AcceptButton>
+                        <RejectButton
+                            onClick={handleDeclineClick}
+                        >
+                            거절
+                        </RejectButton>
+                    </ButtonSection>
+                )}
             </ReputationContainer>
 
             <ConfirmModal
@@ -137,6 +195,13 @@ const TimeAgo = styled.span`
 const InfoGroup = styled.div`
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+`;
+
+const NameGroup = styled.div`
+    display: flex;
+    align-items: center;
     gap: 8px;
 `;
 
@@ -145,6 +210,21 @@ const Name = styled.span`
     font-family: 'Pretendard';
     font-weight: 500;
     font-size: 14px;
+`;
+
+const StatusBadge = styled.div`
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-family: 'Pretendard';
+    font-weight: 600;
+    font-size: 13px;
+    color: ${(props) => props.$color};
+    background: ${(props) => props.$bgColor};
+    border: 1px solid ${(props) => props.$color};
+    width: fit-content;
 `;
 
 const ButtonSection = styled.div`
