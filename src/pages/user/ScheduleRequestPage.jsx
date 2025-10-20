@@ -1,11 +1,22 @@
 import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import PageHeader from '../../components/shared/PageHeader';
 import AvailableScheduleList from '../../components/user/scheduleRequest/AvailableScheduleList';
-import SelectedScheduleSection from '../../components/user/scheduleRequest/SelectedScheduleSection';
 import RequestReasonSection from '../../components/user/scheduleRequest/RequestReasonSection';
+import RequestTargetSection from '../../components/user/scheduleRequest/RequestTargetSection';
+import { createSubstituteRequest } from '../../services/scheduleRequest';
 
 const ScheduleRequestPage = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const targetWorker = location.state?.targetWorker || {
+        id: null,
+        name: '알바생',
+        workplaceId: null,
+        workplaceName: '업장',
+    };
+
     const [selectedSchedule, setSelectedSchedule] =
         useState(null);
     const [requestReason, setRequestReason] = useState('');
@@ -15,6 +26,7 @@ const ScheduleRequestPage = () => {
     const [currentMonth, setCurrentMonth] = useState(
         new Date().getMonth() + 1
     );
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleScheduleSelect = (schedule) => {
         setSelectedSchedule(schedule);
@@ -46,7 +58,7 @@ const ScheduleRequestPage = () => {
         setCurrentYear(nextYear);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!selectedSchedule) {
             alert('스케줄을 선택해주세요.');
             return;
@@ -57,13 +69,31 @@ const ScheduleRequestPage = () => {
             return;
         }
 
-        // TODO: API 호출
-        console.log('대타 요청 제출:', {
-            schedule: selectedSchedule,
-            reason: requestReason,
-        });
+        try {
+            setIsSubmitting(true);
 
-        alert('대타 요청이 완료되었습니다.');
+            const requestData = {
+                requestType: 'SPECIFIC',
+                targetId: targetWorker.id,
+                requestReason: requestReason.trim(),
+            };
+
+            await createSubstituteRequest(
+                selectedSchedule.id,
+                requestData
+            );
+
+            alert('대타 요청이 완료되었습니다.');
+            navigate(-1); // 이전 페이지로 이동
+        } catch (error) {
+            console.error('대타 요청 실패:', error);
+            alert(
+                error.response?.data?.message ||
+                    '대타 요청 중 오류가 발생했습니다.'
+            );
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -73,6 +103,9 @@ const ScheduleRequestPage = () => {
                 showBackButton={true}
             />
             <ContentWrapper>
+                <RequestTargetSection
+                    targetWorker={targetWorker}
+                />
                 <AvailableScheduleList
                     onScheduleSelect={handleScheduleSelect}
                     selectedSchedule={selectedSchedule}
@@ -80,9 +113,6 @@ const ScheduleRequestPage = () => {
                     currentMonth={currentMonth}
                     onPreviousMonth={handlePreviousMonth}
                     onNextMonth={handleNextMonth}
-                />
-                <SelectedScheduleSection
-                    selectedSchedule={selectedSchedule}
                 />
                 <RequestReasonSection
                     reason={requestReason}
@@ -92,10 +122,13 @@ const ScheduleRequestPage = () => {
                     onClick={handleSubmit}
                     $disabled={
                         !selectedSchedule ||
-                        !requestReason.trim()
+                        !requestReason.trim() ||
+                        isSubmitting
                     }
                 >
-                    요청하기
+                    {isSubmitting
+                        ? '요청 중...'
+                        : '요청하기'}
                 </SubmitButton>
             </ContentWrapper>
         </PageContainer>

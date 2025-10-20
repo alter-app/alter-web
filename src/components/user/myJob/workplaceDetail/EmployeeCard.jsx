@@ -33,6 +33,21 @@ const EmployeeCard = ({ employee, workplaceId }) => {
         setIsModalOpen(false);
     };
 
+    const handleRequestScheduleChange = () => {
+        navigate('/schedule-request', {
+            state: {
+                targetWorker: {
+                    id: employee.user.id,
+                    name: employee.user.name,
+                    workplaceId: workplaceId,
+                    workplaceName:
+                        employee.workplaceName || '업장',
+                },
+            },
+        });
+        setIsMenuOpen(false);
+    };
+
     const handleMenuOptionClick = (option) => {
         setIsMenuOpen(false);
         switch (option) {
@@ -40,11 +55,7 @@ const EmployeeCard = ({ employee, workplaceId }) => {
                 setIsModalOpen(true);
                 break;
             case 'changeWork':
-                console.log(
-                    '근무 바꾸기 클릭:',
-                    employee.user.name
-                );
-                // TODO: 근무 바꾸기 기능 구현
+                handleRequestScheduleChange();
                 break;
             case 'report':
                 console.log(
@@ -166,7 +177,7 @@ const EmployeeCard = ({ employee, workplaceId }) => {
                                         🔄
                                     </MenuItemIcon>
                                     <MenuItemText>
-                                        근무 바꾸기
+                                        대타 요청
                                     </MenuItemText>
                                 </MenuItem>
                                 <MenuItem

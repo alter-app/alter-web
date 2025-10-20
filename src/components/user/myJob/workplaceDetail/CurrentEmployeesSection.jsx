@@ -6,6 +6,7 @@ const CurrentEmployeesSection = ({
     managers,
     workers,
     workplaceId,
+    workplaceName,
 }) => {
     console.log('CurrentEmployeesSection 렌더링:', {
         managersCount: managers?.length || 0,
@@ -23,6 +24,7 @@ const CurrentEmployeesSection = ({
             <WorkersSection
                 workers={workers || []}
                 workplaceId={workplaceId}
+                workplaceName={workplaceName}
             />
         </Container>
     );
