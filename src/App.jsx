@@ -26,6 +26,7 @@ import ReputationListPage from './pages/user/ReputationListPage';
 import SentReputationListPage from './pages/user/SentReputationListPage';
 import ScheduleListPage from './pages/user/ScheduleListPage';
 import ApplicationListPage from './pages/user/ApplicationListPage';
+import ScheduleRequestPage from './pages/user/ScheduleRequestPage';
 
 function App() {
     return (
@@ -97,6 +98,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <ScheduleListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/schedule-request'
+                        element={
+                            <ProtectedRoute>
+                                <ScheduleRequestPage />
                             </ProtectedRoute>
                         }
                     />
