@@ -2,14 +2,16 @@ import styled from 'styled-components';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PageHeader from '../../../shared/PageHeader';
-import BottomNavigation from '../../../../layouts/BottomNavigation';
+import OwnerBottomNavigation from '../../../../layouts/OwnerBottomNavigation';
 import CurrentEmployeesSection from './CurrentEmployeesSection';
 import ScheduleCalendarSection from './ScheduleCalendarSection';
+import WorkplaceInfoSection from './WorkplaceInfoSection';
 import {
     getWorkplaceManagers,
     getWorkplaceWorkers,
     getWorkplaceSchedule,
-} from '../../../../services/myJob';
+    getWorkplaceDetailInfo,
+} from '../../../../services/workplaceService';
 
 // 스케줄 데이터 변환 함수
 const convertScheduleData = (
@@ -127,6 +129,8 @@ const WorkplaceDetailPage = () => {
     const [workers, setWorkers] = useState([]);
     const [scheduleData, setScheduleData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [workplaceInfo, setWorkplaceInfo] =
+        useState(null);
 
     // 월단위 전환을 위한 상태
     const [currentYear, setCurrentYear] = useState(
@@ -141,7 +145,36 @@ const WorkplaceDetailPage = () => {
             try {
                 setIsLoading(true);
 
-                // 업장 정보는 URL 파라미터에서 이미 설정됨
+                // 업장 상세 정보 조회
+                try {
+                    console.log(
+                        '업장 상세 정보 조회 시작, workplaceId:',
+                        workplaceId
+                    );
+                    const workplaceDetailData =
+                        await getWorkplaceDetailInfo(
+                            parseInt(workplaceId)
+                        );
+                    console.log(
+                        '업장 상세 정보 API 응답:',
+                        workplaceDetailData
+                    );
+
+                    if (
+                        workplaceDetailData &&
+                        workplaceDetailData.data
+                    ) {
+                        setWorkplaceInfo(
+                            workplaceDetailData.data
+                        );
+                    }
+                } catch (error) {
+                    console.error(
+                        '업장 상세 정보 조회 오류:',
+                        error
+                    );
+                    setWorkplaceInfo(null);
+                }
 
                 // 현재 근무 중인 직원 목록 조회
                 try {
@@ -203,9 +236,9 @@ const WorkplaceDetailPage = () => {
                         managersArray.map((manager) => ({
                             id: manager.id,
                             user: {
-                                id: manager.manager?.id,
+                                id: manager.user?.id,
                                 name:
-                                    manager.manager?.name ||
+                                    manager.user?.name ||
                                     '알 수 없는 점주/매니저',
                             },
                             position: {
@@ -217,8 +250,8 @@ const WorkplaceDetailPage = () => {
                                     manager.position
                                         ?.emoji || '👑',
                             },
-                            avatar: manager.manager?.name
-                                ? manager.manager.name.charAt(
+                            avatar: manager.user?.name
+                                ? manager.user.name.charAt(
                                       0
                                   )
                                 : '?',
@@ -409,7 +442,7 @@ const WorkplaceDetailPage = () => {
                         데이터를 불러오는 중...
                     </LoadingMessage>
                 </Container>
-                <BottomNavigation />
+                <OwnerBottomNavigation />
             </>
         );
     }
@@ -422,6 +455,9 @@ const WorkplaceDetailPage = () => {
                 onBackClick={handleBackClick}
             />
             <Container>
+                <WorkplaceInfoSection
+                    workplaceInfo={workplaceInfo}
+                />
                 <CurrentEmployeesSection
                     managers={managers}
                     workers={workers}
@@ -435,7 +471,7 @@ const WorkplaceDetailPage = () => {
                     onNextMonth={handleNextMonth}
                 />
             </Container>
-            <BottomNavigation />
+            <OwnerBottomNavigation />
         </>
     );
 };

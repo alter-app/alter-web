@@ -2,102 +2,109 @@ import { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PageHeader from '../../components/shared/PageHeader';
-import ApplicantCard from '../../components/owner/applicant/ApplicantCard';
-import StatusFilter from '../../components/owner/applicant/StatusFilter';
-import { getPostingsApplications } from '../../services/managerPage';
-import { getWorkplaceList } from '../../services/mainPageService';
+import SentReputationCard from '../../components/user/myJob/SentReputationCard';
+import SentReputationStatusFilter from '../../components/user/myJob/SentReputationStatusFilter';
+import {
+    getSentReputationRequests,
+    cancelReputationRequest,
+} from '../../services/managerPage';
 import Loader from '../../components/Loader';
+import { timeAgo } from '../../utils/timeUtil';
 
-const ApplicantListPage = () => {
-    const [applications, setApplications] = useState([]);
+const SentReputationListPage = () => {
+    const [requests, setRequests] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
     const [cursorInfo, setCursorInfo] = useState('');
-    const [selectedStatus, setSelectedStatus] = useState('');
-    const [selectedWorkplace, setSelectedWorkplace] = useState('');
-    const [workplaceList, setWorkplaceList] = useState([]);
+    const [selectedStatuses, setSelectedStatuses] = useState([]);
     const [totalCount, setTotalCount] = useState(0);
-
-    // 업장 목록 조회
-    useEffect(() => {
-        const fetchWorkplaceList = async () => {
-            try {
-                const result = await getWorkplaceList();
-                setWorkplaceList([
-                    { id: '', businessName: '전체 업장' },
-                    ...result.data,
-                ]);
-            } catch (error) {
-                console.error('업장 목록 조회 오류:', error);
-            }
-        };
-        fetchWorkplaceList();
-    }, []);
 
     // 초기 데이터 로드
     useEffect(() => {
-        const fetchInitialApplications = async () => {
+        const fetchInitialRequests = async () => {
             try {
                 setIsLoading(true);
 
-                const result = await getPostingsApplications({
+                const result = await getSentReputationRequests({
                     cursorInfo: '',
-                    checkedWorkplaceId: selectedWorkplace,
-                    checkedStatusId: selectedStatus,
+                    status: selectedStatuses,
                 });
 
-                const applicationsData = result.data || [];
+                const requestsData = result.data || [];
                 const newCursorInfo = result.page?.cursor || '';
 
-                setApplications(applicationsData);
+                setRequests(requestsData);
                 setCursorInfo(newCursorInfo);
                 setTotalCount(result.page?.totalCount || 0);
 
                 // 데이터가 10개 미만이거나 cursorInfo가 없으면 더 이상 데이터가 없음
-                setHasMore(
-                    applicationsData.length >= 10 && newCursorInfo !== ''
-                );
+                setHasMore(requestsData.length >= 10 && newCursorInfo !== '');
             } catch (error) {
-                console.error('지원 목록 조회 실패:', error);
-                setApplications([]);
+                console.error('보낸 평판 요청 목록 조회 실패:', error);
+                setRequests([]);
                 setHasMore(false);
             } finally {
                 setIsLoading(false);
             }
         };
 
-        fetchInitialApplications();
-    }, [selectedStatus, selectedWorkplace]);
+        fetchInitialRequests();
+    }, [selectedStatuses]);
 
     // 더 많은 데이터 로드
-    const fetchMoreApplications = useCallback(async () => {
+    const fetchMoreRequests = useCallback(async () => {
         if (!hasMore || !cursorInfo) return;
 
         try {
-            const result = await getPostingsApplications({
+            const result = await getSentReputationRequests({
                 cursorInfo,
-                checkedWorkplaceId: selectedWorkplace,
-                checkedStatusId: selectedStatus,
+                status: selectedStatuses,
             });
 
-            const newApplications = result.data || [];
+            const newRequests = result.data || [];
             const newCursorInfo = result.page?.cursor || '';
 
-            setApplications((prev) => [...prev, ...newApplications]);
+            setRequests((prev) => [...prev, ...newRequests]);
             setCursorInfo(newCursorInfo);
 
             // 데이터가 10개 미만이거나 cursorInfo가 없으면 더 이상 데이터가 없음
-            setHasMore(newApplications.length >= 10 && newCursorInfo !== '');
+            setHasMore(newRequests.length >= 10 && newCursorInfo !== '');
         } catch (error) {
-            console.error('추가 지원 목록 조회 실패:', error);
+            console.error('추가 평판 요청 목록 조회 실패:', error);
             setHasMore(false);
         }
-    }, [hasMore, cursorInfo, selectedStatus, selectedWorkplace]);
+    }, [hasMore, cursorInfo, selectedStatuses]);
+
+    const handleCancelRequest = async (request) => {
+        try {
+            console.log('보낸 평판 취소:', request);
+            await cancelReputationRequest(request.id);
+
+            // 최신 데이터 다시 가져오기
+            const result = await getSentReputationRequests({
+                cursorInfo: '',
+                status: selectedStatuses,
+            });
+
+            const requestsData = result.data || [];
+            const newCursorInfo = result.page?.cursor || '';
+
+            setRequests(requestsData);
+            setCursorInfo(newCursorInfo);
+            setTotalCount(result.page?.totalCount || 0);
+
+            // 데이터가 10개 미만이거나 cursorInfo가 없으면 더 이상 데이터가 없음
+            setHasMore(requestsData.length >= 10 && newCursorInfo !== '');
+        } catch (error) {
+            console.error('보낸 평판 취소 오류:', error);
+            alert('평판 취소 중 오류가 발생했습니다.');
+        }
+    };
 
     if (isLoading) {
         return (
             <PageContainer>
-                <PageHeader title='지원자 목록' />
+                <PageHeader title='보낸 평판 요청' />
                 <LoadingContainer>
                     <Loader />
                 </LoadingContainer>
@@ -107,20 +114,22 @@ const ApplicantListPage = () => {
 
     return (
         <PageContainer>
-            <PageHeader title='지원자 목록' />
+            <PageHeader title='보낸 평판 요청' />
             <ContentContainer>
-                <StatusFilter
-                    selectedStatus={selectedStatus}
-                    onStatusChange={setSelectedStatus}
-                    selectedWorkplace={selectedWorkplace}
-                    onWorkplaceChange={setSelectedWorkplace}
-                    workplaceList={workplaceList}
-                    totalCount={totalCount}
-                />
-                {applications.length > 0 ? (
+                <FilterWrapper>
+                    <TotalCountText>
+                        총 <TotalCount>{totalCount}</TotalCount>건
+                    </TotalCountText>
+                    <SentReputationStatusFilter
+                        selectedStatuses={selectedStatuses}
+                        onStatusChange={setSelectedStatuses}
+                    />
+                </FilterWrapper>
+
+                {requests.length > 0 ? (
                     <InfiniteScroll
-                        dataLength={applications.length}
-                        next={fetchMoreApplications}
+                        dataLength={requests.length}
+                        next={fetchMoreRequests}
                         hasMore={hasMore}
                         loader={
                             <LoadingContainer>
@@ -129,14 +138,28 @@ const ApplicantListPage = () => {
                         }
                     >
                         <SectionCard>
-                            <ApplicationList>
-                                {applications.map((application) => (
-                                    <ApplicantCard
-                                        key={application.id}
-                                        application={application}
+                            <RequestList>
+                                {requests.map((request) => (
+                                    <SentReputationCard
+                                        key={request.id}
+                                        targetName={
+                                            request.target?.name || '알 수 없음'
+                                        }
+                                        workplaceName={
+                                            request.requester?.name ||
+                                            '업장 정보 없음'
+                                        }
+                                        timeAgo={timeAgo(request.createdAt)}
+                                        status={request.status.value}
+                                        statusDescription={
+                                            request.status.description
+                                        }
+                                        onCancel={() =>
+                                            handleCancelRequest(request)
+                                        }
                                     />
                                 ))}
-                            </ApplicationList>
+                            </RequestList>
                         </SectionCard>
                     </InfiniteScroll>
                 ) : (
@@ -184,11 +207,11 @@ const ApplicantListPage = () => {
                                 />
                             </svg>
                         </EmptyIcon>
-                        <EmptyTitle>지원자가 없습니다</EmptyTitle>
+                        <EmptyTitle>보낸 평판 요청이 없습니다</EmptyTitle>
                         <EmptyDescription>
-                            아직 지원자가 없습니다.
+                            아직 보낸 평판 요청이 없습니다.
                             <br />
-                            공고를 등록하고 지원자를 기다려보세요.
+                            평판을 요청하고 응답을 기다려보세요.
                         </EmptyDescription>
                     </EmptyContainer>
                 )}
@@ -197,7 +220,7 @@ const ApplicantListPage = () => {
     );
 };
 
-export default ApplicantListPage;
+export default SentReputationListPage;
 
 const PageContainer = styled.div`
     min-height: 100vh;
@@ -210,13 +233,39 @@ const ContentContainer = styled.div`
     padding-top: 20px;
 `;
 
+const FilterWrapper = styled.div`
+    margin-bottom: 16px;
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f0f0f0;
+`;
+
+const TotalCountText = styled.div`
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 14px;
+    color: #666666;
+    margin-bottom: 12px;
+
+    @media (max-width: 480px) {
+        font-size: 13px;
+    }
+`;
+
+const TotalCount = styled.span`
+    font-weight: 600;
+    color: #333333;
+`;
+
 const SectionCard = styled.div`
     background: transparent;
     border-radius: 16px;
     padding: 0;
 `;
 
-const ApplicationList = styled.div`
+const RequestList = styled.div`
     display: flex;
     flex-direction: column;
     gap: 12px;

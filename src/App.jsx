@@ -14,10 +14,13 @@ import JobPosting from './pages/owner/JobPosting';
 import MyPage from './pages/user/MyPage';
 import MyJob from './pages/user/MyJob';
 import ApplicantListPage from './pages/owner/ApplicantListPage';
+import SentReputationListPageOwner from './pages/owner/SentReputationListPage';
+import ReputationNotificationListPage from './pages/owner/ReputationNotificationListPage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Main from './pages/owner/Main';
 import WorkplaceDetail from './components/owner/workplace/WorkplaceDetail';
 import WorkplaceDetailPage from './components/user/myJob/workplaceDetail/WorkplaceDetailPage';
+import OwnerWorkplaceDetailPage from './components/owner/workplace/workplaceDetail/WorkplaceDetailPage';
 import ReputationWrite from './pages/ReputationWrite';
 import ReputationListPage from './pages/user/ReputationListPage';
 import SentReputationListPage from './pages/user/SentReputationListPage';
@@ -29,15 +32,6 @@ function App() {
         <>
             <Routes>
                 <Route element={<FooterLayout />}>
-                    <Route
-                        path='/applicant'
-                        element={
-                            <ProtectedRoute requiredScope='MANAGER'>
-                                <ApplicantListPage />
-                            </ProtectedRoute>
-                        }
-                    />
-
                     <Route
                         path='*'
                         element={<NotFound />}
@@ -147,6 +141,14 @@ function App() {
                         }
                     />
                     <Route
+                        path='/owner/workplace/:workplaceId/:workplaceName'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <OwnerWorkplaceDetailPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
                         path='/my-job/workplace/:workplaceId/:workplaceName'
                         element={
                             <ProtectedRoute>
@@ -161,6 +163,30 @@ function App() {
                     <Route
                         path='/auth/apple/callback'
                         element={<AppleCallback />}
+                    />
+                    <Route
+                        path='/applicant'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <ApplicantListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/owner/sent-reputation'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <SentReputationListPageOwner />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/owner/reputation-notification'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <ReputationNotificationListPage />
+                            </ProtectedRoute>
+                        }
                     />
                 </Route>
             </Routes>

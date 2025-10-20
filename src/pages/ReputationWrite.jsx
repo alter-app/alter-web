@@ -8,6 +8,7 @@ import {
     createWorkerReputation,
     userSubmitReputation,
 } from '../services/myJob';
+import { createWorkerReputationByManager } from '../services/managerPage';
 import useAuthStore from '../store/authStore';
 import KeywordList from '../components/owner/reputation/KeywordList';
 import EpisodeInputCard from '../components/owner/reputation/EpisodeInputCard';
@@ -108,12 +109,28 @@ const ReputationWrite = () => {
         }
 
         try {
-            // 근무자 평판인 경우 새로운 API 사용
+            // 근무자 평판인 경우
             if (location.state?.type === 'worker') {
-                await createWorkerReputation(
-                    location.state.workplaceId,
-                    keywordsPayload
-                );
+                const { scope } = useAuthStore.getState();
+
+                // 매니저가 근무자에게 평판을 생성하는 경우
+                if (scope === 'MANAGER') {
+                    await createWorkerReputationByManager({
+                        workspaceId: parseInt(
+                            location.state.workplaceId
+                        ),
+                        targetUserId: parseInt(
+                            location.state.employeeId
+                        ),
+                        keywordsPayload: keywordsPayload,
+                    });
+                } else {
+                    // 사용자(APP)가 업장에 평판을 생성하는 경우
+                    await createWorkerReputation(
+                        location.state.workplaceId,
+                        keywordsPayload
+                    );
+                }
             } else {
                 // scope에 따라 적절한 API 사용
                 const { scope } = useAuthStore.getState();

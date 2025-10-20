@@ -32,19 +32,24 @@ export const getWorkplaceList = async () => {
 };
 
 // 지원자 목록 조회 로직
-export const getApplicants = async () => {
+export const getApplicants = async (
+    pageSize = 5,
+    status = null
+) => {
     const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/manager/postings/applications?pageSize=5`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
+        let url = `${backend}/manager/postings/applications?pageSize=${pageSize}`;
+        if (status) {
+            url += `&status=${status}`;
+        }
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
 
         if (!response.ok) {
             throw new Error('서버 응답 오류');
@@ -61,11 +66,13 @@ export const getApplicants = async () => {
 };
 
 // 평판 요청 목록 조회 로직
-export const getReputationRequestList = async () => {
+export const getReputationRequestList = async (
+    pageSize = 5
+) => {
     const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
-            `${backend}/manager/reputations/requests?pageSize=5`,
+            `${backend}/manager/reputations/requests?pageSize=${pageSize}`,
             {
                 method: 'GET',
                 headers: {

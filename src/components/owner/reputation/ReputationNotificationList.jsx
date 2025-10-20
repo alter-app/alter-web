@@ -1,31 +1,14 @@
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import ReputationNotificationItem from './ReputationNotificationItem';
-import { useState, useRef, useEffect } from 'react';
-import Arrow from '../../../assets/icons/Arrow.svg';
+import { useState, useEffect } from 'react';
 import { getReputationRequestList } from '../../../services/mainPageService';
+import { timeAgo } from '../../../utils/timeUtil';
 
 const ReputationNotificationList = () => {
+    const navigate = useNavigate();
     const [reputationRequest, setReputationRequest] =
         useState([]);
-    const scrollRef = useRef();
-
-    // 버튼 클릭시 스크롤 이동
-    const slideLeft = () => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollBy({
-                left: -400,
-                behavior: 'smooth',
-            });
-        }
-    };
-    const slideRight = () => {
-        if (scrollRef.current) {
-            scrollRef.current.scrollBy({
-                left: 400,
-                behavior: 'smooth',
-            });
-        }
-    };
 
     useEffect(() => {
         fetchData();
@@ -33,7 +16,9 @@ const ReputationNotificationList = () => {
 
     const fetchData = async () => {
         try {
-            const result = await getReputationRequestList();
+            const result = await getReputationRequestList(
+                3
+            );
             setReputationRequest(result.data);
             console.log(result.data);
         } catch (error) {
@@ -44,147 +29,99 @@ const ReputationNotificationList = () => {
         }
     };
 
+    const handleViewAll = () => {
+        navigate('/owner/reputation-notification');
+    };
+
     return (
-        <>
-            <Column>
-                <TopBetween>
-                    <TopLeftRow>
-                        <ReputationTitle>
-                            평판 알림
-                        </ReputationTitle>
-                        <ViewAllButton>
-                            전체보기
-                        </ViewAllButton>
-                    </TopLeftRow>
-                    <TopRightRow>
-                        <ArrowLeftIcon
-                            src={Arrow}
-                            alt='왼쪽 버튼'
-                            onClick={slideLeft}
-                        />
-                        <ArrowRightIcon
-                            src={Arrow}
-                            alt='오른쪽 버튼'
-                            onClick={slideRight}
-                        />
-                    </TopRightRow>
-                </TopBetween>
-                <ContentRow>
-                    <AccentBar />
-                    {reputationRequest.length > 0 ? (
-                        <ScrollableRow ref={scrollRef}>
-                            {reputationRequest.map(
-                                (item) => (
-                                    <ReputationNotificationItem
-                                        key={item.id}
-                                        {...item}
-                                    />
-                                )
-                            )}
-                        </ScrollableRow>
-                    ) : (
-                        <EmptyNotification>
-                            알림이 없습니다.
-                        </EmptyNotification>
-                    )}
-                </ContentRow>
-            </Column>
-        </>
+        <SectionContainer>
+            <SectionHeader>
+                <SectionTitle>평판 알림</SectionTitle>
+                <ViewAllButton onClick={handleViewAll}>
+                    전체보기
+                </ViewAllButton>
+            </SectionHeader>
+            {reputationRequest.length > 0 ? (
+                <CardList>
+                    {reputationRequest
+                        .slice(0, 3)
+                        .map((item) => (
+                            <ReputationNotificationItem
+                                key={item.id}
+                                id={item.id}
+                                workspaceName={
+                                    item.workspace
+                                        ?.businessName ||
+                                    '업장 정보 없음'
+                                }
+                                targetName={
+                                    item.requester?.name ||
+                                    '알 수 없음'
+                                }
+                                timeAgo={timeAgo(
+                                    item.createdAt
+                                )}
+                                status={item.status}
+                            />
+                        ))}
+                </CardList>
+            ) : (
+                <EmptyMessage>
+                    알림이 없습니다.
+                </EmptyMessage>
+            )}
+        </SectionContainer>
     );
 };
 
 export default ReputationNotificationList;
 
-const ReputationTitle = styled.div`
-    color: #111111;
-    font-family: 'Pretendard';
-    font-weight: 600;
-    font-size: 32px;
-    line-height: 42px;
+const SectionContainer = styled.div`
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 `;
 
-const ViewAllButton = styled.div`
-    color: #767676;
-    font-family: 'Pretendard';
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 24px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    text-decoration: underline;
-`;
-
-const Column = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-`;
-
-const TopBetween = styled.div`
+const SectionHeader = styled.div`
     display: flex;
     justify-content: space-between;
-`;
-
-const TopLeftRow = styled.div`
-    display: flex;
-    gap: 20px;
-`;
-
-const TopRightRow = styled.div`
-    display: flex;
-    gap: 15px;
-    padding-right: 20px;
     align-items: center;
+    margin-bottom: 16px;
 `;
 
-const ContentRow = styled.div`
-    display: flex;
-    overflow-x: auto;
-    white-space: nowrap;
-    gap: 10px;
+const SectionTitle = styled.h3`
+    font-family: 'Pretendard';
+    font-weight: 600;
+    font-size: 18px;
+    color: #333333;
+    margin: 0;
 `;
 
-const AccentBar = styled.div`
-    width: 5px;
-    height: 30px;
-    background: #2de283;
-`;
-
-const ScrollableRow = styled.div`
-    display: flex;
-    gap: 20px;
-    overflow-x: auto;
-    padding-bottom: 10px;
-    width: 100%;
-    min-width: 0;
-    padding-left: 10px;
-    padding-right: 20px;
-    scroll-behavior: smooth;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    &::-webkit-scrollbar {
-        display: none;
-    }
-`;
-
-const ArrowRightIcon = styled.img`
-    width: 35px;
-    height: 35px;
+const ViewAllButton = styled.button`
+    background: none;
+    border: none;
+    color: #666666;
+    font-family: 'Pretendard';
+    font-weight: 500;
+    font-size: 14px;
     cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
 `;
 
-const ArrowLeftIcon = styled.img`
-    width: 35px;
-    height: 35px;
-    transform: scaleX(-1);
-    cursor: pointer;
+const CardList = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 `;
 
-const EmptyNotification = styled.div`
+const EmptyMessage = styled.div`
     color: #767676;
     font-family: 'Pretendard';
     font-weight: 400;
-    font-size: 20px;
-    line-height: 30px;
+    font-size: 14px;
+    text-align: center;
+    padding: 20px 0;
 `;

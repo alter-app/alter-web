@@ -1,26 +1,37 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 
-const BottomNavigation = () => {
+const OwnerBottomNavigation = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
     const isActive = (path) => {
-        if (path === '/my-applications') {
-            // 내알바 관련 모든 하위 경로들
+        if (path === '/main') {
+            // 매니저 메인 관련 모든 하위 경로들
             return (
-                location.pathname === '/my-applications' ||
-                location.pathname === '/reputation-list' ||
-                location.pathname === '/schedule-list' ||
-                location.pathname === '/application-list' ||
-                location.pathname.startsWith('/my-job/workplace/')
+                location.pathname === '/main' ||
+                location.pathname.startsWith('/main/')
             );
         }
-        if (path === '/mypage') {
+        if (path === '/owner/notifications') {
+            // 알림 관련 모든 하위 경로들
+            return (
+                location.pathname === '/owner/notifications' ||
+                location.pathname.startsWith('/owner/notifications/')
+            );
+        }
+        if (path === '/owner/chat') {
+            // 채팅 관련 모든 하위 경로들
+            return (
+                location.pathname === '/owner/chat' ||
+                location.pathname.startsWith('/owner/chat/')
+            );
+        }
+        if (path === '/owner/mypage') {
             // 마이페이지 관련 모든 하위 경로들
             return (
-                location.pathname === '/mypage' ||
-                location.pathname.startsWith('/mypage/')
+                location.pathname === '/owner/mypage' ||
+                location.pathname.startsWith('/owner/mypage/')
             );
         }
         return location.pathname === path;
@@ -29,47 +40,40 @@ const BottomNavigation = () => {
     return (
         <BottomNavContainer>
             <NavItem
-                $active={isActive('/job-lookup-map')}
-                onClick={() => navigate('/job-lookup-map')}
+                $active={isActive('/main')}
+                onClick={() => navigate('/main')}
             >
-                <HomeIcon $active={isActive('/job-lookup-map')} />
-                <NavLabel $active={isActive('/job-lookup-map')}>홈</NavLabel>
+                <HomeIcon $active={isActive('/main')} />
+                <NavLabel $active={isActive('/main')}>홈</NavLabel>
             </NavItem>
             <NavItem
-                $active={isActive('/my-applications')}
-                onClick={() => navigate('/my-applications')}
+                $active={isActive('/owner/notifications')}
+                // onClick={() => navigate('/owner/notifications')}
             >
-                <CalendarIcon $active={isActive('/my-applications')} />
-                <NavLabel $active={isActive('/my-applications')}>
-                    내알바
+                <NotificationIcon $active={isActive('/owner/notifications')} />
+                <NavLabel $active={isActive('/owner/notifications')}>
+                    알림
                 </NavLabel>
             </NavItem>
             <NavItem
-                $active={isActive('/chat')}
-                // onClick={() => navigate('/chat')}
+                $active={isActive('/owner/chat')}
+                // onClick={() => navigate('/owner/chat')}
             >
-                <ChatIcon $active={isActive('/chat')} />
-                <NavLabel $active={isActive('/chat')}>채팅</NavLabel>
+                <ChatIcon $active={isActive('/owner/chat')} />
+                <NavLabel $active={isActive('/owner/chat')}>채팅</NavLabel>
             </NavItem>
             <NavItem
-                $active={isActive('/notifications')}
-                // onClick={() => navigate('/notifications')}
+                $active={isActive('/owner/mypage')}
+                // onClick={() => navigate('/owner/mypage')}
             >
-                <NotificationIcon $active={isActive('/notifications')} />
-                <NavLabel $active={isActive('/notifications')}>알림</NavLabel>
-            </NavItem>
-            <NavItem
-                $active={isActive('/mypage')}
-                onClick={() => navigate('/mypage')}
-            >
-                <ProfileIcon $active={isActive('/mypage')} />
-                <NavLabel $active={isActive('/mypage')}>MY</NavLabel>
+                <ProfileIcon $active={isActive('/owner/mypage')} />
+                <NavLabel $active={isActive('/owner/mypage')}>MY</NavLabel>
             </NavItem>
         </BottomNavContainer>
     );
 };
 
-export default BottomNavigation;
+export default OwnerBottomNavigation;
 
 const BottomNavContainer = styled.div`
     position: fixed;
@@ -146,34 +150,6 @@ const HomeIcon = styled.div`
     margin-bottom: 4px;
     background: ${(props) => (props.$active ? '#399982' : '#666666')};
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z'/%3E%3C/svg%3E")
-        no-repeat center;
-    mask-size: contain;
-    transition: all 0.2s ease;
-
-    @media (max-width: 480px) {
-        width: 22px;
-        height: 22px;
-        margin-bottom: 3px;
-    }
-
-    @media (max-width: 360px) {
-        width: 20px;
-        height: 20px;
-        margin-bottom: 2px;
-    }
-
-    @media (max-width: 320px) {
-        width: 18px;
-        height: 18px;
-    }
-`;
-
-const CalendarIcon = styled.div`
-    width: 24px;
-    height: 24px;
-    margin-bottom: 4px;
-    background: ${(props) => (props.$active ? '#399982' : '#666666')};
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z'/%3E%3C/svg%3E")
         no-repeat center;
     mask-size: contain;
     transition: all 0.2s ease;
