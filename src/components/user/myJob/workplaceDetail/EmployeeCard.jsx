@@ -37,7 +37,7 @@ const EmployeeCard = ({ employee, workplaceId }) => {
         navigate('/schedule-request', {
             state: {
                 targetWorker: {
-                    id: employee.user.id,
+                    id: employee.id,
                     name: employee.user.name,
                     workplaceId: workplaceId,
                     workplaceName:

@@ -113,6 +113,7 @@ const ScheduleRequestPage = () => {
                     currentMonth={currentMonth}
                     onPreviousMonth={handlePreviousMonth}
                     onNextMonth={handleNextMonth}
+                    workplaceId={targetWorker.workplaceId}
                 />
                 <RequestReasonSection
                     reason={requestReason}

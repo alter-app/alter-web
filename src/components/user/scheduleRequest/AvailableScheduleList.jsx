@@ -1,5 +1,7 @@
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import ScheduleCard from './ScheduleCard';
+import { getExchangeableSchedules } from '../../../services/scheduleRequest';
 
 const AvailableScheduleList = ({
     onScheduleSelect,
@@ -8,9 +10,87 @@ const AvailableScheduleList = ({
     currentMonth,
     onPreviousMonth,
     onNextMonth,
+    workplaceId,
 }) => {
-    // TODO: API에서 데이터 가져오기
-    const availableSchedules = [
+    const [availableSchedules, setAvailableSchedules] =
+        useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    // 스케줄 데이터 변환 함수
+    const transformScheduleData = (data) => {
+        return (data || []).map((item) => {
+            const startDate = new Date(item.startDateTime);
+            const endDate = new Date(item.endDateTime);
+
+            // 근무 시간 계산 (시간 단위)
+            const workHours = Math.round(
+                (endDate - startDate) / (1000 * 60 * 60)
+            );
+
+            return {
+                id: item.shiftId,
+                dayOfWeek: startDate.toLocaleDateString(
+                    'ko-KR',
+                    {
+                        weekday: 'short',
+                    }
+                ),
+                date: startDate.getDate().toString(),
+                position:
+                    item.position || '알 수 없는 직책',
+                startTime: startDate.toLocaleTimeString(
+                    'ko-KR',
+                    {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true,
+                    }
+                ),
+                endTime: endDate.toLocaleTimeString(
+                    'ko-KR',
+                    {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: true,
+                    }
+                ),
+                duration: `${workHours}시간`,
+            };
+        });
+    };
+
+    // 스케줄 데이터 가져오기
+    useEffect(() => {
+        const fetchSchedules = async () => {
+            if (!workplaceId) {
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                setIsLoading(true);
+                const result =
+                    await getExchangeableSchedules(
+                        workplaceId,
+                        currentYear,
+                        currentMonth
+                    );
+                const formattedSchedules =
+                    transformScheduleData(result.data);
+                setAvailableSchedules(formattedSchedules);
+            } catch (error) {
+                console.error('스케줄 조회 실패:', error);
+                setAvailableSchedules([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchSchedules();
+    }, [workplaceId, currentYear, currentMonth]);
+
+    // 더미 데이터 (테스트용)
+    const dummySchedules = [
         {
             id: 1,
             dayOfWeek: '월',
@@ -244,19 +324,31 @@ const AvailableScheduleList = ({
                 </MonthNavigation>
             </SectionHeader>
             <ScheduleList>
-                {availableSchedules.map((schedule) => (
-                    <ScheduleCard
-                        key={schedule.id}
-                        schedule={schedule}
-                        isSelected={
-                            selectedSchedule?.id ===
-                            schedule.id
-                        }
-                        onSelect={() =>
-                            onScheduleSelect(schedule)
-                        }
-                    />
-                ))}
+                {isLoading ? (
+                    <LoadingMessage>
+                        스케줄을 불러오는 중...
+                    </LoadingMessage>
+                ) : availableSchedules.length > 0 ? (
+                    availableSchedules.map((schedule) => (
+                        <ScheduleCard
+                            key={schedule.id}
+                            schedule={schedule}
+                            isSelected={
+                                selectedSchedule?.id ===
+                                schedule.id
+                            }
+                            onSelect={() =>
+                                onScheduleSelect(schedule)
+                            }
+                        />
+                    ))
+                ) : (
+                    <EmptyMessage>
+                        {currentYear}년 {currentMonth}월에는
+                        <br />
+                        요청 가능한 스케줄이 없습니다.
+                    </EmptyMessage>
+                )}
             </ScheduleList>
         </Section>
     );
@@ -359,4 +451,23 @@ const ScheduleList = styled.div`
             background: #a1a1a1;
         }
     }
+`;
+
+const LoadingMessage = styled.div`
+    padding: 40px 20px;
+    text-align: center;
+    font-family: 'Pretendard';
+    font-weight: 500;
+    font-size: 14px;
+    color: #999999;
+`;
+
+const EmptyMessage = styled.div`
+    padding: 40px 20px;
+    text-align: center;
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 14px;
+    color: #999999;
+    line-height: 1.5;
 `;

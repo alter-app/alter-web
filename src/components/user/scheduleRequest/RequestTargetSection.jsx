@@ -1,7 +1,8 @@
 import styled from 'styled-components';
 
 const RequestTargetSection = ({ targetWorker }) => {
-    const { name = '알바생', workplaceName = '업장' } = targetWorker || {};
+    const { name = '알바생', workplaceName = '업장' } =
+        targetWorker || {};
 
     return (
         <Section>
@@ -9,7 +10,9 @@ const RequestTargetSection = ({ targetWorker }) => {
                 <TargetIcon>👷</TargetIcon>
                 <TargetText>
                     <TargetName>{name}님</TargetName>
-                    <TargetWorkplace>{workplaceName}</TargetWorkplace>
+                    <TargetWorkplace>
+                        {workplaceName}
+                    </TargetWorkplace>
                 </TargetText>
             </TargetInfo>
             <RequestLabel>에게 대타 요청</RequestLabel>

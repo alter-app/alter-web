@@ -16,16 +16,13 @@ const ScheduleCard = ({
                 </Date>
             </DateSection>
             <ScheduleInfo>
-                <WorkplaceName $isSelected={isSelected}>
-                    {schedule.workplaceName}
-                </WorkplaceName>
-                <TimeRange $isSelected={isSelected}>
+                <Position $isSelected={isSelected}>
+                    {schedule.position}
+                </Position>
+                <TimeInfo $isSelected={isSelected}>
                     {schedule.startTime} ~{' '}
-                    {schedule.endTime}
-                </TimeRange>
-                <Duration $isSelected={isSelected}>
-                    {schedule.duration}
-                </Duration>
+                    {schedule.endTime} ({schedule.duration})
+                </TimeInfo>
             </ScheduleInfo>
         </Card>
     );
@@ -70,7 +67,7 @@ const DayOfWeek = styled.div`
 const Date = styled.div`
     font-family: 'Pretendard';
     font-weight: 600;
-    font-size: 20px;
+    font-size: 16px;
     color: ${(props) =>
         props.$isSelected ? '#25c973' : '#333333'};
 `;
@@ -82,26 +79,18 @@ const ScheduleInfo = styled.div`
     gap: 4px;
 `;
 
-const WorkplaceName = styled.div`
+const Position = styled.div`
     font-family: 'Pretendard';
     font-weight: 600;
-    font-size: 13px;
+    font-size: 15px;
     color: ${(props) =>
         props.$isSelected ? '#ffffff' : '#333333'};
 `;
 
-const TimeRange = styled.div`
+const TimeInfo = styled.div`
     font-family: 'Pretendard';
     font-weight: 400;
-    font-size: 12px;
-    color: ${(props) =>
-        props.$isSelected ? '#ffffff' : '#666666'};
-`;
-
-const Duration = styled.div`
-    font-family: 'Pretendard';
-    font-weight: 500;
-    font-size: 12px;
+    font-size: 14px;
     color: ${(props) =>
         props.$isSelected ? '#ffffff' : '#666666'};
 `;
