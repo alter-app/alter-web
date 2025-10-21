@@ -24,6 +24,7 @@ import OwnerWorkplaceDetailPage from './components/owner/workplace/workplaceDeta
 import ReputationWrite from './pages/ReputationWrite';
 import ReputationListPage from './pages/user/ReputationListPage';
 import SentReputationListPage from './pages/user/SentReputationListPage';
+import SentSubstituteRequestListPage from './pages/user/SentSubstituteRequestListPage';
 import ScheduleListPage from './pages/user/ScheduleListPage';
 import ApplicationListPage from './pages/user/ApplicationListPage';
 import ScheduleRequestPage from './pages/user/ScheduleRequestPage';
@@ -90,6 +91,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <SentReputationListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/sent-substitute-request-list'
+                        element={
+                            <ProtectedRoute>
+                                <SentSubstituteRequestListPage />
                             </ProtectedRoute>
                         }
                     />

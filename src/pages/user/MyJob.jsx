@@ -5,6 +5,7 @@ import BottomNavigation from '../../layouts/BottomNavigation';
 import WorkplaceSection from '../../components/user/myJob/WorkplaceSection';
 import ReputationSection from '../../components/user/myJob/ReputationSection';
 import SentReputationSection from '../../components/user/myJob/SentReputationSection';
+import SentSubstituteRequestSection from '../../components/user/myJob/SentSubstituteRequestSection';
 import ApplicationSection from '../../components/user/myJob/ApplicationSection';
 import ScheduleSection from '../../components/user/myJob/ScheduleSection';
 import {
@@ -17,6 +18,7 @@ import {
     cancelApplication,
 } from '../../services/myJob';
 import { getApplicationList } from '../../services/myPage';
+import { getSentSubstituteRequests } from '../../services/scheduleRequest';
 import { timeAgo } from '../../utils/timeUtil';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../../components/Loader';
@@ -27,6 +29,10 @@ const MyJob = () => {
     const [sentReputations, setSentReputations] = useState(
         []
     );
+    const [
+        sentSubstituteRequests,
+        setSentSubstituteRequests,
+    ] = useState([]);
     const [applications, setApplications] = useState([]);
     const [schedules, setSchedules] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -35,10 +41,10 @@ const MyJob = () => {
     // 데이터 로딩
     useEffect(() => {
         const fetchData = async () => {
-            try {
-                setIsLoading(true);
+            setIsLoading(true);
 
-                // 평판 요청 목록 조회
+            // 평판 요청 목록 조회
+            try {
                 const reputationData =
                     await getUserReputationRequestsList(3);
 
@@ -100,8 +106,16 @@ const MyJob = () => {
                 });
 
                 setReputations(formattedReputations);
+            } catch (error) {
+                console.error(
+                    '평판 요청 조회 오류:',
+                    error
+                );
+                setReputations([]);
+            }
 
-                // 보낸 평판 요청 목록 조회 (요청 중인 것만)
+            // 보낸 평판 요청 목록 조회 (요청 중인 것만)
+            try {
                 const sentReputationData =
                     await getUserSentReputationRequestsList(
                         3,
@@ -151,8 +165,90 @@ const MyJob = () => {
                 setSentReputations(
                     formattedSentReputations
                 );
+            } catch (error) {
+                console.error(
+                    '보낸 평판 조회 오류:',
+                    error
+                );
+                setSentReputations([]);
+            }
 
-                // 지원 현황 데이터 조회 (지원완료 상태만)
+            // 보낸 대타 요청 목록 조회 (PENDING 상태만)
+            try {
+                const sentSubstituteRequestData =
+                    await getSentSubstituteRequests(
+                        3,
+                        null,
+                        'PENDING'
+                    );
+
+                // API 데이터를 컴포넌트에 맞게 변환
+                const formattedSentSubstituteRequests = (
+                    sentSubstituteRequestData.data?.data ||
+                    []
+                ).map((item) => {
+                    const startDate = new Date(
+                        item.schedule.startDateTime
+                    );
+                    const endDate = new Date(
+                        item.schedule.endDateTime
+                    );
+
+                    return {
+                        id: item.id,
+                        workspaceName:
+                            item.workspace?.workspaceName ||
+                            '알 수 없는 업장',
+                        scheduleDate:
+                            startDate.toLocaleDateString(
+                                'ko-KR',
+                                {
+                                    month: 'long',
+                                    day: 'numeric',
+                                }
+                            ),
+                        scheduleTime: `${startDate.toLocaleTimeString(
+                            'ko-KR',
+                            {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true,
+                            }
+                        )} ~ ${endDate.toLocaleTimeString(
+                            'ko-KR',
+                            {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: true,
+                            }
+                        )}`,
+                        position:
+                            item.schedule.position ||
+                            '알 수 없는 직책',
+                        timeAgo: item.createdAt
+                            ? timeAgo(item.createdAt)
+                            : '알 수 없음',
+                        status:
+                            item.status?.value || 'PENDING',
+                        statusDescription:
+                            item.status?.description ||
+                            '대기 중',
+                    };
+                });
+
+                setSentSubstituteRequests(
+                    formattedSentSubstituteRequests
+                );
+            } catch (error) {
+                console.error(
+                    '보낸 대타 요청 조회 오류:',
+                    error
+                );
+                setSentSubstituteRequests([]);
+            }
+
+            // 지원 현황 데이터 조회 (지원완료 상태만)
+            try {
                 const applicationData =
                     await getApplicationList({
                         pageSize: 3,
@@ -178,140 +274,136 @@ const MyJob = () => {
                 }));
 
                 setApplications(formattedApplications);
-
-                // 근무 중인 업장 데이터 조회
-                try {
-                    const workplaceData =
-                        await getUserWorkplaceList(3);
-
-                    // API 데이터를 컴포넌트에 맞게 변환
-                    const formattedWorkplaces = (
-                        workplaceData.data?.data || []
-                    ).map((item) => {
-                        let nextShiftText = '정보 없음';
-
-                        if (item.nextShiftDateTime) {
-                            const nextShiftDate = new Date(
-                                item.nextShiftDateTime
-                            );
-                            nextShiftText = `${nextShiftDate.getFullYear()}-${(
-                                nextShiftDate.getMonth() + 1
-                            )
-                                .toString()
-                                .padStart(
-                                    2,
-                                    '0'
-                                )}-${nextShiftDate
-                                .getDate()
-                                .toString()
-                                .padStart(
-                                    2,
-                                    '0'
-                                )} ${nextShiftDate
-                                .getHours()
-                                .toString()
-                                .padStart(
-                                    2,
-                                    '0'
-                                )}:${nextShiftDate
-                                .getMinutes()
-                                .toString()
-                                .padStart(2, '0')}`;
-                        }
-
-                        return {
-                            id: item.workspaceId,
-                            name:
-                                item.businessName ||
-                                '알 수 없는 업장',
-                            status: 'working',
-                            position: '근무자',
-                            wage: '0',
-                            nextShift: nextShiftText,
-                        };
-                    });
-
-                    setWorkplaces(formattedWorkplaces);
-                } catch (error) {
-                    console.error(
-                        '근무 중인 업장 조회 오류:',
-                        error
-                    );
-                    // 에러 발생 시 빈 배열로 초기화
-                    setWorkplaces([]);
-                }
-
-                // 이번 주 일정 데이터 조회 (최근 데이터)
-                try {
-                    const scheduleData =
-                        await getUserScheduleSelf();
-
-                    // API 데이터를 컴포넌트에 맞게 변환
-                    const formattedSchedules = (
-                        scheduleData.data || []
-                    ).map((item) => {
-                        const startDate = new Date(
-                            item.startDateTime
-                        );
-                        const endDate = new Date(
-                            item.endDateTime
-                        );
-
-                        // 근무 시간 계산 (시간 단위)
-                        const workHours = Math.round(
-                            (endDate - startDate) /
-                                (1000 * 60 * 60)
-                        );
-
-                        return {
-                            id: item.shiftId,
-                            day: startDate.toLocaleDateString(
-                                'ko-KR',
-                                {
-                                    weekday: 'short',
-                                }
-                            ),
-                            date: startDate
-                                .getDate()
-                                .toString(),
-                            workplace:
-                                item.workspace
-                                    ?.workspaceName ||
-                                '알 수 없는 업장',
-                            time: `${startDate.toLocaleTimeString(
-                                'ko-KR',
-                                {
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                }
-                            )} ~ ${endDate.toLocaleTimeString(
-                                'ko-KR',
-                                {
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                }
-                            )}`,
-                            hours: `${workHours}시간`,
-                        };
-                    });
-
-                    setSchedules(formattedSchedules);
-                } catch (error) {
-                    console.error(
-                        '스케줄 조회 오류:',
-                        error
-                    );
-                    // 에러 발생 시 빈 배열로 초기화
-                    setSchedules([]);
-                }
             } catch (error) {
-                console.error('데이터 로딩 오류:', error);
-                // 에러 발생 시 빈 배열로 초기화
-                setReputations([]);
-                setSentReputations([]);
-            } finally {
-                setIsLoading(false);
+                console.error(
+                    '지원 현황 조회 오류:',
+                    error
+                );
+                setApplications([]);
             }
+
+            // 근무 중인 업장 데이터 조회
+            try {
+                const workplaceData =
+                    await getUserWorkplaceList(3);
+
+                // API 데이터를 컴포넌트에 맞게 변환
+                const formattedWorkplaces = (
+                    workplaceData.data?.data || []
+                ).map((item) => {
+                    let nextShiftText = '정보 없음';
+
+                    if (item.nextShiftDateTime) {
+                        const nextShiftDate = new Date(
+                            item.nextShiftDateTime
+                        );
+                        nextShiftText = `${nextShiftDate.getFullYear()}-${(
+                            nextShiftDate.getMonth() + 1
+                        )
+                            .toString()
+                            .padStart(
+                                2,
+                                '0'
+                            )}-${nextShiftDate
+                            .getDate()
+                            .toString()
+                            .padStart(
+                                2,
+                                '0'
+                            )} ${nextShiftDate
+                            .getHours()
+                            .toString()
+                            .padStart(
+                                2,
+                                '0'
+                            )}:${nextShiftDate
+                            .getMinutes()
+                            .toString()
+                            .padStart(2, '0')}`;
+                    }
+
+                    return {
+                        id: item.workspaceId,
+                        name:
+                            item.businessName ||
+                            '알 수 없는 업장',
+                        status: 'working',
+                        position: '근무자',
+                        wage: '0',
+                        nextShift: nextShiftText,
+                    };
+                });
+
+                setWorkplaces(formattedWorkplaces);
+            } catch (error) {
+                console.error(
+                    '근무 중인 업장 조회 오류:',
+                    error
+                );
+                // 에러 발생 시 빈 배열로 초기화
+                setWorkplaces([]);
+            }
+
+            // 이번 주 일정 데이터 조회 (최근 데이터)
+            try {
+                const scheduleData =
+                    await getUserScheduleSelf();
+
+                // API 데이터를 컴포넌트에 맞게 변환
+                const formattedSchedules = (
+                    scheduleData.data || []
+                ).map((item) => {
+                    const startDate = new Date(
+                        item.startDateTime
+                    );
+                    const endDate = new Date(
+                        item.endDateTime
+                    );
+
+                    // 근무 시간 계산 (시간 단위)
+                    const workHours = Math.round(
+                        (endDate - startDate) /
+                            (1000 * 60 * 60)
+                    );
+
+                    return {
+                        id: item.shiftId,
+                        day: startDate.toLocaleDateString(
+                            'ko-KR',
+                            {
+                                weekday: 'short',
+                            }
+                        ),
+                        date: startDate
+                            .getDate()
+                            .toString(),
+                        workplace:
+                            item.workspace?.workspaceName ||
+                            '알 수 없는 업장',
+                        time: `${startDate.toLocaleTimeString(
+                            'ko-KR',
+                            {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                            }
+                        )} ~ ${endDate.toLocaleTimeString(
+                            'ko-KR',
+                            {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                            }
+                        )}`,
+                        hours: `${workHours}시간`,
+                    };
+                });
+
+                setSchedules(formattedSchedules);
+            } catch (error) {
+                console.error('스케줄 조회 오류:', error);
+                setSchedules([]);
+            }
+
+            setIsLoading(false);
         };
 
         fetchData();
@@ -344,6 +436,18 @@ const MyJob = () => {
     const handleSentReputationViewAll = () => {
         console.log('전체 보낸 평판 보기');
         navigate('/sent-reputation-list');
+    };
+
+    const handleSentSubstituteRequestViewAll = () => {
+        console.log('전체 보낸 대타 요청 보기');
+        navigate('/sent-substitute-request-list');
+    };
+
+    const handleSentSubstituteRequestCancel = async (
+        request
+    ) => {
+        console.log('대타 요청 취소:', request);
+        // TODO: 대타 요청 취소 API 호출
     };
 
     const handleSentReputationCancel = async (
@@ -526,6 +630,17 @@ const MyJob = () => {
                         handleSentReputationViewAll
                     }
                     onCancel={handleSentReputationCancel}
+                />
+                <SentSubstituteRequestSection
+                    sentSubstituteRequests={
+                        sentSubstituteRequests
+                    }
+                    onViewAllClick={
+                        handleSentSubstituteRequestViewAll
+                    }
+                    onCancel={
+                        handleSentSubstituteRequestCancel
+                    }
                 />
                 <ApplicationSection
                     applications={applications}
