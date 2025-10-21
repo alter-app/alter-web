@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PageHeader from '../../components/shared/PageHeader';
 import SentSubstituteRequestCard from '../../components/user/myJob/SentSubstituteRequestCard';
+import SentSubstituteRequestStatusFilter from '../../components/user/myJob/SentSubstituteRequestStatusFilter';
 import { getSentSubstituteRequests } from '../../services/scheduleRequest';
 import { timeAgo } from '../../utils/timeUtil';
 import Loader from '../../components/Loader';
@@ -18,6 +19,8 @@ const SentSubstituteRequestListPage = () => {
     const [nextCursor, setNextCursor] = useState(null);
     const [isLoadingMore, setIsLoadingMore] =
         useState(false);
+    const [selectedStatuses, setSelectedStatuses] =
+        useState([]);
     const navigate = useNavigate();
 
     // 데이터 변환 함수
@@ -74,11 +77,15 @@ const SentSubstituteRequestListPage = () => {
                 try {
                     setIsLoading(true);
 
+                    const selectedStatus =
+                        selectedStatuses.length > 0
+                            ? selectedStatuses[0]
+                            : null;
                     const sentSubstituteRequestData =
                         await getSentSubstituteRequests(
                             10,
                             null,
-                            null
+                            selectedStatus
                         );
                     const formattedSentSubstituteRequests =
                         transformSentSubstituteRequestData(
@@ -110,7 +117,7 @@ const SentSubstituteRequestListPage = () => {
             };
 
         fetchInitialSentSubstituteRequests();
-    }, []);
+    }, [selectedStatuses]);
 
     // 더 많은 데이터 로드
     const fetchMoreSentSubstituteRequests =
@@ -120,11 +127,15 @@ const SentSubstituteRequestListPage = () => {
             try {
                 setIsLoadingMore(true);
 
+                const selectedStatus =
+                    selectedStatuses.length > 0
+                        ? selectedStatuses[0]
+                        : null;
                 const sentSubstituteRequestData =
                     await getSentSubstituteRequests(
                         10,
                         nextCursor,
-                        null
+                        selectedStatus
                     );
                 const formattedSentSubstituteRequests =
                     transformSentSubstituteRequestData(
@@ -153,7 +164,7 @@ const SentSubstituteRequestListPage = () => {
             } finally {
                 setIsLoadingMore(false);
             }
-        }, [nextCursor, isLoadingMore]);
+        }, [nextCursor, isLoadingMore, selectedStatuses]);
 
     // 대타 요청 취소
     const handleCancel = async (request) => {
@@ -177,6 +188,10 @@ const SentSubstituteRequestListPage = () => {
         <PageContainer>
             <PageHeader title='보낸 대타 요청' />
             <ContentContainer>
+                <SentSubstituteRequestStatusFilter
+                    selectedStatuses={selectedStatuses}
+                    onStatusChange={setSelectedStatuses}
+                />
                 {sentSubstituteRequests.length > 0 ? (
                     <InfiniteScroll
                         dataLength={
