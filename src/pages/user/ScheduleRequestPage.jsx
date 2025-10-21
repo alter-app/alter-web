@@ -5,6 +5,7 @@ import PageHeader from '../../components/shared/PageHeader';
 import AvailableScheduleList from '../../components/user/scheduleRequest/AvailableScheduleList';
 import RequestReasonSection from '../../components/user/scheduleRequest/RequestReasonSection';
 import RequestTargetSection from '../../components/user/scheduleRequest/RequestTargetSection';
+import ConfirmModal from '../../components/shared/ConfirmModal';
 import { createSubstituteRequest } from '../../services/scheduleRequest';
 
 const ScheduleRequestPage = () => {
@@ -27,6 +28,8 @@ const ScheduleRequestPage = () => {
         new Date().getMonth() + 1
     );
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] =
+        useState(false);
 
     const handleScheduleSelect = (schedule) => {
         setSelectedSchedule(schedule);
@@ -58,17 +61,15 @@ const ScheduleRequestPage = () => {
         setCurrentYear(nextYear);
     };
 
-    const handleSubmit = async () => {
-        if (!selectedSchedule) {
-            alert('스케줄을 선택해주세요.');
+    const handleSubmit = () => {
+        if (!selectedSchedule || !requestReason.trim()) {
             return;
         }
 
-        if (!requestReason.trim()) {
-            alert('요청 사유를 입력해주세요.');
-            return;
-        }
+        setIsConfirmModalOpen(true);
+    };
 
+    const handleConfirmSubmit = async () => {
         try {
             setIsSubmitting(true);
 
@@ -83,14 +84,10 @@ const ScheduleRequestPage = () => {
                 requestData
             );
 
-            alert('대타 요청이 완료되었습니다.');
-            navigate(-1); // 이전 페이지로 이동
+            setIsConfirmModalOpen(false);
+            navigate(-1);
         } catch (error) {
             console.error('대타 요청 실패:', error);
-            alert(
-                error.response?.data?.message ||
-                    '대타 요청 중 오류가 발생했습니다.'
-            );
         } finally {
             setIsSubmitting(false);
         }
@@ -132,6 +129,16 @@ const ScheduleRequestPage = () => {
                         : '요청하기'}
                 </SubmitButton>
             </ContentWrapper>
+            <ConfirmModal
+                isOpen={isConfirmModalOpen}
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={handleConfirmSubmit}
+                title='대타 요청'
+                message='대타 요청을 제출하시겠습니까?'
+                confirmText='요청하기'
+                cancelText='취소'
+                confirmColor='#2de283'
+            />
         </PageContainer>
     );
 };

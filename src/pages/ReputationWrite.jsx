@@ -13,7 +13,7 @@ import useAuthStore from '../store/authStore';
 import KeywordList from '../components/owner/reputation/KeywordList';
 import EpisodeInputCard from '../components/owner/reputation/EpisodeInputCard';
 import PageHeader from '../components/shared/PageHeader';
-import CompletionModal from '../components/shared/CompletionModal';
+import ConfirmModal from '../components/shared/ConfirmModal';
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -22,10 +22,8 @@ const ReputationWrite = () => {
     const [allKeywords, setAllKeywords] = useState([]);
     const [categories, setCategories] = useState([]);
     const [episodeInputs, setEpisodeInputs] = useState({});
-    const [
-        isCompletionModalOpen,
-        setIsCompletionModalOpen,
-    ] = useState(false);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] =
+        useState(false);
     const location = useLocation();
     const navigate = useNavigate();
     const requestId = location.state?.requestId;
@@ -95,18 +93,24 @@ const ReputationWrite = () => {
         }));
     };
 
-    const handleSave = async () => {
+    const handleSave = () => {
         const keywordsPayload = selectedIds.map((id) => ({
             keywordId: id,
             description: episodeInputs[id] || '',
         }));
 
         if (keywordsPayload.length < 2) {
-            alert(
-                '키워드는 최소 2개 이상 선택해야 합니다.'
-            );
             return;
         }
+
+        setIsConfirmModalOpen(true);
+    };
+
+    const handleConfirmSave = async () => {
+        const keywordsPayload = selectedIds.map((id) => ({
+            keywordId: id,
+            description: episodeInputs[id] || '',
+        }));
 
         try {
             // 근무자 평판인 경우
@@ -149,18 +153,11 @@ const ReputationWrite = () => {
                 }
             }
 
-            // 완료 모달 표시
-            setIsCompletionModalOpen(true);
+            setIsConfirmModalOpen(false);
+            navigate(-1);
         } catch (error) {
-            alert(
-                `평판 저장 중 오류 발생: ${error.message}`
-            );
+            console.error('평판 저장 중 오류:', error);
         }
-    };
-
-    const handleCompletionModalClose = () => {
-        setIsCompletionModalOpen(false);
-        navigate(-1);
     };
 
     return (
@@ -219,13 +216,15 @@ const ReputationWrite = () => {
                 </StyledButton>
             </Container>
 
-            <CompletionModal
-                isOpen={isCompletionModalOpen}
-                onClose={handleCompletionModalClose}
-                icon='✅'
-                title='평판 작성 완료!'
-                description='평판이 성공적으로 작성되었습니다. 다른 사용자들에게 도움이 될 거예요.'
-                buttonText='확인'
+            <ConfirmModal
+                isOpen={isConfirmModalOpen}
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={handleConfirmSave}
+                title='평판 작성'
+                message='평판을 제출하시겠습니까?'
+                confirmText='제출하기'
+                cancelText='취소'
+                confirmColor='#2de283'
             />
         </Overlay>
     );

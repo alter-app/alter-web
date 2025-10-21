@@ -1,10 +1,8 @@
 import styled from 'styled-components';
 import { useState, useRef, useEffect } from 'react';
-import ConfirmModal from '../../../shared/ConfirmModal';
 import { useNavigate } from 'react-router-dom';
 
 const EmployeeCard = ({ employee, workplaceId }) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef(null);
     const navigate = useNavigate();
@@ -17,10 +15,6 @@ const EmployeeCard = ({ employee, workplaceId }) => {
         setIsMenuOpen(!isMenuOpen);
     };
 
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-    };
-
     const handleRequestReputation = () => {
         navigate('/reputation-write', {
             state: {
@@ -30,7 +24,6 @@ const EmployeeCard = ({ employee, workplaceId }) => {
                 type: 'worker',
             },
         });
-        setIsModalOpen(false);
     };
 
     const handleRequestScheduleChange = () => {
@@ -52,7 +45,7 @@ const EmployeeCard = ({ employee, workplaceId }) => {
         setIsMenuOpen(false);
         switch (option) {
             case 'reputation':
-                setIsModalOpen(true);
+                handleRequestReputation();
                 break;
             case 'changeWork':
                 handleRequestScheduleChange();
@@ -199,17 +192,6 @@ const EmployeeCard = ({ employee, workplaceId }) => {
                     </MenuContainer>
                 </CardRight>
             </Card>
-
-            <ConfirmModal
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-                onConfirm={handleRequestReputation}
-                title='평판 요청'
-                message={`${employee.user.name}님에 대한 평판을 작성하시겠습니까?`}
-                confirmText='평판 작성하기'
-                cancelText='취소'
-                confirmColor='#2de283'
-            />
         </>
     );
 };
