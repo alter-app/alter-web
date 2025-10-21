@@ -5,7 +5,10 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import PageHeader from '../../components/shared/PageHeader';
 import SentSubstituteRequestCard from '../../components/user/myJob/SentSubstituteRequestCard';
 import SentSubstituteRequestStatusFilter from '../../components/user/myJob/SentSubstituteRequestStatusFilter';
-import { getSentSubstituteRequests } from '../../services/scheduleRequest';
+import {
+    getSentSubstituteRequests,
+    cancelSubstituteRequest,
+} from '../../services/scheduleRequest';
 import { timeAgo } from '../../utils/timeUtil';
 import Loader from '../../components/Loader';
 
@@ -168,9 +171,25 @@ const SentSubstituteRequestListPage = () => {
 
     // 대타 요청 취소
     const handleCancel = async (request) => {
-        console.log('대타 요청 취소:', request);
-        // TODO: 대타 요청 취소 API 호출
-        alert('대타 요청 취소 기능은 준비 중입니다.');
+        try {
+            await cancelSubstituteRequest(request.id);
+
+            // 성공 시 목록에서 해당 항목 제거
+            setSentSubstituteRequests((prev) =>
+                prev.filter(
+                    (item) => item.id !== request.id
+                )
+            );
+
+            // 성공 메시지 (선택사항)
+            console.log('대타 요청이 취소되었습니다.');
+        } catch (error) {
+            console.error('대타 요청 취소 실패:', error);
+            // 에러 처리 (필요시 사용자에게 알림)
+            alert(
+                '대타 요청 취소에 실패했습니다. 다시 시도해주세요.'
+            );
+        }
     };
 
     if (isLoading) {

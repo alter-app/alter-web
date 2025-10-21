@@ -18,7 +18,10 @@ import {
     cancelApplication,
 } from '../../services/myJob';
 import { getApplicationList } from '../../services/myPage';
-import { getSentSubstituteRequests } from '../../services/scheduleRequest';
+import {
+    getSentSubstituteRequests,
+    cancelSubstituteRequest,
+} from '../../services/scheduleRequest';
 import { timeAgo } from '../../utils/timeUtil';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../../components/Loader';
@@ -419,42 +422,52 @@ const MyJob = () => {
     };
 
     const handleApplicationClick = (application) => {
-        console.log('지원 현황 클릭:', application);
         // 지원 상세 페이지로 이동하는 로직
     };
 
     const handleWorkplaceViewAll = () => {
-        console.log('전체 업장 보기');
         // 전체 업장 페이지로 이동하는 로직
     };
 
     const handleReputationViewAll = () => {
-        console.log('전체 평판 보기');
         navigate('/reputation-list');
     };
 
     const handleSentReputationViewAll = () => {
-        console.log('전체 보낸 평판 보기');
         navigate('/sent-reputation-list');
     };
 
     const handleSentSubstituteRequestViewAll = () => {
-        console.log('전체 보낸 대타 요청 보기');
         navigate('/sent-substitute-request-list');
     };
 
     const handleSentSubstituteRequestCancel = async (
         request
     ) => {
-        console.log('대타 요청 취소:', request);
-        // TODO: 대타 요청 취소 API 호출
+        try {
+            await cancelSubstituteRequest(request.id);
+
+            // 성공 시 목록에서 해당 항목 제거
+            setSentSubstituteRequests((prev) =>
+                prev.filter(
+                    (item) => item.id !== request.id
+                )
+            );
+
+            // 성공 시 목록에서 제거됨
+        } catch (error) {
+            console.error('대타 요청 취소 실패:', error);
+            // 에러 처리 (필요시 사용자에게 알림)
+            alert(
+                '대타 요청 취소에 실패했습니다. 다시 시도해주세요.'
+            );
+        }
     };
 
     const handleSentReputationCancel = async (
         reputation
     ) => {
         try {
-            console.log('보낸 평판 취소:', reputation);
             await cancelSentReputationRequest(
                 reputation.id
             );
@@ -513,7 +526,6 @@ const MyJob = () => {
     // 지원 취소 핸들러
     const handleApplicationCancel = async (application) => {
         try {
-            console.log('지원 취소:', application);
             await cancelApplication(application.id);
 
             // 최신 지원 목록 다시 가져오기 (지원완료 상태만)
@@ -540,7 +552,6 @@ const MyJob = () => {
             }));
 
             setApplications(formattedApplications);
-            console.log('지원 취소 성공');
         } catch (error) {
             console.error('지원 취소 오류:', error);
             alert('지원 취소 중 오류가 발생했습니다.');
@@ -548,18 +559,15 @@ const MyJob = () => {
     };
 
     const handleApplicationViewAll = () => {
-        console.log('전체 지원 보기');
         navigate('/application-list');
     };
 
     const handleScheduleViewAll = () => {
-        console.log('전체 일정 보기');
         navigate('/schedule-list');
     };
 
     const handleReputationAccept = async (reputation) => {
         try {
-            console.log('평판 수락:', reputation);
             // 평판 작성 페이지로 이동
             navigate('/reputation-write', {
                 state: { requestId: reputation.id },
@@ -572,7 +580,6 @@ const MyJob = () => {
 
     const handleReputationReject = async (reputation) => {
         try {
-            console.log('평판 거절:', reputation);
             await userDeclineReputation(reputation.id);
 
             alert('평판이 거절되었습니다.');

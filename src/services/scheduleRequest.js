@@ -110,3 +110,28 @@ export const createSubstituteRequest = async (
         throw error;
     }
 };
+
+/**
+ * 보낸 대타 요청 취소
+ * @param {number} requestId - 대타 요청 ID
+ * @returns {Promise} API 응답
+ */
+export const cancelSubstituteRequest = async (
+    requestId
+) => {
+    const accessToken = useAuthStore.getState().accessToken;
+    try {
+        const response = await axios.delete(
+            `${backend}/app/users/me/substitute-requests/${requestId}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('대타 요청 취소 실패:', error);
+        throw error;
+    }
+};
