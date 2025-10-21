@@ -3,11 +3,18 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+html,
 body {
-    min-height: 100dvh;
+    height: 100%;
     margin: 0;
     padding: 0;
+    overflow: hidden;
     background: #f4f4f4;
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+body {
     font-family: 'Pretendard', -apple-system,
         BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
         'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans',
@@ -16,12 +23,15 @@ body {
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
-    overflow-x: hidden;
+    position: fixed;
+    width: 100%;
 }
 
 #root {
-    min-height: 100vh;
+    height: 100%;
     width: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
 }
 
 header {
