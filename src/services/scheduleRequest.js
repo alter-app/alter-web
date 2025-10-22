@@ -171,3 +171,57 @@ export const getReceivedSubstituteRequests = async (
         throw error;
     }
 };
+
+/**
+ * 받은 대타 요청 수락
+ * @param {number} requestId - 대타 요청 ID
+ * @returns {Promise} API 응답
+ */
+export const acceptSubstituteRequest = async (
+    requestId
+) => {
+    const accessToken = useAuthStore.getState().accessToken;
+    try {
+        const response = await axios.post(
+            `${backend}/app/substitute-requests/${requestId}/accept`,
+            {},
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('대타 요청 수락 실패:', error);
+        throw error;
+    }
+};
+
+/**
+ * 받은 대타 요청 거절
+ * @param {number} requestId - 대타 요청 ID
+ * @returns {Promise} API 응답
+ */
+export const rejectSubstituteRequest = async (
+    requestId
+) => {
+    const accessToken = useAuthStore.getState().accessToken;
+    try {
+        const response = await axios.post(
+            `${backend}/app/substitute-requests/${requestId}/reject`,
+            {},
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('대타 요청 거절 실패:', error);
+        throw error;
+    }
+};

@@ -5,7 +5,11 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import PageHeader from '../../components/shared/PageHeader';
 import ReceivedSubstituteRequestCard from '../../components/user/myJob/ReceivedSubstituteRequestCard';
 import ReceivedSubstituteRequestStatusFilter from '../../components/user/myJob/ReceivedSubstituteRequestStatusFilter';
-import { getReceivedSubstituteRequests } from '../../services/scheduleRequest';
+import {
+    getReceivedSubstituteRequests,
+    acceptSubstituteRequest,
+    rejectSubstituteRequest,
+} from '../../services/scheduleRequest';
 import { timeAgo } from '../../utils/timeUtil';
 import Loader from '../../components/Loader';
 
@@ -174,16 +178,44 @@ const ReceivedSubstituteRequestListPage = () => {
 
     // 대타 요청 수락
     const handleAccept = async (request) => {
-        console.log('대타 요청 수락:', request);
-        // TODO: 대타 요청 수락 API 호출
-        alert('대타 요청 수락 기능은 준비 중입니다.');
+        try {
+            await acceptSubstituteRequest(request.id);
+
+            // 성공 시 목록에서 해당 항목 제거
+            setReceivedSubstituteRequests((prev) =>
+                prev.filter(
+                    (item) => item.id !== request.id
+                )
+            );
+
+            alert('대타 요청을 수락했습니다.');
+        } catch (error) {
+            console.error('대타 요청 수락 실패:', error);
+            alert(
+                '대타 요청 수락에 실패했습니다. 다시 시도해주세요.'
+            );
+        }
     };
 
     // 대타 요청 거절
     const handleReject = async (request) => {
-        console.log('대타 요청 거절:', request);
-        // TODO: 대타 요청 거절 API 호출
-        alert('대타 요청 거절 기능은 준비 중입니다.');
+        try {
+            await rejectSubstituteRequest(request.id);
+
+            // 성공 시 목록에서 해당 항목 제거
+            setReceivedSubstituteRequests((prev) =>
+                prev.filter(
+                    (item) => item.id !== request.id
+                )
+            );
+
+            alert('대타 요청을 거절했습니다.');
+        } catch (error) {
+            console.error('대타 요청 거절 실패:', error);
+            alert(
+                '대타 요청 거절에 실패했습니다. 다시 시도해주세요.'
+            );
+        }
     };
 
     if (isLoading) {
