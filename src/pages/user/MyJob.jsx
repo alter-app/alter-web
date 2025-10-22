@@ -6,6 +6,7 @@ import WorkplaceSection from '../../components/user/myJob/WorkplaceSection';
 import ReputationSection from '../../components/user/myJob/ReputationSection';
 import SentReputationSection from '../../components/user/myJob/SentReputationSection';
 import SentSubstituteRequestSection from '../../components/user/myJob/SentSubstituteRequestSection';
+import ReceivedSubstituteRequestSection from '../../components/user/myJob/ReceivedSubstituteRequestSection';
 import ApplicationSection from '../../components/user/myJob/ApplicationSection';
 import ScheduleSection from '../../components/user/myJob/ScheduleSection';
 import {
@@ -21,6 +22,7 @@ import { getApplicationList } from '../../services/myPage';
 import {
     getSentSubstituteRequests,
     cancelSubstituteRequest,
+    getReceivedSubstituteRequests,
 } from '../../services/scheduleRequest';
 import { timeAgo } from '../../utils/timeUtil';
 import { useNavigate } from 'react-router-dom';
@@ -35,6 +37,10 @@ const MyJob = () => {
     const [
         sentSubstituteRequests,
         setSentSubstituteRequests,
+    ] = useState([]);
+    const [
+        receivedSubstituteRequests,
+        setReceivedSubstituteRequests,
     ] = useState([]);
     const [applications, setApplications] = useState([]);
     const [schedules, setSchedules] = useState([]);
@@ -242,12 +248,98 @@ const MyJob = () => {
                 setSentSubstituteRequests(
                     formattedSentSubstituteRequests
                 );
+
+                // 받은 대타 요청 조회 (PENDING 상태만)
+                try {
+                    const receivedSubstituteRequestData =
+                        await getReceivedSubstituteRequests(
+                            3,
+                            null,
+                            'PENDING'
+                        );
+                    const formattedReceivedSubstituteRequests =
+                        (
+                            receivedSubstituteRequestData
+                                .data?.data || []
+                        ).map((item) => {
+                            const startDate = new Date(
+                                item.schedule.startDateTime
+                            );
+                            const endDate = new Date(
+                                item.schedule.endDateTime
+                            );
+
+                            return {
+                                id: item.id,
+                                workspaceName:
+                                    item.workspace
+                                        ?.workspaceName ||
+                                    '알 수 없는 업장',
+                                requesterName:
+                                    item.requester
+                                        ?.workerName ||
+                                    '알 수 없는 요청자',
+                                scheduleDate:
+                                    startDate.toLocaleDateString(
+                                        'ko-KR',
+                                        {
+                                            month: 'long',
+                                            day: 'numeric',
+                                        }
+                                    ),
+                                scheduleTime: `${startDate.toLocaleTimeString(
+                                    'ko-KR',
+                                    {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: true,
+                                    }
+                                )} ~ ${endDate.toLocaleTimeString(
+                                    'ko-KR',
+                                    {
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                        hour12: true,
+                                    }
+                                )}`,
+                                position:
+                                    item.schedule
+                                        .position ||
+                                    '알 수 없는 직책',
+                                timeAgo: item.createdAt
+                                    ? timeAgo(
+                                          item.createdAt
+                                      )
+                                    : '알 수 없음',
+                                status:
+                                    item.status?.value ||
+                                    'PENDING',
+                                statusDescription:
+                                    item.status
+                                        ?.description ||
+                                    '대기 중',
+                                requestReason:
+                                    item.requestReason ||
+                                    '',
+                            };
+                        });
+                    setReceivedSubstituteRequests(
+                        formattedReceivedSubstituteRequests
+                    );
+                } catch (error) {
+                    console.error(
+                        '받은 대타 요청 조회 오류:',
+                        error
+                    );
+                    setReceivedSubstituteRequests([]);
+                }
             } catch (error) {
                 console.error(
                     '보낸 대타 요청 조회 오류:',
                     error
                 );
                 setSentSubstituteRequests([]);
+                setReceivedSubstituteRequests([]);
             }
 
             // 지원 현황 데이터 조회 (지원완료 상태만)
@@ -439,6 +531,38 @@ const MyJob = () => {
 
     const handleSentSubstituteRequestViewAll = () => {
         navigate('/sent-substitute-request-list');
+    };
+
+    const handleReceivedSubstituteRequestViewAll = () => {
+        navigate('/received-substitute-request-list');
+    };
+
+    const handleReceivedSubstituteRequestAccept = async (
+        request
+    ) => {
+        try {
+            // TODO: 대타 요청 수락 API 호출
+            alert('대타 요청 수락 기능은 준비 중입니다.');
+        } catch (error) {
+            console.error('대타 요청 수락 실패:', error);
+            alert(
+                '대타 요청 수락에 실패했습니다. 다시 시도해주세요.'
+            );
+        }
+    };
+
+    const handleReceivedSubstituteRequestReject = async (
+        request
+    ) => {
+        try {
+            // TODO: 대타 요청 거절 API 호출
+            alert('대타 요청 거절 기능은 준비 중입니다.');
+        } catch (error) {
+            console.error('대타 요청 거절 실패:', error);
+            alert(
+                '대타 요청 거절에 실패했습니다. 다시 시도해주세요.'
+            );
+        }
     };
 
     const handleSentSubstituteRequestCancel = async (
@@ -647,6 +771,20 @@ const MyJob = () => {
                     }
                     onCancel={
                         handleSentSubstituteRequestCancel
+                    }
+                />
+                <ReceivedSubstituteRequestSection
+                    receivedSubstituteRequests={
+                        receivedSubstituteRequests
+                    }
+                    onViewAllClick={
+                        handleReceivedSubstituteRequestViewAll
+                    }
+                    onAccept={
+                        handleReceivedSubstituteRequestAccept
+                    }
+                    onReject={
+                        handleReceivedSubstituteRequestReject
                     }
                 />
                 <ApplicationSection

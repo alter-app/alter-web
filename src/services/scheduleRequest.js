@@ -135,3 +135,39 @@ export const cancelSubstituteRequest = async (
         throw error;
     }
 };
+
+/**
+ * 받은 대타 요청 목록 조회
+ * @param {number} pageSize - 페이지 크기
+ * @param {string} cursor - 커서
+ * @param {string} status - 요청 상태 (PENDING, ACCEPTED, REJECTED_BY_TARGET, APPROVED, REJECTED_BY_APPROVER, CANCELLED, EXPIRED)
+ * @returns {Promise} API 응답
+ */
+export const getReceivedSubstituteRequests = async (
+    pageSize = 10,
+    cursor = null,
+    status = null
+) => {
+    const accessToken = useAuthStore.getState().accessToken;
+    try {
+        let url = `${backend}/app/users/me/substitute-requests/received?pageSize=${pageSize}`;
+        if (cursor) {
+            url += `&cursor=${cursor}`;
+        }
+        if (status) {
+            url += `&status=${status}`;
+        }
+        const response = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error(
+            '받은 대타 요청 목록 조회 실패:',
+            error
+        );
+        throw error;
+    }
+};
