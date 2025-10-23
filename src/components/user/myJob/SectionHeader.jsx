@@ -26,9 +26,7 @@ const IconWrapper = styled.div`
 const Title = styled.h3`
     font-family: 'Pretendard';
     font-weight: 600;
-    font-size: 16px;
+    font-size: 18px;
     color: #333333;
     margin: 0;
 `;
-
-
