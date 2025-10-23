@@ -7,7 +7,11 @@ import PageHeader from '../../components/shared/PageHeader';
 import OwnerBottomNavigation from '../../layouts/OwnerBottomNavigation';
 import styled from 'styled-components';
 import { useState, useEffect } from 'react';
-import { getOwnerSubstituteRequests } from '../../services/ownerSubstituteRequest';
+import {
+    getOwnerSubstituteRequests,
+    approveOwnerSubstituteRequest,
+    rejectOwnerSubstituteRequest,
+} from '../../services/ownerSubstituteRequest';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../../components/Loader';
 
@@ -47,23 +51,35 @@ const Main = () => {
         fetchSubstituteRequests();
     }, []);
 
-    // 대타 요청 수락
+    // 대타 요청 승인
     const handleAccept = async (request) => {
         try {
-            // TODO: 대타 요청 수락 API 호출
-            console.log('대타 요청 수락:', request);
-            // API 호출 후 목록에서 제거하거나 상태 업데이트
+            await approveOwnerSubstituteRequest(
+                request.id,
+                '승인합니다'
+            );
+            // 성공 시 목록에서 제거하거나 상태 업데이트
+            setSubstituteRequests((prev) =>
+                prev.filter((req) => req.id !== request.id)
+            );
+            console.log('대타 요청 승인 완료:', request);
         } catch (error) {
-            console.error('대타 요청 수락 실패:', error);
+            console.error('대타 요청 승인 실패:', error);
         }
     };
 
     // 대타 요청 거절
     const handleReject = async (request) => {
         try {
-            // TODO: 대타 요청 거절 API 호출
-            console.log('대타 요청 거절:', request);
-            // API 호출 후 목록에서 제거하거나 상태 업데이트
+            await rejectOwnerSubstituteRequest(
+                request.id,
+                '승인 불가'
+            );
+            // 성공 시 목록에서 제거하거나 상태 업데이트
+            setSubstituteRequests((prev) =>
+                prev.filter((req) => req.id !== request.id)
+            );
+            console.log('대타 요청 거절 완료:', request);
         } catch (error) {
             console.error('대타 요청 거절 실패:', error);
         }

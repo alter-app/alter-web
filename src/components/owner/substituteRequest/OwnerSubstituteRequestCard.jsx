@@ -76,8 +76,8 @@ const OwnerSubstituteRequestCard = ({
     };
 
     const statusInfo = getStatusInfo();
-    const canAccept = status === 'PENDING';
-    const canReject = status === 'PENDING';
+    const canAccept = status === 'ACCEPTED';
+    const canReject = status === 'ACCEPTED';
 
     const formatDateTime = (dateTimeString) => {
         if (!dateTimeString) return '';
@@ -209,7 +209,7 @@ const OwnerSubstituteRequestCard = ({
                         <AcceptButton
                             onClick={handleAcceptClick}
                         >
-                            수락
+                            승인
                         </AcceptButton>
                         <RejectButton
                             onClick={handleRejectClick}
@@ -226,17 +226,17 @@ const OwnerSubstituteRequestCard = ({
                 onConfirm={handleModalConfirm}
                 title={
                     modalType === 'accept'
-                        ? '대타 요청 수락'
+                        ? '대타 요청 승인'
                         : '대타 요청 거절'
                 }
                 message={
                     modalType === 'accept'
-                        ? `${requesterName}님의 대타 요청을 수락하시겠습니까?`
+                        ? `${requesterName}님의 대타 요청을 승인하시겠습니까?`
                         : `${requesterName}님의 대타 요청을 거절하시겠습니까?`
                 }
                 confirmText={
                     modalType === 'accept'
-                        ? '수락하기'
+                        ? '승인하기'
                         : '거절하기'
                 }
                 cancelText='취소'

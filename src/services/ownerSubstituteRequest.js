@@ -41,18 +41,22 @@ export const getOwnerSubstituteRequests = async (
 };
 
 /**
- * Owner 대타 요청 수락
+ * Owner 대타 요청 승인
  * @param {number} requestId - 대타 요청 ID
+ * @param {string} approvalComment - 승인 코멘트
  * @returns {Promise} API 응답
  */
-export const acceptOwnerSubstituteRequest = async (
-    requestId
+export const approveOwnerSubstituteRequest = async (
+    requestId,
+    approvalComment = '승인합니다'
 ) => {
     const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await axios.post(
-            `${backend}/manager/substitute-requests/${requestId}/accept`,
-            {},
+            `${backend}/manager/substitute-requests/${requestId}/approve`,
+            {
+                approvalComment: approvalComment,
+            },
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -62,7 +66,7 @@ export const acceptOwnerSubstituteRequest = async (
         );
         return response.data;
     } catch (error) {
-        console.error('Owner 대타 요청 수락 실패:', error);
+        console.error('Owner 대타 요청 승인 실패:', error);
         throw error;
     }
 };
@@ -70,19 +74,20 @@ export const acceptOwnerSubstituteRequest = async (
 /**
  * Owner 대타 요청 거절
  * @param {number} requestId - 대타 요청 ID
- * @param {string} rejectionReason - 거절 사유
+ * @param {string} approverRejectionReason - 승인자 거절 사유
  * @returns {Promise} API 응답
  */
 export const rejectOwnerSubstituteRequest = async (
     requestId,
-    rejectionReason = '승인 불가'
+    approverRejectionReason = '승인 불가'
 ) => {
     const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await axios.post(
             `${backend}/manager/substitute-requests/${requestId}/reject`,
             {
-                approverRejectionReason: rejectionReason,
+                approverRejectionReason:
+                    approverRejectionReason,
             },
             {
                 headers: {

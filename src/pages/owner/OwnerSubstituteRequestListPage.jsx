@@ -6,7 +6,7 @@ import OwnerSubstituteRequestCard from '../../components/owner/substituteRequest
 import OwnerSubstituteRequestStatusFilter from '../../components/owner/substituteRequest/OwnerSubstituteRequestStatusFilter';
 import {
     getOwnerSubstituteRequests,
-    acceptOwnerSubstituteRequest,
+    approveOwnerSubstituteRequest,
     rejectOwnerSubstituteRequest,
 } from '../../services/ownerSubstituteRequest';
 import Loader from '../../components/Loader';
@@ -92,17 +92,20 @@ const OwnerSubstituteRequestListPage = () => {
         fetchSubstituteRequests,
     ]);
 
-    // 대타 요청 수락
+    // 대타 요청 승인
     const handleAccept = async (request) => {
         try {
-            await acceptOwnerSubstituteRequest(request.id);
+            await approveOwnerSubstituteRequest(
+                request.id,
+                '승인합니다'
+            );
             // 성공 시 목록에서 제거하거나 상태 업데이트
             setSubstituteRequests((prev) =>
                 prev.filter((req) => req.id !== request.id)
             );
-            console.log('대타 요청 수락 완료:', request);
+            console.log('대타 요청 승인 완료:', request);
         } catch (error) {
-            console.error('대타 요청 수락 실패:', error);
+            console.error('대타 요청 승인 실패:', error);
             // 에러 처리 (토스트 메시지 등)
         }
     };
