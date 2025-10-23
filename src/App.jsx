@@ -26,6 +26,7 @@ import ReputationListPage from './pages/user/ReputationListPage';
 import SentReputationListPage from './pages/user/SentReputationListPage';
 import SentSubstituteRequestListPage from './pages/user/SentSubstituteRequestListPage';
 import ReceivedSubstituteRequestListPage from './pages/user/ReceivedSubstituteRequestListPage';
+import OwnerSubstituteRequestListPage from './pages/owner/OwnerSubstituteRequestListPage';
 import ScheduleListPage from './pages/user/ScheduleListPage';
 import ApplicationListPage from './pages/user/ApplicationListPage';
 import ScheduleRequestPage from './pages/user/ScheduleRequestPage';
@@ -212,6 +213,14 @@ function App() {
                         element={
                             <ProtectedRoute requiredScope='MANAGER'>
                                 <ReputationNotificationListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/owner/substitute-requests'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <OwnerSubstituteRequestListPage />
                             </ProtectedRoute>
                         }
                     />
