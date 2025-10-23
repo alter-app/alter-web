@@ -105,58 +105,65 @@ const ReceivedSubstituteRequestCard = ({
                     <WorkplaceName>
                         {workspaceName}
                     </WorkplaceName>
+                </CardHeader>
+                <ScheduleSection>
+                    <ScheduleText>
+                        <DateText>{scheduleDate}</DateText>
+                        <Separator>·</Separator>
+                        <TimeText>{scheduleTime}</TimeText>
+                    </ScheduleText>
+                </ScheduleSection>
+                <PositionTimeAndStatusRow>
+                    <PositionTimeGroup>
+                        <PositionText>
+                            {position}
+                        </PositionText>
+                        <Separator>·</Separator>
+                        <TimeInfo>{timeAgo}</TimeInfo>
+                    </PositionTimeGroup>
                     <StatusBadge
                         $color={statusInfo.color}
                         $bgColor={statusInfo.bgColor}
                     >
                         {statusInfo.text}
                     </StatusBadge>
-                </CardHeader>
-                <CardSubtitle>
-                    <ScheduleText>
-                        <DateText>{scheduleDate}</DateText>
-                        <Separator>·</Separator>
-                        <TimeText>{scheduleTime}</TimeText>
-                    </ScheduleText>
-                    <PositionText>{position}</PositionText>
-                </CardSubtitle>
+                </PositionTimeAndStatusRow>
                 <CardContent>
-                    <RequesterInfo>
-                        <RequesterLabel>
-                            요청자
-                        </RequesterLabel>
-                        <RequesterName>
-                            {requesterName}
-                        </RequesterName>
-                    </RequesterInfo>
-                    {requestReason && (
-                        <ReasonInfo>
-                            <ReasonLabel>
-                                요청 사유
-                            </ReasonLabel>
-                            <ReasonText>
-                                {requestReason}
-                            </ReasonText>
-                        </ReasonInfo>
-                    )}
+                    <InfoSection>
+                        <RequesterInfo>
+                            <RequesterLabel>
+                                요청자
+                            </RequesterLabel>
+                            <RequesterName>
+                                {requesterName}
+                            </RequesterName>
+                        </RequesterInfo>
+                        {requestReason && (
+                            <ReasonInfo>
+                                <ReasonLabel>
+                                    요청 사유
+                                </ReasonLabel>
+                                <ReasonText>
+                                    {requestReason}
+                                </ReasonText>
+                            </ReasonInfo>
+                        )}
+                    </InfoSection>
                 </CardContent>
-                <CardFooter>
-                    <TimeAgo>{timeAgo}</TimeAgo>
-                    {canAccept && canReject && (
-                        <ButtonGroup>
-                            <AcceptButton
-                                onClick={handleAcceptClick}
-                            >
-                                수락
-                            </AcceptButton>
-                            <RejectButton
-                                onClick={handleRejectClick}
-                            >
-                                거절
-                            </RejectButton>
-                        </ButtonGroup>
-                    )}
-                </CardFooter>
+                {canAccept && canReject && (
+                    <ButtonGroup>
+                        <AcceptButton
+                            onClick={handleAcceptClick}
+                        >
+                            수락
+                        </AcceptButton>
+                        <RejectButton
+                            onClick={handleRejectClick}
+                        >
+                            거절
+                        </RejectButton>
+                    </ButtonGroup>
+                )}
             </CardContainer>
 
             <ConfirmModal
@@ -196,6 +203,9 @@ const CardContainer = styled.div`
     border: 1px solid #f0f0f0;
     border-radius: 12px;
     padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
     transition: all 0.2s ease;
 
     &:hover {
@@ -208,14 +218,23 @@ const CardHeader = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
 `;
 
-const CardSubtitle = styled.div`
+const ScheduleSection = styled.div`
     display: flex;
-    flex-direction: column;
-    gap: 4px;
-    margin-bottom: 12px;
+    align-items: center;
+`;
+
+const PositionTimeAndStatusRow = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+`;
+
+const PositionTimeGroup = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
 `;
 
 const ScheduleText = styled.p`
@@ -230,7 +249,7 @@ const ScheduleText = styled.p`
 `;
 
 const DateText = styled.span`
-    font-weight: 600;
+    font-weight: 500;
     color: #333333;
 `;
 
@@ -240,39 +259,49 @@ const Separator = styled.span`
 `;
 
 const TimeText = styled.span`
-    font-weight: 400;
-    color: #666666;
+    font-weight: 500;
+    color: #333333;
 `;
 
 const PositionText = styled.p`
     font-family: 'Pretendard';
     font-weight: 400;
-    font-size: 13px;
+    font-size: 14px;
     color: #666666;
     margin: 0;
 `;
 
 const CardContent = styled.div`
-    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+`;
+
+const InfoSection = styled.div`
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 `;
 
 const RequesterInfo = styled.div`
     display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
+    flex-direction: column;
+    gap: 4px;
 `;
 
 const RequesterLabel = styled.span`
     font-family: 'Pretendard';
-    font-weight: 500;
+    font-weight: 400;
     font-size: 13px;
-    color: #666666;
+    color: #999999;
 `;
 
 const RequesterName = styled.span`
     font-family: 'Pretendard';
-    font-weight: 600;
+    font-weight: 500;
     font-size: 14px;
     color: #333333;
 `;
@@ -285,23 +314,17 @@ const ReasonInfo = styled.div`
 
 const ReasonLabel = styled.span`
     font-family: 'Pretendard';
-    font-weight: 500;
+    font-weight: 400;
     font-size: 13px;
-    color: #666666;
+    color: #999999;
 `;
 
 const ReasonText = styled.span`
     font-family: 'Pretendard';
-    font-weight: 400;
+    font-weight: 500;
     font-size: 14px;
     color: #333333;
-    line-height: 1.4;
-`;
-
-const CardFooter = styled.div`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    line-height: 1.5;
 `;
 
 const WorkplaceName = styled.h4`
@@ -313,10 +336,16 @@ const WorkplaceName = styled.h4`
     flex: 1;
 `;
 
-const TimeAgo = styled.span`
+const TimeAndStatusRow = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+`;
+
+const TimeInfo = styled.div`
     font-family: 'Pretendard';
     font-weight: 400;
-    font-size: 12px;
+    font-size: 13px;
     color: #999999;
 `;
 
@@ -329,6 +358,7 @@ const StatusBadge = styled.div`
     color: ${(props) => props.$color};
     background: ${(props) => props.$bgColor};
     border: 1px solid ${(props) => props.$color}20;
+    white-space: nowrap;
 `;
 
 const ButtonGroup = styled.div`
@@ -337,14 +367,15 @@ const ButtonGroup = styled.div`
 `;
 
 const AcceptButton = styled.button`
-    padding: 6px 12px;
+    flex: 1;
+    padding: 12px 16px;
     background: #2de283;
     color: #ffffff;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-family: 'Pretendard';
-    font-weight: 500;
-    font-size: 12px;
+    font-weight: 600;
+    font-size: 14px;
     cursor: pointer;
     transition: background 0.2s ease;
 
@@ -358,14 +389,15 @@ const AcceptButton = styled.button`
 `;
 
 const RejectButton = styled.button`
-    padding: 6px 12px;
+    flex: 1;
+    padding: 12px 16px;
     background: #ef4444;
     color: #ffffff;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     font-family: 'Pretendard';
-    font-weight: 500;
-    font-size: 12px;
+    font-weight: 600;
+    font-size: 14px;
     cursor: pointer;
     transition: background 0.2s ease;
 

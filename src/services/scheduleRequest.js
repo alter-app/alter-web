@@ -202,16 +202,20 @@ export const acceptSubstituteRequest = async (
 /**
  * 받은 대타 요청 거절
  * @param {number} requestId - 대타 요청 ID
+ * @param {string} rejectionReason - 거절 사유
  * @returns {Promise} API 응답
  */
 export const rejectSubstituteRequest = async (
-    requestId
+    requestId,
+    rejectionReason = '개인 사정으로 인한 거절'
 ) => {
     const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await axios.post(
             `${backend}/app/substitute-requests/${requestId}/reject`,
-            {},
+            {
+                targetRejectionReason: rejectionReason,
+            },
             {
                 headers: {
                     'Content-Type': 'application/json',

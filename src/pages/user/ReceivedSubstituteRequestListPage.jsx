@@ -187,13 +187,8 @@ const ReceivedSubstituteRequestListPage = () => {
                     (item) => item.id !== request.id
                 )
             );
-
-            alert('대타 요청을 수락했습니다.');
         } catch (error) {
             console.error('대타 요청 수락 실패:', error);
-            alert(
-                '대타 요청 수락에 실패했습니다. 다시 시도해주세요.'
-            );
         }
     };
 
@@ -208,13 +203,8 @@ const ReceivedSubstituteRequestListPage = () => {
                     (item) => item.id !== request.id
                 )
             );
-
-            alert('대타 요청을 거절했습니다.');
         } catch (error) {
             console.error('대타 요청 거절 실패:', error);
-            alert(
-                '대타 요청 거절에 실패했습니다. 다시 시도해주세요.'
-            );
         }
     };
 
