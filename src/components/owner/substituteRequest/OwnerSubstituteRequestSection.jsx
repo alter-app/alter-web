@@ -7,35 +7,10 @@ const OwnerSubstituteRequestSection = ({
     onAccept,
     onReject,
 }) => {
-    const substituteIcon = (
-        <svg
-            width='20'
-            height='20'
-            viewBox='0 0 24 24'
-            fill='none'
-        >
-            <path
-                d='M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z'
-                stroke='#666666'
-                strokeWidth='2'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-            />
-            <path
-                d='M12 16L13.09 22.26L22 23L13.09 23.74L12 30L10.91 23.74L2 23L10.91 22.26L12 16Z'
-                stroke='#666666'
-                strokeWidth='2'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-            />
-        </svg>
-    );
-
     return (
         <Section>
             <SectionCard>
                 <SectionHeader>
-                    {substituteIcon}
                     <HeaderText>대타 요청 관리</HeaderText>
                 </SectionHeader>
                 <CardList>
