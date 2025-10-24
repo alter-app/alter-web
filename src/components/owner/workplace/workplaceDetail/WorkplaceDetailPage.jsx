@@ -14,11 +14,7 @@ import {
 } from '../../../../services/workplaceService';
 
 // 스케줄 데이터 변환 함수
-const convertScheduleData = (
-    scheduleArray,
-    year,
-    month
-) => {
+const convertScheduleData = (scheduleArray, year, month) => {
     // 해당 월의 첫 번째 날과 마지막 날
     const firstDay = new Date(year, month - 1, 1);
     const lastDay = new Date(year, month, 0);
@@ -28,15 +24,7 @@ const convertScheduleData = (
     const firstDayOfWeek = firstDay.getDay();
 
     const scheduleData = [];
-    const dayNames = [
-        '일',
-        '월',
-        '화',
-        '수',
-        '목',
-        '금',
-        '토',
-    ];
+    const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
 
     // 첫 번째 날 이전의 빈 날짜들 추가 (이전 달의 날짜들)
     for (let i = 0; i < firstDayOfWeek; i++) {
@@ -55,49 +43,33 @@ const convertScheduleData = (
         const dayName = dayNames[date.getDay()];
 
         // 해당 날짜의 스케줄 찾기
-        const daySchedules = scheduleArray.filter(
-            (schedule) => {
-                if (!schedule.startDateTime) return false;
+        const daySchedules = scheduleArray.filter((schedule) => {
+            if (!schedule.startDateTime) return false;
 
-                const scheduleDate = new Date(
-                    schedule.startDateTime
-                );
-                const isMatch =
-                    scheduleDate.getDate() === day &&
-                    scheduleDate.getMonth() === month - 1 &&
-                    scheduleDate.getFullYear() === year;
+            const scheduleDate = new Date(schedule.startDateTime);
+            const isMatch =
+                scheduleDate.getDate() === day &&
+                scheduleDate.getMonth() === month - 1 &&
+                scheduleDate.getFullYear() === year;
 
-                if (isMatch) {
-                    console.log(
-                        `날짜 ${day}일에 매칭된 스케줄:`,
-                        {
-                            scheduleDate:
-                                scheduleDate.toISOString(),
-                            workerName:
-                                schedule.assignedWorker
-                                    ?.workerName,
-                            position: schedule.position,
-                            startDateTime:
-                                schedule.startDateTime,
-                        }
-                    );
-                }
-
-                return isMatch;
+            if (isMatch) {
+                console.log(`날짜 ${day}일에 매칭된 스케줄:`, {
+                    scheduleDate: scheduleDate.toISOString(),
+                    workerName: schedule.assignedWorker?.workerName,
+                    position: schedule.position,
+                    startDateTime: schedule.startDateTime,
+                });
             }
-        );
 
-        console.log(
-            `날짜 ${day}일의 스케줄 개수:`,
-            daySchedules.length
-        );
+            return isMatch;
+        });
+
+        console.log(`날짜 ${day}일의 스케줄 개수:`, daySchedules.length);
 
         // 근무자 이름 추출 (중복 제거)
         const uniqueEmployees = [];
         daySchedules.forEach((schedule) => {
-            const workerName =
-                schedule.assignedWorker?.workerName ||
-                '알 수 없는 직원';
+            const workerName = schedule.assignedWorker?.workerName || '미배정';
             if (!uniqueEmployees.includes(workerName)) {
                 uniqueEmployees.push(workerName);
             }
@@ -121,24 +93,17 @@ const WorkplaceDetailPage = () => {
     // 업장 정보는 URL 파라미터에서 직접 사용
     const workplace = {
         id: workplaceId,
-        name: decodeURIComponent(
-            workplaceName || '알 수 없는 업장'
-        ),
+        name: decodeURIComponent(workplaceName || '알 수 없는 업장'),
     };
     const [managers, setManagers] = useState([]);
     const [workers, setWorkers] = useState([]);
     const [scheduleData, setScheduleData] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    const [workplaceInfo, setWorkplaceInfo] =
-        useState(null);
+    const [workplaceInfo, setWorkplaceInfo] = useState(null);
 
     // 월단위 전환을 위한 상태
-    const [currentYear, setCurrentYear] = useState(
-        new Date().getFullYear()
-    );
-    const [currentMonth, setCurrentMonth] = useState(
-        new Date().getMonth() + 1
-    );
+    const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+    const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
 
     useEffect(() => {
         const fetchWorkplaceData = async () => {
@@ -151,28 +116,19 @@ const WorkplaceDetailPage = () => {
                         '업장 상세 정보 조회 시작, workplaceId:',
                         workplaceId
                     );
-                    const workplaceDetailData =
-                        await getWorkplaceDetailInfo(
-                            parseInt(workplaceId)
-                        );
+                    const workplaceDetailData = await getWorkplaceDetailInfo(
+                        parseInt(workplaceId)
+                    );
                     console.log(
                         '업장 상세 정보 API 응답:',
                         workplaceDetailData
                     );
 
-                    if (
-                        workplaceDetailData &&
-                        workplaceDetailData.data
-                    ) {
-                        setWorkplaceInfo(
-                            workplaceDetailData.data
-                        );
+                    if (workplaceDetailData && workplaceDetailData.data) {
+                        setWorkplaceInfo(workplaceDetailData.data);
                     }
                 } catch (error) {
-                    console.error(
-                        '업장 상세 정보 조회 오류:',
-                        error
-                    );
+                    console.error('업장 상세 정보 조회 오류:', error);
                     setWorkplaceInfo(null);
                 }
 
@@ -183,27 +139,17 @@ const WorkplaceDetailPage = () => {
                         workplaceId
                     );
                     // 점주/매니저와 알바생 목록을 각각 조회
-                    const managersData =
-                        await getWorkplaceManagers(
-                            parseInt(workplaceId)
-                        );
-                    const workersData =
-                        await getWorkplaceWorkers(
-                            parseInt(workplaceId)
-                        );
-                    console.log(
-                        '점주/매니저 API 응답:',
-                        managersData
+                    const managersData = await getWorkplaceManagers(
+                        parseInt(workplaceId)
                     );
-                    console.log(
-                        '알바생 API 응답:',
-                        workersData
+                    const workersData = await getWorkplaceWorkers(
+                        parseInt(workplaceId)
                     );
+                    console.log('점주/매니저 API 응답:', managersData);
+                    console.log('알바생 API 응답:', workersData);
 
                     // 점주/매니저 데이터 변환 (중첩된 data 구조 처리)
-                    const managersArray = Array.isArray(
-                        managersData.data?.data
-                    )
+                    const managersArray = Array.isArray(managersData.data?.data)
                         ? managersData.data.data
                         : Array.isArray(managersData.data)
                         ? managersData.data
@@ -212,9 +158,7 @@ const WorkplaceDetailPage = () => {
                         : [];
 
                     // 알바생 데이터 변환 (중첩된 data 구조 처리)
-                    const workersArray = Array.isArray(
-                        workersData.data?.data
-                    )
+                    const workersArray = Array.isArray(workersData.data?.data)
                         ? workersData.data.data
                         : Array.isArray(workersData.data)
                         ? workersData.data
@@ -222,107 +166,66 @@ const WorkplaceDetailPage = () => {
                         ? workersData
                         : [];
 
-                    console.log(
-                        '점주/매니저 배열:',
-                        managersArray
-                    );
-                    console.log(
-                        '알바생 배열:',
-                        workersArray
-                    );
+                    console.log('점주/매니저 배열:', managersArray);
+                    console.log('알바생 배열:', workersArray);
 
                     // 점주/매니저 데이터를 컴포넌트에 맞게 변환
-                    const formattedManagers =
-                        managersArray.map((manager) => ({
-                            id: manager.id,
-                            user: {
-                                id: manager.user?.id,
-                                name:
-                                    manager.user?.name ||
-                                    '알 수 없는 점주/매니저',
-                            },
-                            position: {
-                                description:
-                                    manager.position
-                                        ?.description ||
-                                    '점주/매니저',
-                                emoji:
-                                    manager.position
-                                        ?.emoji || '👑',
-                            },
-                            avatar: manager.user?.name
-                                ? manager.user.name.charAt(
-                                      0
-                                  )
-                                : '?',
-                            status: 'manager',
-                            startTime: '점주/매니저',
-                        }));
+                    const formattedManagers = managersArray.map((manager) => ({
+                        id: manager.id,
+                        user: {
+                            id: manager.user?.id,
+                            name:
+                                manager.user?.name || '알 수 없는 점주/매니저',
+                        },
+                        position: {
+                            description:
+                                manager.position?.description || '점주/매니저',
+                            emoji: manager.position?.emoji || '👑',
+                        },
+                        avatar: manager.user?.name
+                            ? manager.user.name.charAt(0)
+                            : '?',
+                        status: 'manager',
+                        startTime: '점주/매니저',
+                    }));
 
                     // 알바생 데이터를 컴포넌트에 맞게 변환
-                    const formattedWorkers =
-                        workersArray.map((worker) => ({
-                            id: worker.id,
-                            user: {
-                                id: worker.user?.id,
-                                name:
-                                    worker.user?.name ||
-                                    '알 수 없는 알바생',
-                            },
-                            position: {
-                                description:
-                                    worker.position
-                                        ?.description ||
-                                    '알바생',
-                                emoji:
-                                    worker.position
-                                        ?.emoji || '👷',
-                            },
-                            avatar: worker.user?.name
-                                ? worker.user.name.charAt(0)
-                                : '?',
-                            status: 'worker',
-                            startTime: worker.employedAt
-                                ? `입사일: ${new Date(
-                                      worker.employedAt
-                                  ).toLocaleDateString(
-                                      'ko-KR'
-                                  )}`
-                                : '정보 없음',
-                            nextShift:
-                                worker.nextShiftDateTime
-                                    ? `다음 근무: ${new Date(
-                                          worker.nextShiftDateTime
-                                      ).toLocaleDateString(
-                                          'ko-KR'
-                                      )}`
-                                    : null,
-                        }));
+                    const formattedWorkers = workersArray.map((worker) => ({
+                        id: worker.id,
+                        user: {
+                            id: worker.user?.id,
+                            name: worker.user?.name || '알 수 없는 알바생',
+                        },
+                        position: {
+                            description:
+                                worker.position?.description || '알바생',
+                            emoji: worker.position?.emoji || '👷',
+                        },
+                        avatar: worker.user?.name
+                            ? worker.user.name.charAt(0)
+                            : '?',
+                        status: 'worker',
+                        startTime: worker.employedAt
+                            ? `입사일: ${new Date(
+                                  worker.employedAt
+                              ).toLocaleDateString('ko-KR')}`
+                            : '정보 없음',
+                        nextShift: worker.nextShiftDateTime
+                            ? `다음 근무: ${new Date(
+                                  worker.nextShiftDateTime
+                              ).toLocaleDateString('ko-KR')}`
+                            : null,
+                    }));
 
-                    console.log(
-                        '변환된 점주/매니저 목록:',
-                        formattedManagers
-                    );
-                    console.log(
-                        '변환된 근무자 목록:',
-                        formattedWorkers
-                    );
-                    console.log(
-                        '점주/매니저 수:',
-                        formattedManagers.length
-                    );
-                    console.log(
-                        '근무자 수:',
-                        formattedWorkers.length
-                    );
+                    console.log('변환된 점주/매니저 목록:', formattedManagers);
+                    console.log('변환된 근무자 목록:', formattedWorkers);
+                    console.log('점주/매니저 수:', formattedManagers.length);
+                    console.log('근무자 수:', formattedWorkers.length);
 
                     setManagers(formattedManagers);
                     setWorkers(formattedWorkers);
                 } catch (error) {
-                    console.error(
-                        '근무자 목록 조회 오류:',
-                        error
-                    );
+                    console.error('근무자 목록 조회 오류:', error);
                     // 에러 발생 시 빈 배열로 초기화
                     setManagers([]);
                     setWorkers([]);
@@ -330,10 +233,7 @@ const WorkplaceDetailPage = () => {
 
                 // 초기 스케줄 데이터 로딩은 별도 useEffect에서 처리
             } catch (error) {
-                console.error(
-                    '업장 데이터 로딩 오류:',
-                    error
-                );
+                console.error('업장 데이터 로딩 오류:', error);
             } finally {
                 setIsLoading(false);
             }
@@ -356,10 +256,7 @@ const WorkplaceDetailPage = () => {
                 year,
                 month
             );
-            console.log(
-                '업장 스케줄 API 응답:',
-                scheduleData
-            );
+            console.log('업장 스케줄 API 응답:', scheduleData);
 
             // 백엔드 데이터 구조에 맞게 스케줄 배열 추출
             let scheduleArray = [];
@@ -371,22 +268,15 @@ const WorkplaceDetailPage = () => {
                 scheduleArray = scheduleData.data;
             }
 
-            console.log(
-                '추출된 스케줄 배열:',
-                scheduleArray
-            );
+            console.log('추출된 스케줄 배열:', scheduleArray);
 
             // 스케줄 데이터를 컴포넌트에 맞게 변환
-            const formattedScheduleData =
-                convertScheduleData(
-                    scheduleArray,
-                    year,
-                    month
-                );
-            console.log(
-                '변환된 스케줄 데이터:',
-                formattedScheduleData
+            const formattedScheduleData = convertScheduleData(
+                scheduleArray,
+                year,
+                month
             );
+            console.log('변환된 스케줄 데이터:', formattedScheduleData);
             setScheduleData(formattedScheduleData);
         } catch (error) {
             console.error('업장 스케줄 조회 오류:', error);
@@ -417,10 +307,10 @@ const WorkplaceDetailPage = () => {
     // 월 변경 시 스케줄 데이터 다시 로딩
     useEffect(() => {
         if (workplaceId) {
-            console.log(
-                '월 변경으로 인한 스케줄 데이터 로딩:',
-                { currentYear, currentMonth }
-            );
+            console.log('월 변경으로 인한 스케줄 데이터 로딩:', {
+                currentYear,
+                currentMonth,
+            });
             loadScheduleData(currentYear, currentMonth);
         }
     }, [currentYear, currentMonth, workplaceId]);
@@ -438,9 +328,7 @@ const WorkplaceDetailPage = () => {
                     onBackClick={handleBackClick}
                 />
                 <Container>
-                    <LoadingMessage>
-                        데이터를 불러오는 중...
-                    </LoadingMessage>
+                    <LoadingMessage>데이터를 불러오는 중...</LoadingMessage>
                 </Container>
                 <OwnerBottomNavigation />
             </>
@@ -455,9 +343,7 @@ const WorkplaceDetailPage = () => {
                 onBackClick={handleBackClick}
             />
             <Container>
-                <WorkplaceInfoSection
-                    workplaceInfo={workplaceInfo}
-                />
+                <WorkplaceInfoSection workplaceInfo={workplaceInfo} />
                 <CurrentEmployeesSection
                     managers={managers}
                     workers={workers}

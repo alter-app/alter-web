@@ -10,7 +10,7 @@ import JobDetailFooter from './jobPostDetail/JobDetailFooter';
 import Divider from './jobPostDetail/Divider';
 import PageHeader from '../../shared/PageHeader';
 import JobApplyOverlay from './JobApplyOverlay';
-import CompletionModal from '../../shared/CompletionModal';
+import ConfirmModal from '../../shared/ConfirmModal';
 import { getPostDetail } from '../../../services/post';
 import useScrapStore from '../../../store/scrapStore';
 
@@ -24,7 +24,7 @@ const JobPostDetailOverlay = ({
     const [loading, setLoading] = useState(true);
     const [showApplyOverlay, setShowApplyOverlay] =
         useState(false);
-    const [showCompletionModal, setShowCompletionModal] =
+    const [showConfirmModal, setShowConfirmModal] =
         useState(false);
 
     // 스크랩 전역 상태 사용
@@ -78,11 +78,11 @@ const JobPostDetailOverlay = ({
         // 지원 오버레이 닫기
         setShowApplyOverlay(false);
         // 지원 성공 모달 표시
-        setShowCompletionModal(true);
+        setShowConfirmModal(true);
     };
 
-    const handleCloseCompletionModal = () => {
-        setShowCompletionModal(false);
+    const handleCloseConfirmModal = () => {
+        setShowConfirmModal(false);
     };
 
     // 스크랩 상태를 store에서 가져옴
@@ -196,13 +196,15 @@ const JobPostDetailOverlay = ({
             )}
 
             {/* 지원 완료 모달 */}
-            <CompletionModal
-                isOpen={showCompletionModal}
-                onClose={handleCloseCompletionModal}
-                icon='🎉'
+            <ConfirmModal
+                isOpen={showConfirmModal}
+                onClose={handleCloseConfirmModal}
+                onConfirm={handleCloseConfirmModal}
                 title='지원 완료!'
-                description='공고 지원이 성공적으로 완료되었습니다. 매니저의 검토 후 연락드릴 예정입니다.'
-                buttonText='확인'
+                message='공고 지원이 성공적으로 완료되었습니다. 매니저의 검토 후 연락드릴 예정입니다.'
+                confirmText='확인'
+                showCancel={false}
+                confirmColor='#2de283'
             />
         </Overlay>
     );

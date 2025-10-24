@@ -1,10 +1,8 @@
 import styled from 'styled-components';
 import { useState, useRef, useEffect } from 'react';
-import ConfirmModal from '../../../shared/ConfirmModal';
 import { useNavigate } from 'react-router-dom';
 
 const EmployeeCard = ({ employee, workplaceId }) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef(null);
     const navigate = useNavigate();
@@ -17,10 +15,6 @@ const EmployeeCard = ({ employee, workplaceId }) => {
         setIsMenuOpen(!isMenuOpen);
     };
 
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-    };
-
     const handleRequestReputation = () => {
         navigate('/reputation-write', {
             state: {
@@ -30,21 +24,31 @@ const EmployeeCard = ({ employee, workplaceId }) => {
                 type: 'worker',
             },
         });
-        setIsModalOpen(false);
+    };
+
+    const handleRequestScheduleChange = () => {
+        navigate('/schedule-request', {
+            state: {
+                targetWorker: {
+                    id: employee.id,
+                    name: employee.user.name,
+                    workplaceId: workplaceId,
+                    workplaceName:
+                        employee.workplaceName || '업장',
+                },
+            },
+        });
+        setIsMenuOpen(false);
     };
 
     const handleMenuOptionClick = (option) => {
         setIsMenuOpen(false);
         switch (option) {
             case 'reputation':
-                setIsModalOpen(true);
+                handleRequestReputation();
                 break;
             case 'changeWork':
-                console.log(
-                    '근무 바꾸기 클릭:',
-                    employee.user.name
-                );
-                // TODO: 근무 바꾸기 기능 구현
+                handleRequestScheduleChange();
                 break;
             case 'report':
                 console.log(
@@ -166,7 +170,7 @@ const EmployeeCard = ({ employee, workplaceId }) => {
                                         🔄
                                     </MenuItemIcon>
                                     <MenuItemText>
-                                        근무 바꾸기
+                                        대타 요청
                                     </MenuItemText>
                                 </MenuItem>
                                 <MenuItem
@@ -188,17 +192,6 @@ const EmployeeCard = ({ employee, workplaceId }) => {
                     </MenuContainer>
                 </CardRight>
             </Card>
-
-            <ConfirmModal
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-                onConfirm={handleRequestReputation}
-                title='평판 요청'
-                message={`${employee.user.name}님에 대한 평판을 작성하시겠습니까?`}
-                confirmText='평판 작성하기'
-                cancelText='취소'
-                confirmColor='#2de283'
-            />
         </>
     );
 };

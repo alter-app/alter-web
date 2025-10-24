@@ -20,8 +20,7 @@ const ScheduleModal = ({
             <ModalContainer>
                 <ModalHeader>
                     <Title>
-                        {selectedDate}일 ({selectedDay})
-                        스케줄
+                        {selectedDate}일 ({selectedDay}) 스케줄
                     </Title>
                     <CloseButton onClick={onClose}>
                         <svg
@@ -45,56 +44,41 @@ const ScheduleModal = ({
                     {schedules.length === 0 ? (
                         <EmptyMessage>
                             <EmptyIcon>🗓️</EmptyIcon>
-                            <EmptyText>
-                                이 날에는 스케줄이 없습니다.
-                            </EmptyText>
+                            <EmptyText>이 날에는 스케줄이 없습니다.</EmptyText>
                         </EmptyMessage>
                     ) : (
                         <ScheduleList>
-                            {schedules.map(
-                                (schedule, index) => (
-                                    <ScheduleItem
-                                        key={index}
-                                    >
-                                        <WorkerInfo>
-                                            <WorkerName>
-                                                {schedule
-                                                    .assignedWorker
-                                                    ?.workerName ||
-                                                    '알 수 없는 직원'}
-                                            </WorkerName>
-                                            <Position>
-                                                {schedule.position ||
-                                                    '직원'}
-                                            </Position>
-                                        </WorkerInfo>
-                                        <TimeInfo>
-                                            <TimeRange>
-                                                {schedule.startDateTime &&
-                                                    new Date(
-                                                        schedule.startDateTime
-                                                    ).toLocaleTimeString(
-                                                        'ko-KR',
-                                                        {
-                                                            hour: '2-digit',
-                                                            minute: '2-digit',
-                                                        }
-                                                    )}
-                                                {schedule.endDateTime &&
-                                                    ` - ${new Date(
-                                                        schedule.endDateTime
-                                                    ).toLocaleTimeString(
-                                                        'ko-KR',
-                                                        {
-                                                            hour: '2-digit',
-                                                            minute: '2-digit',
-                                                        }
-                                                    )}`}
-                                            </TimeRange>
-                                        </TimeInfo>
-                                    </ScheduleItem>
-                                )
-                            )}
+                            {schedules.map((schedule, index) => (
+                                <ScheduleItem key={index}>
+                                    <WorkerInfo>
+                                        <WorkerName>
+                                            {schedule.assignedWorker
+                                                ?.workerName || '미배정'}
+                                        </WorkerName>
+                                        <Position>
+                                            {schedule.position || '직원'}
+                                        </Position>
+                                    </WorkerInfo>
+                                    <TimeInfo>
+                                        <TimeRange>
+                                            {schedule.startDateTime &&
+                                                new Date(
+                                                    schedule.startDateTime
+                                                ).toLocaleTimeString('ko-KR', {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                })}
+                                            {schedule.endDateTime &&
+                                                ` - ${new Date(
+                                                    schedule.endDateTime
+                                                ).toLocaleTimeString('ko-KR', {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                })}`}
+                                        </TimeRange>
+                                    </TimeInfo>
+                                </ScheduleItem>
+                            ))}
                         </ScheduleList>
                     )}
                 </ModalContent>

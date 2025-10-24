@@ -128,7 +128,7 @@ const Message = styled.div`
 const ButtonGroup = styled.div`
     display: flex;
     gap: 12px;
-    padding: 16px 24px 24px 24px;
+    padding: 0px 24px 24px 24px;
 `;
 
 const CancelButton = styled.button`

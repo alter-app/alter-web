@@ -31,17 +31,12 @@ export const getUserReputationRequestsList = async (
         return data;
     } catch (error) {
         console.error('평판 요청 목록 조회 오류:', error);
-        throw new Error(
-            '평판 요청 목록 조회 중 오류가 발생했습니다.'
-        );
+        throw new Error('평판 요청 목록 조회 중 오류가 발생했습니다.');
     }
 };
 
 // 사용자용 평판 수락 및 작성 로직
-export const userSubmitReputation = async (
-    requestId,
-    keywordsPayload
-) => {
+export const userSubmitReputation = async (requestId, keywordsPayload) => {
     const accessToken = useAuthStore.getState().accessToken;
 
     try {
@@ -64,9 +59,7 @@ export const userSubmitReputation = async (
         }
     } catch (error) {
         console.error('평판 수락 및 작성 중 오류:', error);
-        throw new Error(
-            '평판 수락 및 작성 중 오류가 발생했습니다.'
-        );
+        throw new Error('평판 수락 및 작성 중 오류가 발생했습니다.');
     }
 };
 
@@ -91,9 +84,7 @@ export const userDeclineReputation = async (requestId) => {
         }
     } catch (error) {
         console.error('평판 요청 거절 중 오류:', error);
-        throw new Error(
-            '평판 요청 거절 중 오류가 발생했습니다.'
-        );
+        throw new Error('평판 요청 거절 중 오류가 발생했습니다.');
     }
 };
 
@@ -119,21 +110,13 @@ export const getUserWorkplaceList = async (pageSize) => {
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error(
-            '근무 중인 업장 목록 조회 오류:',
-            error
-        );
-        throw new Error(
-            '근무 중인 업장 목록 조회 중 오류가 발생했습니다.'
-        );
+        console.error('근무 중인 업장 목록 조회 오류:', error);
+        throw new Error('근무 중인 업장 목록 조회 중 오류가 발생했습니다.');
     }
 };
 
 // 사용자 스케줄 조회 로직
-export const getUserScheduleSelf = async (
-    year = null,
-    month = null
-) => {
+export const getUserScheduleSelf = async (year = null, month = null) => {
     const accessToken = useAuthStore.getState().accessToken;
     try {
         let url = `${backend}/app/schedules/self`;
@@ -157,9 +140,7 @@ export const getUserScheduleSelf = async (
         return data;
     } catch (error) {
         console.error('스케줄 조회 오류:', error);
-        throw new Error(
-            '스케줄 조회 중 오류가 발생했습니다.'
-        );
+        throw new Error('스케줄 조회 중 오류가 발생했습니다.');
     }
 };
 
@@ -191,10 +172,7 @@ export const getWorkplaceManagers = async (workplaceId) => {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error(
-                '서버 응답 오류 상세:',
-                errorText
-            );
+            console.error('서버 응답 오류 상세:', errorText);
             throw new Error(
                 `서버 응답 오류: ${response.status} ${response.statusText}`
             );
@@ -239,10 +217,7 @@ export const getWorkplaceWorkers = async (workplaceId) => {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error(
-                '서버 응답 오류 상세:',
-                errorText
-            );
+            console.error('서버 응답 오류 상세:', errorText);
             throw new Error(
                 `서버 응답 오류: ${response.status} ${response.statusText}`
             );
@@ -253,9 +228,7 @@ export const getWorkplaceWorkers = async (workplaceId) => {
         return data;
     } catch (error) {
         console.error('알바생 조회 오류:', error);
-        throw new Error(
-            `알바생 조회 중 오류가 발생했습니다: ${error.message}`
-        );
+        throw new Error(`알바생 조회 중 오류가 발생했습니다: ${error.message}`);
     }
 };
 
@@ -296,10 +269,7 @@ export const getWorkplaceEmployees = async (
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error(
-                '서버 응답 오류 상세:',
-                errorText
-            );
+            console.error('서버 응답 오류 상세:', errorText);
             throw new Error(
                 `서버 응답 오류: ${response.status} ${response.statusText}`
             );
@@ -309,12 +279,8 @@ export const getWorkplaceEmployees = async (
         console.log('API 응답 데이터 구조:', {
             hasData: !!data,
             dataKeys: data ? Object.keys(data) : [],
-            dataType: Array.isArray(data)
-                ? 'array'
-                : typeof data,
-            dataLength: Array.isArray(data)
-                ? data.length
-                : 'N/A',
+            dataType: Array.isArray(data) ? 'array' : typeof data,
+            dataLength: Array.isArray(data) ? data.length : 'N/A',
         });
 
         return data;
@@ -327,14 +293,10 @@ export const getWorkplaceEmployees = async (
 };
 
 // 업장별 스케줄 조회 로직
-export const getWorkplaceSchedule = async (
-    workspaceId,
-    year,
-    month
-) => {
+export const getWorkplaceSchedule = async (workspaceId, year, month) => {
     const accessToken = useAuthStore.getState().accessToken;
     try {
-        const url = `${backend}/app/schedules/workspace/${workspaceId}?year=${year}&month=${month}`;
+        const url = `${backend}/app/schedules/workspaces/${workspaceId}?year=${year}&month=${month}`;
 
         console.log('업장 스케줄 조회 API 요청:', {
             url,
@@ -360,10 +322,7 @@ export const getWorkplaceSchedule = async (
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error(
-                '서버 응답 오류 상세:',
-                errorText
-            );
+            console.error('서버 응답 오류 상세:', errorText);
             throw new Error(
                 `서버 응답 오류: ${response.status} ${response.statusText}`
             );
@@ -373,39 +332,23 @@ export const getWorkplaceSchedule = async (
         console.log('스케줄 API 응답 데이터 구조:', {
             hasData: !!data,
             dataKeys: data ? Object.keys(data) : [],
-            dataType: Array.isArray(data)
-                ? 'array'
-                : typeof data,
-            dataLength: Array.isArray(data)
-                ? data.length
-                : 'N/A',
+            dataType: Array.isArray(data) ? 'array' : typeof data,
+            dataLength: Array.isArray(data) ? data.length : 'N/A',
         });
 
         // 실제 데이터 내용 로깅
-        console.log(
-            '스케줄 API 전체 응답:',
-            JSON.stringify(data, null, 2)
-        );
+        console.log('스케줄 API 전체 응답:', JSON.stringify(data, null, 2));
 
         // 중첩된 데이터 구조 확인
         if (data && typeof data === 'object') {
             console.log('데이터 키들:', Object.keys(data));
             if (data.data) {
-                console.log(
-                    'data.data 타입:',
-                    typeof data.data
-                );
+                console.log('data.data 타입:', typeof data.data);
                 console.log('data.data 내용:', data.data);
                 if (Array.isArray(data.data)) {
-                    console.log(
-                        'data.data 배열 길이:',
-                        data.data.length
-                    );
+                    console.log('data.data 배열 길이:', data.data.length);
                     if (data.data.length > 0) {
-                        console.log(
-                            '첫 번째 data.data 요소:',
-                            data.data[0]
-                        );
+                        console.log('첫 번째 data.data 요소:', data.data[0]);
                     }
                 }
             }
@@ -421,10 +364,7 @@ export const getWorkplaceSchedule = async (
 };
 
 // 사용자용 업장 평판 생성
-export const createWorkerReputation = async (
-    workspaceId,
-    keywordsPayload
-) => {
+export const createWorkerReputation = async (workspaceId, keywordsPayload) => {
     const accessToken = useAuthStore.getState().accessToken;
 
     try {
@@ -448,9 +388,7 @@ export const createWorkerReputation = async (
         }
     } catch (error) {
         console.error('평판 생성 중 오류:', error);
-        throw new Error(
-            '평판 생성 중 오류가 발생했습니다.'
-        );
+        throw new Error('평판 생성 중 오류가 발생했습니다.');
     }
 };
 
@@ -485,20 +423,13 @@ export const getUserSentReputationRequestsList = async (
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error(
-            '보낸 평판 요청 목록 조회 오류:',
-            error
-        );
-        throw new Error(
-            '보낸 평판 요청 목록 조회 중 오류가 발생했습니다.'
-        );
+        console.error('보낸 평판 요청 목록 조회 오류:', error);
+        throw new Error('보낸 평판 요청 목록 조회 중 오류가 발생했습니다.');
     }
 };
 
 // 보낸 평판 요청 취소
-export const cancelSentReputationRequest = async (
-    requestId
-) => {
+export const cancelSentReputationRequest = async (requestId) => {
     const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
@@ -517,9 +448,7 @@ export const cancelSentReputationRequest = async (
         }
     } catch (error) {
         console.error('보낸 평판 요청 취소 오류:', error);
-        throw new Error(
-            '보낸 평판 요청 취소 중 오류가 발생했습니다.'
-        );
+        throw new Error('보낸 평판 요청 취소 중 오류가 발생했습니다.');
     }
 };
 
@@ -545,8 +474,6 @@ export const cancelApplication = async (applicationId) => {
         }
     } catch (error) {
         console.error('지원 취소 오류:', error);
-        throw new Error(
-            '지원 취소 중 오류가 발생했습니다.'
-        );
+        throw new Error('지원 취소 중 오류가 발생했습니다.');
     }
 };

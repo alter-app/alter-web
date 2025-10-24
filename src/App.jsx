@@ -24,8 +24,12 @@ import OwnerWorkplaceDetailPage from './components/owner/workplace/workplaceDeta
 import ReputationWrite from './pages/ReputationWrite';
 import ReputationListPage from './pages/user/ReputationListPage';
 import SentReputationListPage from './pages/user/SentReputationListPage';
+import SentSubstituteRequestListPage from './pages/user/SentSubstituteRequestListPage';
+import ReceivedSubstituteRequestListPage from './pages/user/ReceivedSubstituteRequestListPage';
+import OwnerSubstituteRequestListPage from './pages/owner/OwnerSubstituteRequestListPage';
 import ScheduleListPage from './pages/user/ScheduleListPage';
 import ApplicationListPage from './pages/user/ApplicationListPage';
+import ScheduleRequestPage from './pages/user/ScheduleRequestPage';
 
 function App() {
     return (
@@ -93,10 +97,34 @@ function App() {
                         }
                     />
                     <Route
+                        path='/sent-substitute-request-list'
+                        element={
+                            <ProtectedRoute>
+                                <SentSubstituteRequestListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/received-substitute-request-list'
+                        element={
+                            <ProtectedRoute>
+                                <ReceivedSubstituteRequestListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
                         path='/schedule-list'
                         element={
                             <ProtectedRoute>
                                 <ScheduleListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/schedule-request'
+                        element={
+                            <ProtectedRoute>
+                                <ScheduleRequestPage />
                             </ProtectedRoute>
                         }
                     />
@@ -185,6 +213,14 @@ function App() {
                         element={
                             <ProtectedRoute requiredScope='MANAGER'>
                                 <ReputationNotificationListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/owner/substitute-requests'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <OwnerSubstituteRequestListPage />
                             </ProtectedRoute>
                         }
                     />
