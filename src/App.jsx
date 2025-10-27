@@ -30,6 +30,8 @@ import OwnerSubstituteRequestListPage from './pages/owner/OwnerSubstituteRequest
 import ScheduleListPage from './pages/user/ScheduleListPage';
 import ApplicationListPage from './pages/user/ApplicationListPage';
 import ScheduleRequestPage from './pages/user/ScheduleRequestPage';
+import NotificationListPage from './pages/user/NotificationListPage';
+import ManagerNotificationListPage from './pages/owner/ManagerNotificationListPage';
 
 function App() {
     return (
@@ -137,6 +139,14 @@ function App() {
                         }
                     />
                     <Route
+                        path='/notifications'
+                        element={
+                            <ProtectedRoute>
+                                <NotificationListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
                         path='/job-lookup-map'
                         element={
                             <ProtectedRoute>
@@ -221,6 +231,14 @@ function App() {
                         element={
                             <ProtectedRoute requiredScope='MANAGER'>
                                 <OwnerSubstituteRequestListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/owner/notifications'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <ManagerNotificationListPage />
                             </ProtectedRoute>
                         }
                     />

@@ -13,7 +13,9 @@ const BottomNavigation = () => {
                 location.pathname === '/reputation-list' ||
                 location.pathname === '/schedule-list' ||
                 location.pathname === '/application-list' ||
-                location.pathname.startsWith('/my-job/workplace/')
+                location.pathname.startsWith(
+                    '/my-job/workplace/'
+                )
             );
         }
         if (path === '/mypage') {
@@ -32,15 +34,25 @@ const BottomNavigation = () => {
                 $active={isActive('/job-lookup-map')}
                 onClick={() => navigate('/job-lookup-map')}
             >
-                <HomeIcon $active={isActive('/job-lookup-map')} />
-                <NavLabel $active={isActive('/job-lookup-map')}>홈</NavLabel>
+                <HomeIcon
+                    $active={isActive('/job-lookup-map')}
+                />
+                <NavLabel
+                    $active={isActive('/job-lookup-map')}
+                >
+                    홈
+                </NavLabel>
             </NavItem>
             <NavItem
                 $active={isActive('/my-applications')}
                 onClick={() => navigate('/my-applications')}
             >
-                <CalendarIcon $active={isActive('/my-applications')} />
-                <NavLabel $active={isActive('/my-applications')}>
+                <CalendarIcon
+                    $active={isActive('/my-applications')}
+                />
+                <NavLabel
+                    $active={isActive('/my-applications')}
+                >
                     내알바
                 </NavLabel>
             </NavItem>
@@ -49,21 +61,33 @@ const BottomNavigation = () => {
                 // onClick={() => navigate('/chat')}
             >
                 <ChatIcon $active={isActive('/chat')} />
-                <NavLabel $active={isActive('/chat')}>채팅</NavLabel>
+                <NavLabel $active={isActive('/chat')}>
+                    채팅
+                </NavLabel>
             </NavItem>
             <NavItem
                 $active={isActive('/notifications')}
-                // onClick={() => navigate('/notifications')}
+                onClick={() => navigate('/notifications')}
             >
-                <NotificationIcon $active={isActive('/notifications')} />
-                <NavLabel $active={isActive('/notifications')}>알림</NavLabel>
+                <NotificationIcon
+                    $active={isActive('/notifications')}
+                />
+                <NavLabel
+                    $active={isActive('/notifications')}
+                >
+                    알림
+                </NavLabel>
             </NavItem>
             <NavItem
                 $active={isActive('/mypage')}
                 onClick={() => navigate('/mypage')}
             >
-                <ProfileIcon $active={isActive('/mypage')} />
-                <NavLabel $active={isActive('/mypage')}>MY</NavLabel>
+                <ProfileIcon
+                    $active={isActive('/mypage')}
+                />
+                <NavLabel $active={isActive('/mypage')}>
+                    MY
+                </NavLabel>
             </NavItem>
         </BottomNavContainer>
     );
@@ -87,7 +111,10 @@ const BottomNavContainer = styled.div`
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
 
     @supports (padding: max(0px)) {
-        padding-bottom: max(12px, env(safe-area-inset-bottom));
+        padding-bottom: max(
+            12px,
+            env(safe-area-inset-bottom)
+        );
     }
 
     @media (max-width: 480px) {
@@ -95,7 +122,10 @@ const BottomNavContainer = styled.div`
         padding: 14px 0;
 
         @supports (padding: max(0px)) {
-            padding-bottom: max(14px, env(safe-area-inset-bottom));
+            padding-bottom: max(
+                14px,
+                env(safe-area-inset-bottom)
+            );
         }
     }
 
@@ -104,7 +134,10 @@ const BottomNavContainer = styled.div`
         padding: 12px 0;
 
         @supports (padding: max(0px)) {
-            padding-bottom: max(12px, env(safe-area-inset-bottom));
+            padding-bottom: max(
+                12px,
+                env(safe-area-inset-bottom)
+            );
         }
     }
 `;
@@ -122,7 +155,8 @@ const NavItem = styled.div`
     flex: 1;
 
     &:hover {
-        background: ${(props) => (props.$active ? 'transparent' : '#f8f9fa')};
+        background: ${(props) =>
+            props.$active ? 'transparent' : '#f8f9fa'};
     }
 
     &:active {
@@ -144,7 +178,8 @@ const HomeIcon = styled.div`
     width: 24px;
     height: 24px;
     margin-bottom: 4px;
-    background: ${(props) => (props.$active ? '#399982' : '#666666')};
+    background: ${(props) =>
+        props.$active ? '#399982' : '#666666'};
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z'/%3E%3C/svg%3E")
         no-repeat center;
     mask-size: contain;
@@ -172,7 +207,8 @@ const CalendarIcon = styled.div`
     width: 24px;
     height: 24px;
     margin-bottom: 4px;
-    background: ${(props) => (props.$active ? '#399982' : '#666666')};
+    background: ${(props) =>
+        props.$active ? '#399982' : '#666666'};
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z'/%3E%3C/svg%3E")
         no-repeat center;
     mask-size: contain;
@@ -200,7 +236,8 @@ const ChatIcon = styled.div`
     width: 24px;
     height: 24px;
     margin-bottom: 4px;
-    background: ${(props) => (props.$active ? '#399982' : '#666666')};
+    background: ${(props) =>
+        props.$active ? '#399982' : '#666666'};
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z'/%3E%3C/svg%3E")
         no-repeat center;
     mask-size: contain;
@@ -228,7 +265,8 @@ const NotificationIcon = styled.div`
     width: 24px;
     height: 24px;
     margin-bottom: 4px;
-    background: ${(props) => (props.$active ? '#399982' : '#666666')};
+    background: ${(props) =>
+        props.$active ? '#399982' : '#666666'};
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z'/%3E%3C/svg%3E")
         no-repeat center;
     mask-size: contain;
@@ -256,7 +294,8 @@ const ProfileIcon = styled.div`
     width: 24px;
     height: 24px;
     margin-bottom: 4px;
-    background: ${(props) => (props.$active ? '#399982' : '#666666')};
+    background: ${(props) =>
+        props.$active ? '#399982' : '#666666'};
     mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'/%3E%3C/svg%3E")
         no-repeat center;
     mask-size: contain;
@@ -284,7 +323,8 @@ const NavLabel = styled.span`
     font-family: 'Pretendard';
     font-weight: 500;
     font-size: 12px;
-    color: ${(props) => (props.$active ? '#399982' : '#666666')};
+    color: ${(props) =>
+        props.$active ? '#399982' : '#666666'};
     transition: all 0.2s ease;
     text-align: center;
     line-height: 1.2;

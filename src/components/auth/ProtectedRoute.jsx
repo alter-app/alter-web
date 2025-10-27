@@ -24,6 +24,7 @@ const ProtectedRoute = ({ children, requiredScope }) => {
                 '/owner/sent-reputation',
                 '/owner/reputation-notification',
                 '/owner/substitute-requests',
+                '/owner/notifications',
             ].includes(location.pathname) ||
             location.pathname.startsWith(
                 '/workplace/detail/'
