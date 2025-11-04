@@ -12,6 +12,7 @@ import AddScheduleButton from '../../components/owner/jobPosting/AddScheduleButt
 import WageInputField from '../../components/owner/jobPosting/WageInputField';
 import DetailInputField from '../../components/owner/jobPosting/DetailInputField';
 import PageHeader from '../../components/shared/PageHeader';
+import ConfirmModal from '../../components/shared/ConfirmModal';
 
 const JobPosting = () => {
     const navigate = useNavigate();
@@ -56,6 +57,10 @@ const JobPosting = () => {
     const [businessName, setBusinessName] = useState(
         location.state?.businessName || ''
     );
+
+    // 작성 완료 확인 모달 상태
+    const [showConfirmModal, setShowConfirmModal] =
+        useState(false);
 
     // 급여 지급 방법 핸들러
     const handlePaymentTypeChange = (newType) => {
@@ -139,7 +144,17 @@ const JobPosting = () => {
         }));
     };
 
-    // 작성 버튼
+    // 작성 완료 확인 모달 열기
+    const handleOpenConfirmModal = () => {
+        setShowConfirmModal(true);
+    };
+
+    // 작성 완료 확인 모달 닫기
+    const handleCloseConfirmModal = () => {
+        setShowConfirmModal(false);
+    };
+
+    // 작성 버튼 (기존 로직 그대로 유지)
     const handleJobPosting = async () => {
         try {
             // null, undefined, 0 등 falsy 값 제거
@@ -154,6 +169,12 @@ const JobPosting = () => {
                 error.message || '공고 작성 중 오류 발생'
             );
         }
+    };
+
+    // 모달에서 확인 버튼 클릭 시 실행
+    const handleConfirmPosting = async () => {
+        setShowConfirmModal(false);
+        await handleJobPosting();
     };
 
     return (
@@ -243,10 +264,22 @@ const JobPosting = () => {
                     value={inputs.description}
                     onChange={handleInputChange}
                 />
-                <StyledButton onClick={handleJobPosting}>
+                <StyledButton
+                    onClick={handleOpenConfirmModal}
+                >
                     작성
                 </StyledButton>
             </Container>
+            <ConfirmModal
+                isOpen={showConfirmModal}
+                onClose={handleCloseConfirmModal}
+                onConfirm={handleConfirmPosting}
+                title='공고 작성'
+                message='공고 작성을 완료하시겠습니까?'
+                confirmText='작성 완료'
+                cancelText='취소'
+                confirmColor='#2de283'
+            />
         </>
     );
 };
