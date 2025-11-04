@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
     getAvailableKeywords,
     postJobPosting,
@@ -15,11 +15,15 @@ import PageHeader from '../../components/shared/PageHeader';
 
 const JobPosting = () => {
     const navigate = useNavigate();
+    const location = useLocation();
 
     // 키워드 조회
     const [keywords, setKeywords] = useState([]);
 
     useEffect(() => {
+        // 페이지 진입 시 상단으로 스크롤
+        window.scrollTo({ top: 0, behavior: 'instant' });
+
         const fetchKeywords = async () => {
             const result = await getAvailableKeywords();
             setKeywords(result.data);
@@ -29,7 +33,9 @@ const JobPosting = () => {
 
     // 스케줄, 키워드 등 모든 입력값 상태
     const [inputs, setInputs] = useState({
-        workspaceId: 4,
+        workspaceId: location.state?.workplaceId
+            ? parseInt(location.state.workplaceId)
+            : 4,
         title: '',
         description: '',
         payAmount: '',
@@ -45,6 +51,11 @@ const JobPosting = () => {
             },
         ],
     });
+
+    // 업장 상호명 상태
+    const [businessName, setBusinessName] = useState(
+        location.state?.businessName || ''
+    );
 
     // 급여 지급 방법 핸들러
     const handlePaymentTypeChange = (newType) => {
@@ -161,6 +172,12 @@ const JobPosting = () => {
                     <JobTitleField
                         placeholder='상호명'
                         title='상호명'
+                        name='businessName'
+                        value={businessName}
+                        onChange={(e) =>
+                            setBusinessName(e.target.value)
+                        }
+                        readOnly={true}
                     />
                 </JobTitleAndCompanyFields>
 
@@ -176,6 +193,7 @@ const JobPosting = () => {
                             <Dropdown
                                 key={idx}
                                 options={keywords}
+                                value={inputs.keywords[idx]}
                                 onChange={handleKeywordChange(
                                     idx
                                 )}

@@ -6,6 +6,7 @@ const JobTitleField = ({
     name,
     value,
     onChange,
+    readOnly = false,
 }) => {
     return (
         <StyledFieldGroup>
@@ -15,6 +16,7 @@ const JobTitleField = ({
                 name={name}
                 value={value}
                 onChange={onChange}
+                readOnly={readOnly}
             />
         </StyledFieldGroup>
     );
@@ -76,6 +78,12 @@ const StyledTextInput = styled.input`
     &:focus {
         outline: none;
         border: 1px solid #2de283;
+    }
+
+    &[readonly] {
+        background-color: #f9f9f9;
+        cursor: not-allowed;
+        color: #666666;
     }
 
     @media (max-width: 768px) {
