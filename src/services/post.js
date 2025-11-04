@@ -65,7 +65,7 @@ export const postJobPosting = async (inputs) => {
     const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
-            `${backend}/app/postings`,
+            `${backend}/manager/postings`,
             {
                 method: 'POST',
                 headers: {
