@@ -11,6 +11,7 @@ import WorkScheduleItem from '../../components/owner/jobPosting/WorkScheduleItem
 import AddScheduleButton from '../../components/owner/jobPosting/AddScheduleButton';
 import WageInputField from '../../components/owner/jobPosting/WageInputField';
 import DetailInputField from '../../components/owner/jobPosting/DetailInputField';
+import PageHeader from '../../components/shared/PageHeader';
 
 const JobPosting = () => {
     const navigate = useNavigate();
@@ -145,82 +146,90 @@ const JobPosting = () => {
     };
 
     return (
-        <Container>
-            <Title>공고 작성</Title>
-            <JobTitleAndCompanyFields>
-                <JobTitleField
-                    placeholder='공고 제목'
-                    title='공고 제목'
-                    name='title'
-                    value={inputs.title}
+        <>
+            <PageHeader title='공고 작성' />
+            <Container>
+                <JobTitleAndCompanyFields>
+                    <JobTitleField
+                        placeholder='공고 제목'
+                        title='공고 제목'
+                        name='title'
+                        value={inputs.title}
+                        onChange={handleInputChange}
+                    />
+                    <Divider />
+                    <JobTitleField
+                        placeholder='상호명'
+                        title='상호명'
+                    />
+                </JobTitleAndCompanyFields>
+
+                <StyledJobTypeGroup>
+                    <JobTypeRow>
+                        <SubTitle>업직종</SubTitle>
+                        <JobTypeInfo>
+                            업직종은 3개까지 선택 가능합니다
+                        </JobTypeInfo>
+                    </JobTypeRow>
+                    <JobTypeRow>
+                        {[0, 1, 2].map((idx) => (
+                            <Dropdown
+                                key={idx}
+                                options={keywords}
+                                onChange={handleKeywordChange(
+                                    idx
+                                )}
+                            />
+                        ))}
+                    </JobTypeRow>
+                </StyledJobTypeGroup>
+
+                <WorkScheduleGroup>
+                    <SubTitle>근무일정</SubTitle>
+                    {inputs.schedules.map(
+                        (schedule, idx) => (
+                            <WorkScheduleItem
+                                key={idx}
+                                schedule={schedule}
+                                index={idx + 1}
+                                onChange={(changed) =>
+                                    handleScheduleChange(
+                                        idx,
+                                        changed
+                                    )
+                                }
+                                onRemove={() =>
+                                    handleRemoveSchedule(
+                                        idx
+                                    )
+                                }
+                            />
+                        )
+                    )}
+                    <AddScheduleButton
+                        onClick={handleAddSchedule}
+                    />
+                </WorkScheduleGroup>
+
+                <WageInputField
+                    name='payAmount'
+                    value={inputs.payAmount}
+                    onChange={handleInputChange}
+                    payType={inputs.paymentType}
+                    onPayTypeChange={
+                        handlePaymentTypeChange
+                    }
+                />
+                <DetailInputField
+                    name='description'
+                    value={inputs.description}
                     onChange={handleInputChange}
                 />
-                <Divider />
-                <JobTitleField
-                    placeholder='상호명'
-                    title='상호명'
-                />
-            </JobTitleAndCompanyFields>
-
-            <StyledJobTypeGroup>
-                <JobTypeRow>
-                    <SubTitle>업직종</SubTitle>
-                    <JobTypeInfo>
-                        업직종은 3개까지 선택 가능합니다
-                    </JobTypeInfo>
-                </JobTypeRow>
-                <JobTypeRow>
-                    {[0, 1, 2].map((idx) => (
-                        <Dropdown
-                            key={idx}
-                            options={keywords}
-                            onChange={handleKeywordChange(
-                                idx
-                            )}
-                        />
-                    ))}
-                </JobTypeRow>
-            </StyledJobTypeGroup>
-
-            <WorkScheduleGroup>
-                <SubTitle>근무일정</SubTitle>
-                {inputs.schedules.map((schedule, idx) => (
-                    <WorkScheduleItem
-                        key={idx}
-                        schedule={schedule}
-                        index={idx + 1}
-                        onChange={(changed) =>
-                            handleScheduleChange(
-                                idx,
-                                changed
-                            )
-                        }
-                        onRemove={() =>
-                            handleRemoveSchedule(idx)
-                        }
-                    />
-                ))}
-                <AddScheduleButton
-                    onClick={handleAddSchedule}
-                />
-            </WorkScheduleGroup>
-
-            <WageInputField
-                name='payAmount'
-                value={inputs.payAmount}
-                onChange={handleInputChange}
-                payType={inputs.paymentType}
-                onPayTypeChange={handlePaymentTypeChange}
-            />
-            <DetailInputField
-                name='description'
-                value={inputs.description}
-                onChange={handleInputChange}
-            />
-            <StyledButton onClick={handleJobPosting}>
-                작성
-            </StyledButton>
-        </Container>
+                <StyledButton onClick={handleJobPosting}>
+                    작성
+                </StyledButton>
+            </Container>
+        </>
     );
 };
 
@@ -231,11 +240,22 @@ const Container = styled.div`
     flex-direction: column;
     align-items: center;
     gap: 20px;
+    width: 100%;
+    padding: 0 16px;
+    box-sizing: border-box;
+    padding-top: 80px;
+
+    @media (max-width: 768px) {
+        padding: 0 16px;
+        padding-top: 76px;
+        gap: 16px;
+    }
 `;
 
 const JobTitleAndCompanyFields = styled.div`
-    width: 820px;
-    height: 177px;
+    width: 100%;
+    max-width: 820px;
+    min-height: 177px;
     background-color: #ffffff;
     border-radius: 4px;
     padding: 24px 20px;
@@ -243,17 +263,28 @@ const JobTitleAndCompanyFields = styled.div`
     display: flex;
     flex-direction: column;
     gap: 16px;
+
+    @media (max-width: 768px) {
+        padding: 20px 16px;
+        gap: 12px;
+        min-height: auto;
+    }
 `;
 
 const Divider = styled.div`
-    width: 772px;
+    width: 100%;
     height: 1px;
     background: #f4f4f4;
+
+    @media (max-width: 768px) {
+        width: 100%;
+    }
 `;
 
 const StyledJobTypeGroup = styled.div`
-    width: 820px;
-    height: 152px;
+    width: 100%;
+    max-width: 820px;
+    min-height: 152px;
     background-color: #ffffff;
     border-radius: 4px;
     display: flex;
@@ -261,6 +292,12 @@ const StyledJobTypeGroup = styled.div`
     box-sizing: border-box;
     padding: 28px 20px;
     justify-content: space-between;
+
+    @media (max-width: 768px) {
+        padding: 20px 16px;
+        gap: 16px;
+        min-height: auto;
+    }
 `;
 
 const SubTitle = styled.div`
@@ -271,6 +308,11 @@ const SubTitle = styled.div`
     color: #111111;
     display: flex;
     align-items: center;
+
+    @media (max-width: 768px) {
+        font-size: 15px;
+        line-height: 22px;
+    }
 `;
 
 const JobTypeInfo = styled.div`
@@ -281,21 +323,22 @@ const JobTypeInfo = styled.div`
     color: #999999;
     display: flex;
     align-items: center;
+
+    @media (max-width: 768px) {
+        font-size: 13px;
+        line-height: 18px;
+    }
 `;
 
 const JobTypeRow = styled.div`
     display: flex;
     flex-direction: row;
     gap: 16px;
-`;
 
-const Title = styled.div`
-    font-family: 'Pretendard';
-    font-weight: 600;
-    font-size: 32px;
-    line-height: 42px;
-    color: #111111;
-    margin-top: 60px;
+    @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 12px;
+    }
 `;
 
 const WorkScheduleGroup = styled.div`
@@ -307,10 +350,18 @@ const WorkScheduleGroup = styled.div`
     border-radius: 4px;
     box-sizing: border-box;
     gap: 30px;
+    width: 100%;
+    max-width: 820px;
+
+    @media (max-width: 768px) {
+        padding: 16px;
+        gap: 20px;
+    }
 `;
 
 const StyledButton = styled.button`
-    width: 820px;
+    width: 100%;
+    max-width: 820px;
     height: 48px;
     border: none;
     background: #2de283;
@@ -321,4 +372,11 @@ const StyledButton = styled.button`
     font-weight: 400;
     border-radius: 8px;
     cursor: pointer;
+    margin-bottom: 20px;
+
+    @media (max-width: 768px) {
+        height: 52px;
+        font-size: 16px;
+        margin-bottom: 16px;
+    }
 `;

@@ -12,7 +12,8 @@ const AddScheduleButton = ({ onClick }) => {
 export default AddScheduleButton;
 
 const Container = styled.div`
-    width: 780px;
+    width: 100%;
+    max-width: 780px;
     height: 48px;
     cursor: pointer;
     display: flex;
@@ -21,4 +22,13 @@ const Container = styled.div`
     background-color: #ffffff;
     border-radius: 8px;
     border: solid 1px #d9d9d9;
+    touch-action: manipulation;
+
+    @media (max-width: 768px) {
+        height: 52px;
+    }
+
+    &:active {
+        background-color: #f9f9f9;
+    }
 `;

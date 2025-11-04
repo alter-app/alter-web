@@ -85,6 +85,12 @@ const SelectBox = styled.div`
     cursor: pointer;
     display: flex;
     align-items: center;
+
+    @media (max-width: 768px) {
+        width: ${({ width }) => (width ? `100%` : '100%')};
+        height: 48px;
+        padding: 12px 14px;
+    }
 `;
 
 const ArrowWrapper = styled.div`
@@ -109,6 +115,11 @@ const Label = styled.div`
     overflow: hidden; /* 넘치는 내용 숨김 */
     white-space: nowrap; /* 줄바꿈 없이 한 줄로 표시 */
     text-overflow: ellipsis; /* 넘치면 ...으로 표시 */
+
+    @media (max-width: 768px) {
+        width: calc(100% - 50px);
+        font-size: 15px;
+    }
 `;
 
 const SelectOptions = styled.ul`
@@ -127,6 +138,12 @@ const SelectOptions = styled.ul`
         $show ? 'auto' : 'none'};
     list-style: none;
     padding: 0;
+
+    @media (max-width: 768px) {
+        top: 100%;
+        max-height: ${({ $show }) =>
+            $show ? '180px' : '0'};
+    }
 `;
 
 const Option = styled.li`
@@ -136,10 +153,18 @@ const Option = styled.li`
     line-height: 20px;
     padding: 10px;
     cursor: pointer;
+    touch-action: manipulation;
+
     &:hover {
         color: white;
         border-radius: 5px;
         background: #2de283;
+    }
+
+    @media (max-width: 768px) {
+        padding: 12px 10px;
+        font-size: 15px;
+        line-height: 22px;
     }
 `;
 

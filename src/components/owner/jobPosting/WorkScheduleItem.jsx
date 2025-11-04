@@ -97,12 +97,6 @@ const WorkScheduleItem = ({
                             ))}
                         </WorkingDaysCategory>
                     </WeekDiv>
-                    <TimeGap>
-                        <NegotiableTimeWrapper>
-                            요일 협의가능
-                        </NegotiableTimeWrapper>
-                        <StyledCheckbox />
-                    </TimeGap>
                 </Column>
                 <Divider />
                 <Column>
@@ -110,7 +104,7 @@ const WorkScheduleItem = ({
                         <WorkTimeLabel>
                             근무시간
                         </WorkTimeLabel>
-                        <TimeGap>
+                        <TimeGap $isTimeInput>
                             <TimeInput
                                 placeholder='시작시간'
                                 value={startTime}
@@ -127,12 +121,6 @@ const WorkScheduleItem = ({
                             />
                         </TimeGap>
                     </WeekDiv>
-                    <TimeGap>
-                        <NegotiableTimeWrapper>
-                            시간 협의가능
-                        </NegotiableTimeWrapper>
-                        <StyledCheckbox />
-                    </TimeGap>
                 </Column>
             </Row>
         </ScheduleItemContainer>
@@ -142,13 +130,19 @@ const WorkScheduleItem = ({
 export default WorkScheduleItem;
 
 const ScheduleItemContainer = styled.div`
-    width: 780px;
-    height: 160px;
+    width: 100%;
+    max-width: 780px;
+    min-height: 160px;
     background-color: #ffffff;
     border: solid 1px #d9d9d9;
     border-radius: 4px;
     box-sizing: border-box;
     padding: 16px;
+
+    @media (max-width: 768px) {
+        padding: 16px 12px;
+        min-height: auto;
+    }
 `;
 
 const ScheduleTitle = styled.div`
@@ -157,25 +151,47 @@ const ScheduleTitle = styled.div`
     font-size: 16px;
     line-height: 24px;
     color: #767676;
+
+    @media (max-width: 768px) {
+        font-size: 15px;
+        line-height: 22px;
+    }
 `;
 
 const TopRow = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 16px;
+
+    @media (max-width: 768px) {
+        margin-bottom: 12px;
+    }
 `;
 
 const Row = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 20px;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
 `;
 
 const Column = styled.div`
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: 74px;
+    justify-content: flex-start;
+    flex: 1;
+
+    @media (max-width: 768px) {
+        width: 100%;
+        gap: 12px;
+    }
 `;
 
 const WeekdayLabel = styled.div`
@@ -184,6 +200,11 @@ const WeekdayLabel = styled.div`
     font-size: 15px;
     line-height: 22px;
     color: #767676;
+
+    @media (max-width: 768px) {
+        font-size: 14px;
+        line-height: 20px;
+    }
 `;
 
 const WorkTimeLabel = styled.div`
@@ -192,11 +213,21 @@ const WorkTimeLabel = styled.div`
     font-size: 15px;
     line-height: 22px;
     color: #767676;
+
+    @media (max-width: 768px) {
+        font-size: 14px;
+        line-height: 20px;
+    }
 `;
 
 const WorkingDaysCategory = styled.div`
     display: flex;
     gap: 13px;
+    flex-wrap: wrap;
+
+    @media (max-width: 768px) {
+        gap: 8px;
+    }
 `;
 
 const DayBox = styled.button`
@@ -214,6 +245,7 @@ const DayBox = styled.button`
     border: solid 1px #d9d9d9;
     background-color: #ffffff;
     cursor: pointer;
+    touch-action: manipulation;
 
     ${({ $isSelected }) =>
         $isSelected &&
@@ -222,12 +254,22 @@ const DayBox = styled.button`
             background: #2de283;
             border: none;
         `}
+
+    @media (max-width: 768px) {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
 `;
 
 const Divider = styled.div`
     width: 1px;
-    height: 88px;
+    height: 48px;
     background: #d9d9d9;
+
+    @media (max-width: 768px) {
+        display: none;
+    }
 `;
 
 const TimeInput = styled.input`
@@ -245,6 +287,7 @@ const TimeInput = styled.input`
     border-radius: 8px;
     border-color: #f6f6f6;
     background-color: #f6f6f6;
+    flex: 1;
 
     &::placeholder {
         color: #999999;
@@ -254,6 +297,11 @@ const TimeInput = styled.input`
         outline: none;
         border: 1px solid #2de283;
     }
+
+    @media (max-width: 768px) {
+        flex: 1;
+        min-width: 0;
+    }
 `;
 
 const NegotiableTimeWrapper = styled.div`
@@ -262,6 +310,11 @@ const NegotiableTimeWrapper = styled.div`
     font-size: 14px;
     line-height: 20px;
     color: #767676;
+
+    @media (max-width: 768px) {
+        font-size: 13px;
+        line-height: 18px;
+    }
 `;
 
 const StyledCheckbox = styled.input.attrs({
@@ -269,12 +322,23 @@ const StyledCheckbox = styled.input.attrs({
 })`
     accent-color: #2de283;
     margin: 0px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 `;
 
 const TimeGap = styled.div`
     display: flex;
-    justify-content: end;
-    gap: 4px;
+    justify-content: flex-end;
+    gap: 8px;
+    align-items: center;
+
+    @media (max-width: 768px) {
+        justify-content: flex-start;
+        flex-direction: row;
+        gap: 8px;
+        width: 100%;
+    }
 `;
 
 const WeekDiv = styled.div`
@@ -282,4 +346,12 @@ const WeekDiv = styled.div`
     gap: 16px;
     display: flex;
     align-items: center;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+        height: auto;
+        gap: 12px;
+        width: 100%;
+    }
 `;
