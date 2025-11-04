@@ -95,7 +95,7 @@ export const getAvailableKeywords = async () => {
     const accessToken = useAuthStore.getState().accessToken;
     try {
         const response = await fetch(
-            `${backend}/app/postings/available-keywords`,
+            `${backend}/manager/postings/available-keywords`,
             {
                 method: 'GET',
                 headers: {
