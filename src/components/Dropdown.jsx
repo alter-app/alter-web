@@ -2,19 +2,39 @@ import styled, { css } from 'styled-components';
 import { useState, useEffect, useRef } from 'react';
 import ArrowDownIcon from '../assets/icons/dropdown.svg';
 
-const Dropdown = ({ options = [], onChange, width }) => {
+const Dropdown = ({
+    options = [],
+    onChange,
+    width,
+    value,
+}) => {
     const list = options;
     const selectRef = useRef(null);
-    const [currentValue, setCurrentValue] = useState();
+    const [currentValue, setCurrentValue] = useState(() => {
+        // value prop이 있으면 해당 값을 찾아서 설정
+        if (value && list.length > 0) {
+            const found = list.find(
+                (item) => item.id === value
+            );
+            return found || null;
+        }
+        return null;
+    });
     const [showOptions, setShowOptions] = useState(false);
 
-    // options가 바뀔 때마다 currentValue도 갱신
+    // value prop이 변경되면 currentValue 업데이트
     useEffect(() => {
-        if (list.length > 0 && !currentValue) {
-            setCurrentValue(list[0]); // 처음 한 번만 초기 선택
-            if (onChange) onChange(list[0].id);
+        if (value && list.length > 0) {
+            const found = list.find(
+                (item) => item.id === value
+            );
+            if (found) {
+                setCurrentValue(found);
+            }
+        } else if (!value) {
+            setCurrentValue(null);
         }
-    }, [list]);
+    }, [value, list]);
 
     // 외부 클릭 감지되면 드롭다운 닫음
     useEffect(() => {
@@ -41,7 +61,7 @@ const Dropdown = ({ options = [], onChange, width }) => {
             width={width}
         >
             <Label width={width}>
-                {currentValue?.name}
+                {currentValue?.name || '선택하세요'}
             </Label>
             <ArrowWrapper>
                 <DropdownIcon
@@ -85,6 +105,12 @@ const SelectBox = styled.div`
     cursor: pointer;
     display: flex;
     align-items: center;
+
+    @media (max-width: 768px) {
+        width: ${({ width }) => (width ? `100%` : '100%')};
+        height: 48px;
+        padding: 12px 14px;
+    }
 `;
 
 const ArrowWrapper = styled.div`
@@ -109,11 +135,16 @@ const Label = styled.div`
     overflow: hidden; /* 넘치는 내용 숨김 */
     white-space: nowrap; /* 줄바꿈 없이 한 줄로 표시 */
     text-overflow: ellipsis; /* 넘치면 ...으로 표시 */
+
+    @media (max-width: 768px) {
+        width: calc(100% - 50px);
+        font-size: 15px;
+    }
 `;
 
 const SelectOptions = styled.ul`
     position: absolute;
-    top: 31px;
+    top: calc(100% + 4px);
     left: 0;
     width: 100%;
     overflow-y: auto;
@@ -127,6 +158,13 @@ const SelectOptions = styled.ul`
         $show ? 'auto' : 'none'};
     list-style: none;
     padding: 0;
+    margin: 0;
+
+    @media (max-width: 768px) {
+        top: calc(100% + 4px);
+        max-height: ${({ $show }) =>
+            $show ? '180px' : '0'};
+    }
 `;
 
 const Option = styled.li`
@@ -134,12 +172,20 @@ const Option = styled.li`
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
-    padding: 10px;
+    padding: 8px 10px;
     cursor: pointer;
+    touch-action: manipulation;
+
     &:hover {
         color: white;
         border-radius: 5px;
         background: #2de283;
+    }
+
+    @media (max-width: 768px) {
+        padding: 10px 10px;
+        font-size: 15px;
+        line-height: 22px;
     }
 `;
 

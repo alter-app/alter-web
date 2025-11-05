@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
     getAvailableKeywords,
     postJobPosting,
@@ -11,14 +11,20 @@ import WorkScheduleItem from '../../components/owner/jobPosting/WorkScheduleItem
 import AddScheduleButton from '../../components/owner/jobPosting/AddScheduleButton';
 import WageInputField from '../../components/owner/jobPosting/WageInputField';
 import DetailInputField from '../../components/owner/jobPosting/DetailInputField';
+import PageHeader from '../../components/shared/PageHeader';
+import ConfirmModal from '../../components/shared/ConfirmModal';
 
 const JobPosting = () => {
     const navigate = useNavigate();
+    const location = useLocation();
 
     // 키워드 조회
     const [keywords, setKeywords] = useState([]);
 
     useEffect(() => {
+        // 페이지 진입 시 상단으로 스크롤
+        window.scrollTo({ top: 0, behavior: 'instant' });
+
         const fetchKeywords = async () => {
             const result = await getAvailableKeywords();
             setKeywords(result.data);
@@ -28,7 +34,9 @@ const JobPosting = () => {
 
     // 스케줄, 키워드 등 모든 입력값 상태
     const [inputs, setInputs] = useState({
-        workspaceId: 4,
+        workspaceId: location.state?.workplaceId
+            ? parseInt(location.state.workplaceId)
+            : 4,
         title: '',
         description: '',
         payAmount: '',
@@ -44,6 +52,15 @@ const JobPosting = () => {
             },
         ],
     });
+
+    // 업장 상호명 상태
+    const [businessName, setBusinessName] = useState(
+        location.state?.businessName || ''
+    );
+
+    // 작성 완료 확인 모달 상태
+    const [showConfirmModal, setShowConfirmModal] =
+        useState(false);
 
     // 급여 지급 방법 핸들러
     const handlePaymentTypeChange = (newType) => {
@@ -127,7 +144,17 @@ const JobPosting = () => {
         }));
     };
 
-    // 작성 버튼
+    // 작성 완료 확인 모달 열기
+    const handleOpenConfirmModal = () => {
+        setShowConfirmModal(true);
+    };
+
+    // 작성 완료 확인 모달 닫기
+    const handleCloseConfirmModal = () => {
+        setShowConfirmModal(false);
+    };
+
+    // 작성 버튼 (기존 로직 그대로 유지)
     const handleJobPosting = async () => {
         try {
             // null, undefined, 0 등 falsy 값 제거
@@ -144,83 +171,193 @@ const JobPosting = () => {
         }
     };
 
+    // 모달에서 확인 버튼 클릭 시 실행
+    const handleConfirmPosting = async () => {
+        setShowConfirmModal(false);
+        await handleJobPosting();
+    };
+
+    // 필수 입력값 검증 함수
+    const isFormValid = () => {
+        // 공고 제목 검증
+        if (!inputs.title || inputs.title.trim() === '') {
+            return false;
+        }
+
+        // 상호명 검증
+        if (!businessName || businessName.trim() === '') {
+            return false;
+        }
+
+        // 업직종 검증 (최소 1개 이상)
+        const validKeywords =
+            inputs.keywords.filter(Boolean);
+        if (validKeywords.length === 0) {
+            return false;
+        }
+
+        // 근무일정 검증 (최소 1개 이상)
+        if (
+            !inputs.schedules ||
+            inputs.schedules.length === 0
+        ) {
+            return false;
+        }
+
+        // 각 일정의 필수값 검증
+        for (let i = 0; i < inputs.schedules.length; i++) {
+            const schedule = inputs.schedules[i];
+            if (
+                !schedule.workingDays ||
+                schedule.workingDays.length === 0
+            ) {
+                return false;
+            }
+            if (
+                !schedule.startTime ||
+                schedule.startTime.trim() === ''
+            ) {
+                return false;
+            }
+            if (
+                !schedule.endTime ||
+                schedule.endTime.trim() === ''
+            ) {
+                return false;
+            }
+        }
+
+        // 급여 검증
+        if (
+            !inputs.payAmount ||
+            inputs.payAmount.trim() === ''
+        ) {
+            return false;
+        }
+
+        // 상세내용 검증
+        if (
+            !inputs.description ||
+            inputs.description.trim() === ''
+        ) {
+            return false;
+        }
+
+        return true;
+    };
+
+    // 버튼 활성화 여부
+    const isButtonDisabled = !isFormValid();
+
     return (
-        <Container>
-            <Title>공고 작성</Title>
-            <JobTitleAndCompanyFields>
-                <JobTitleField
-                    placeholder='공고 제목'
-                    title='공고 제목'
-                    name='title'
-                    value={inputs.title}
+        <>
+            <PageHeader title='공고 작성' />
+            <Container>
+                <JobTitleAndCompanyFields>
+                    <JobTitleField
+                        placeholder='공고 제목'
+                        title='공고 제목'
+                        name='title'
+                        value={inputs.title}
+                        onChange={handleInputChange}
+                    />
+                    <Divider />
+                    <JobTitleField
+                        placeholder='상호명'
+                        title='상호명'
+                        name='businessName'
+                        value={businessName}
+                        onChange={(e) =>
+                            setBusinessName(e.target.value)
+                        }
+                        readOnly={true}
+                    />
+                </JobTitleAndCompanyFields>
+
+                <StyledJobTypeGroup>
+                    <JobTypeRow>
+                        <SubTitle>업직종</SubTitle>
+                        <JobTypeInfo>
+                            업직종은 3개까지 선택 가능합니다
+                        </JobTypeInfo>
+                    </JobTypeRow>
+                    <JobTypeRow>
+                        {[0, 1, 2].map((idx) => (
+                            <Dropdown
+                                key={idx}
+                                options={keywords}
+                                value={inputs.keywords[idx]}
+                                onChange={handleKeywordChange(
+                                    idx
+                                )}
+                            />
+                        ))}
+                    </JobTypeRow>
+                </StyledJobTypeGroup>
+
+                <WorkScheduleGroup>
+                    <SubTitle>근무일정</SubTitle>
+                    {inputs.schedules.map(
+                        (schedule, idx) => (
+                            <WorkScheduleItem
+                                key={idx}
+                                schedule={schedule}
+                                index={idx + 1}
+                                onChange={(changed) =>
+                                    handleScheduleChange(
+                                        idx,
+                                        changed
+                                    )
+                                }
+                                onRemove={
+                                    inputs.schedules
+                                        .length > 1
+                                        ? () =>
+                                              handleRemoveSchedule(
+                                                  idx
+                                              )
+                                        : null
+                                }
+                            />
+                        )
+                    )}
+                    <AddScheduleButton
+                        onClick={handleAddSchedule}
+                    />
+                </WorkScheduleGroup>
+
+                <WageInputField
+                    name='payAmount'
+                    value={inputs.payAmount}
+                    onChange={handleInputChange}
+                    payType={inputs.paymentType}
+                    onPayTypeChange={
+                        handlePaymentTypeChange
+                    }
+                />
+                <DetailInputField
+                    name='description'
+                    value={inputs.description}
                     onChange={handleInputChange}
                 />
-                <Divider />
-                <JobTitleField
-                    placeholder='상호명'
-                    title='상호명'
-                />
-            </JobTitleAndCompanyFields>
-
-            <StyledJobTypeGroup>
-                <JobTypeRow>
-                    <SubTitle>업직종</SubTitle>
-                    <JobTypeInfo>
-                        업직종은 3개까지 선택 가능합니다
-                    </JobTypeInfo>
-                </JobTypeRow>
-                <JobTypeRow>
-                    {[0, 1, 2].map((idx) => (
-                        <Dropdown
-                            key={idx}
-                            options={keywords}
-                            onChange={handleKeywordChange(
-                                idx
-                            )}
-                        />
-                    ))}
-                </JobTypeRow>
-            </StyledJobTypeGroup>
-
-            <WorkScheduleGroup>
-                <SubTitle>근무일정</SubTitle>
-                {inputs.schedules.map((schedule, idx) => (
-                    <WorkScheduleItem
-                        key={idx}
-                        schedule={schedule}
-                        index={idx + 1}
-                        onChange={(changed) =>
-                            handleScheduleChange(
-                                idx,
-                                changed
-                            )
-                        }
-                        onRemove={() =>
-                            handleRemoveSchedule(idx)
-                        }
-                    />
-                ))}
-                <AddScheduleButton
-                    onClick={handleAddSchedule}
-                />
-            </WorkScheduleGroup>
-
-            <WageInputField
-                name='payAmount'
-                value={inputs.payAmount}
-                onChange={handleInputChange}
-                payType={inputs.paymentType}
-                onPayTypeChange={handlePaymentTypeChange}
+                <StyledButton
+                    onClick={handleOpenConfirmModal}
+                    disabled={isButtonDisabled}
+                >
+                    작성
+                </StyledButton>
+            </Container>
+            <ConfirmModal
+                isOpen={showConfirmModal}
+                onClose={handleCloseConfirmModal}
+                onConfirm={handleConfirmPosting}
+                title='공고 작성'
+                message='공고 작성을 완료하시겠습니까?'
+                confirmText='작성 완료'
+                cancelText='취소'
+                confirmColor='#2de283'
             />
-            <DetailInputField
-                name='description'
-                value={inputs.description}
-                onChange={handleInputChange}
-            />
-            <StyledButton onClick={handleJobPosting}>
-                작성
-            </StyledButton>
-        </Container>
+        </>
     );
 };
 
@@ -231,11 +368,22 @@ const Container = styled.div`
     flex-direction: column;
     align-items: center;
     gap: 20px;
+    width: 100%;
+    padding: 0 16px;
+    box-sizing: border-box;
+    padding-top: 80px;
+
+    @media (max-width: 768px) {
+        padding: 0 16px;
+        padding-top: 76px;
+        gap: 16px;
+    }
 `;
 
 const JobTitleAndCompanyFields = styled.div`
-    width: 820px;
-    height: 177px;
+    width: 100%;
+    max-width: 820px;
+    min-height: 177px;
     background-color: #ffffff;
     border-radius: 4px;
     padding: 24px 20px;
@@ -243,17 +391,28 @@ const JobTitleAndCompanyFields = styled.div`
     display: flex;
     flex-direction: column;
     gap: 16px;
+
+    @media (max-width: 768px) {
+        padding: 20px 16px;
+        gap: 12px;
+        min-height: auto;
+    }
 `;
 
 const Divider = styled.div`
-    width: 772px;
+    width: 100%;
     height: 1px;
     background: #f4f4f4;
+
+    @media (max-width: 768px) {
+        width: 100%;
+    }
 `;
 
 const StyledJobTypeGroup = styled.div`
-    width: 820px;
-    height: 152px;
+    width: 100%;
+    max-width: 820px;
+    min-height: 152px;
     background-color: #ffffff;
     border-radius: 4px;
     display: flex;
@@ -261,6 +420,12 @@ const StyledJobTypeGroup = styled.div`
     box-sizing: border-box;
     padding: 28px 20px;
     justify-content: space-between;
+
+    @media (max-width: 768px) {
+        padding: 20px 16px;
+        gap: 16px;
+        min-height: auto;
+    }
 `;
 
 const SubTitle = styled.div`
@@ -271,6 +436,11 @@ const SubTitle = styled.div`
     color: #111111;
     display: flex;
     align-items: center;
+
+    @media (max-width: 768px) {
+        font-size: 15px;
+        line-height: 22px;
+    }
 `;
 
 const JobTypeInfo = styled.div`
@@ -281,21 +451,22 @@ const JobTypeInfo = styled.div`
     color: #999999;
     display: flex;
     align-items: center;
+
+    @media (max-width: 768px) {
+        font-size: 13px;
+        line-height: 18px;
+    }
 `;
 
 const JobTypeRow = styled.div`
     display: flex;
     flex-direction: row;
     gap: 16px;
-`;
 
-const Title = styled.div`
-    font-family: 'Pretendard';
-    font-weight: 600;
-    font-size: 32px;
-    line-height: 42px;
-    color: #111111;
-    margin-top: 60px;
+    @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 12px;
+    }
 `;
 
 const WorkScheduleGroup = styled.div`
@@ -307,18 +478,46 @@ const WorkScheduleGroup = styled.div`
     border-radius: 4px;
     box-sizing: border-box;
     gap: 30px;
+    width: 100%;
+    max-width: 820px;
+
+    @media (max-width: 768px) {
+        padding: 16px;
+        gap: 20px;
+    }
 `;
 
 const StyledButton = styled.button`
-    width: 820px;
+    width: 100%;
+    max-width: 820px;
     height: 48px;
     border: none;
-    background: #2de283;
+    background: ${(props) =>
+        props.disabled ? '#cccccc' : '#2de283'};
     color: #ffffff;
     font-size: 16px;
     line-height: 20px;
     font-family: 'Pretendard';
     font-weight: 400;
     border-radius: 8px;
-    cursor: pointer;
+    cursor: ${(props) =>
+        props.disabled ? 'not-allowed' : 'pointer'};
+    margin-bottom: 20px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background: ${(props) =>
+            props.disabled ? '#cccccc' : '#28d075'};
+    }
+
+    &:active {
+        background: ${(props) =>
+            props.disabled ? '#cccccc' : '#24be67'};
+    }
+
+    @media (max-width: 768px) {
+        height: 52px;
+        font-size: 16px;
+        margin-bottom: 16px;
+    }
 `;

@@ -25,9 +25,6 @@ const WageInputField = ({
         <WageContainer>
             <TitleRow>
                 <WageTitle>급여</WageTitle>
-                <TitleInfo>
-                    급여는 시급으로 자동 변환 됩니다.
-                </TitleInfo>
             </TitleRow>
             <WageRow>
                 <WageColumn>
@@ -96,12 +93,6 @@ const WageInputField = ({
                 </WageColumn>
                 <Divider />
                 <WageColumn>
-                    <PayInfoNotice>
-                        2025년 기준 최저시급은 {minimumWage}
-                        원 입니다. 근로시간 6시간 이상시
-                        1시간잉상의 휴게시간ㅍ부과되어야
-                        합니다잉 관련법률 어쩌구
-                    </PayInfoNotice>
                     <CalculatedPayContainer>
                         <CalculatedPayBox>
                             <CalculatedPayLabel>
@@ -128,12 +119,18 @@ const WageInputField = ({
 export default WageInputField;
 
 const WageContainer = styled.div`
-    width: 820px;
-    height: 333px;
+    width: 100%;
+    max-width: 820px;
+    min-height: 333px;
     background-color: #ffffff;
     border-radius: 4px;
     padding: 20px;
     box-sizing: border-box;
+
+    @media (max-width: 768px) {
+        padding: 20px 16px;
+        min-height: auto;
+    }
 `;
 
 const WageTitle = styled.div`
@@ -142,6 +139,11 @@ const WageTitle = styled.div`
     font-size: 16px;
     line-height: 24px;
     color: #111111;
+
+    @media (max-width: 768px) {
+        font-size: 15px;
+        line-height: 22px;
+    }
 `;
 
 const TitleInfo = styled.div`
@@ -150,6 +152,11 @@ const TitleInfo = styled.div`
     font-size: 14px;
     line-height: 20px;
     color: #999999;
+
+    @media (max-width: 768px) {
+        font-size: 13px;
+        line-height: 18px;
+    }
 `;
 
 const TitleRow = styled.div`
@@ -157,6 +164,13 @@ const TitleRow = styled.div`
     gap: 16px;
     align-items: center;
     margin-bottom: 40px;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 24px;
+    }
 `;
 
 const RadioGroup = styled.div`
@@ -164,17 +178,27 @@ const RadioGroup = styled.div`
     gap: 32px;
     align-items: center;
     margin-bottom: 16px;
+
+    @media (max-width: 768px) {
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+    }
 `;
 
 const RadioLabel = styled.label`
     display: flex;
     cursor: pointer;
     gap: 8px;
+    align-items: center;
 `;
 
 const RadioInput = styled.input.attrs({ type: 'radio' })`
     accent-color: #2de283;
     margin: 0px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
 `;
 
 const RadioText = styled.span`
@@ -183,6 +207,11 @@ const RadioText = styled.span`
     font-size: 14px;
     line-height: 20px;
     color: #767676;
+
+    @media (max-width: 768px) {
+        font-size: 13px;
+        line-height: 18px;
+    }
 `;
 
 const WageInput = styled.input`
@@ -200,6 +229,7 @@ const WageInput = styled.input`
     border-radius: 8px;
     border-color: #f6f6f6;
     background-color: #f6f6f6;
+    flex: 1;
 
     &::placeholder {
         color: #999999;
@@ -208,6 +238,10 @@ const WageInput = styled.input`
     &:focus {
         outline: none;
         border: 1px solid #2de283;
+    }
+
+    @media (max-width: 768px) {
+        width: 100%;
     }
 `;
 
@@ -226,6 +260,7 @@ const TimeInput = styled.input`
     border-radius: 8px;
     border-color: #f6f6f6;
     background-color: #f6f6f6;
+    flex: 1;
 
     &::placeholder {
         color: #999999;
@@ -235,6 +270,10 @@ const TimeInput = styled.input`
         outline: none;
         border: 1px solid #2de283;
     }
+
+    @media (max-width: 768px) {
+        width: 100%;
+    }
 `;
 
 const Measure = styled.div`
@@ -243,6 +282,13 @@ const Measure = styled.div`
     font-size: 15px;
     line-height: 22px;
     color: #111111;
+    white-space: nowrap;
+    margin-left: 8px;
+
+    @media (max-width: 768px) {
+        font-size: 14px;
+        margin-left: 4px;
+    }
 `;
 
 const InputRow = styled.div`
@@ -250,6 +296,10 @@ const InputRow = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    @media (max-width: 768px) {
+        width: 100%;
+    }
 `;
 
 const WageInfo = styled.div`
@@ -260,12 +310,22 @@ const WageInfo = styled.div`
     color: #dc0000;
     padding-left: 4px;
     margin-bottom: 27px;
+
+    @media (max-width: 768px) {
+        font-size: 13px;
+        line-height: 18px;
+        margin-bottom: 20px;
+    }
 `;
 
 const Divider = styled.div`
     width: 1px;
     height: 200px;
     background: #d9d9d9;
+
+    @media (max-width: 768px) {
+        display: none;
+    }
 `;
 
 const PayInfoNotice = styled.div`
@@ -276,23 +336,45 @@ const PayInfoNotice = styled.div`
     color: #999999;
     width: 286px;
     margin-bottom: 60px;
+
+    @media (max-width: 768px) {
+        width: 100%;
+        margin-bottom: 24px;
+        font-size: 12px;
+        line-height: 18px;
+    }
 `;
 
 const WageRow = styled.div`
     display: flex;
     gap: 30px;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 24px;
+    }
 `;
 
 const WageColumn = styled.div`
     display: flex;
     flex-direction: column;
     justify-content: center;
+    flex: 1;
+
+    @media (max-width: 768px) {
+        width: 100%;
+    }
 `;
 
 const CalculatedPayContainer = styled.div`
     display: flex;
     width: 318px;
     justify-content: end;
+
+    @media (max-width: 768px) {
+        width: 100%;
+        justify-content: flex-start;
+    }
 `;
 
 const CalculatedPayBox = styled.div`
@@ -301,6 +383,12 @@ const CalculatedPayBox = styled.div`
     border-bottom: solid 1px rgba(153, 153, 153, 0.2);
     justify-content: end;
     align-items: end;
+
+    @media (max-width: 768px) {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 12px;
+    }
 `;
 
 const CalculatedPayValue = styled.div`
@@ -309,6 +397,11 @@ const CalculatedPayValue = styled.div`
     font-size: 24px;
     line-height: 34px;
     color: #111111;
+
+    @media (max-width: 768px) {
+        font-size: 20px;
+        line-height: 28px;
+    }
 `;
 
 const CalculatedPayLabel = styled.div`
@@ -317,4 +410,9 @@ const CalculatedPayLabel = styled.div`
     font-size: 15px;
     line-height: 22px;
     color: #767676;
+
+    @media (max-width: 768px) {
+        font-size: 14px;
+        line-height: 20px;
+    }
 `;

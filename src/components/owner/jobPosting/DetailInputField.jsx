@@ -20,11 +20,16 @@ const DetailInputField = ({ name, value, onChange }) => {
 export default DetailInputField;
 
 const Container = styled.div`
-    width: 820px;
+    width: 100%;
+    max-width: 820px;
     background-color: #ffffff;
     border-radius: 4px;
     padding: 20px;
     box-sizing: border-box;
+
+    @media (max-width: 768px) {
+        padding: 20px 16px;
+    }
 `;
 
 const Title = styled.div`
@@ -33,6 +38,11 @@ const Title = styled.div`
     font-size: 16px;
     line-height: 24px;
     color: #111111;
+
+    @media (max-width: 768px) {
+        font-size: 15px;
+        line-height: 22px;
+    }
 `;
 
 const DetailTextArea = styled.textarea`
@@ -49,11 +59,20 @@ const DetailTextArea = styled.textarea`
     font-weight: 400;
     font-size: 15px;
     line-height: 22px;
+
     &:focus {
         border: 1px solid #2de283;
     }
 
     &::placeholder {
         color: #999999;
+    }
+
+    @media (max-width: 768px) {
+        height: 250px;
+        margin-top: 16px;
+        padding: 12px;
+        font-size: 15px;
+        line-height: 22px;
     }
 `;
