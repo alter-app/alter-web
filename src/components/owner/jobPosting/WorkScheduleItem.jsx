@@ -66,12 +66,14 @@ const WorkScheduleItem = ({
         <ScheduleItemContainer>
             <TopRow>
                 <ScheduleTitle>일정 {index}</ScheduleTitle>
-                <img
-                    src={deleteIcon}
-                    alt='닫기'
-                    style={{ cursor: 'pointer' }}
-                    onClick={onRemove}
-                />
+                {onRemove && (
+                    <img
+                        src={deleteIcon}
+                        alt='닫기'
+                        style={{ cursor: 'pointer' }}
+                        onClick={onRemove}
+                    />
+                )}
             </TopRow>
             <Row>
                 <Column>

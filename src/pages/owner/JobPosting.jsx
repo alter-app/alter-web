@@ -177,6 +177,78 @@ const JobPosting = () => {
         await handleJobPosting();
     };
 
+    // 필수 입력값 검증 함수
+    const isFormValid = () => {
+        // 공고 제목 검증
+        if (!inputs.title || inputs.title.trim() === '') {
+            return false;
+        }
+
+        // 상호명 검증
+        if (!businessName || businessName.trim() === '') {
+            return false;
+        }
+
+        // 업직종 검증 (최소 1개 이상)
+        const validKeywords =
+            inputs.keywords.filter(Boolean);
+        if (validKeywords.length === 0) {
+            return false;
+        }
+
+        // 근무일정 검증 (최소 1개 이상)
+        if (
+            !inputs.schedules ||
+            inputs.schedules.length === 0
+        ) {
+            return false;
+        }
+
+        // 각 일정의 필수값 검증
+        for (let i = 0; i < inputs.schedules.length; i++) {
+            const schedule = inputs.schedules[i];
+            if (
+                !schedule.workingDays ||
+                schedule.workingDays.length === 0
+            ) {
+                return false;
+            }
+            if (
+                !schedule.startTime ||
+                schedule.startTime.trim() === ''
+            ) {
+                return false;
+            }
+            if (
+                !schedule.endTime ||
+                schedule.endTime.trim() === ''
+            ) {
+                return false;
+            }
+        }
+
+        // 급여 검증
+        if (
+            !inputs.payAmount ||
+            inputs.payAmount.trim() === ''
+        ) {
+            return false;
+        }
+
+        // 상세내용 검증
+        if (
+            !inputs.description ||
+            inputs.description.trim() === ''
+        ) {
+            return false;
+        }
+
+        return true;
+    };
+
+    // 버튼 활성화 여부
+    const isButtonDisabled = !isFormValid();
+
     return (
         <>
             <PageHeader title='공고 작성' />
@@ -237,10 +309,14 @@ const JobPosting = () => {
                                         changed
                                     )
                                 }
-                                onRemove={() =>
-                                    handleRemoveSchedule(
-                                        idx
-                                    )
+                                onRemove={
+                                    inputs.schedules
+                                        .length > 1
+                                        ? () =>
+                                              handleRemoveSchedule(
+                                                  idx
+                                              )
+                                        : null
                                 }
                             />
                         )
@@ -266,6 +342,7 @@ const JobPosting = () => {
                 />
                 <StyledButton
                     onClick={handleOpenConfirmModal}
+                    disabled={isButtonDisabled}
                 >
                     작성
                 </StyledButton>
@@ -415,15 +492,28 @@ const StyledButton = styled.button`
     max-width: 820px;
     height: 48px;
     border: none;
-    background: #2de283;
+    background: ${(props) =>
+        props.disabled ? '#cccccc' : '#2de283'};
     color: #ffffff;
     font-size: 16px;
     line-height: 20px;
     font-family: 'Pretendard';
     font-weight: 400;
     border-radius: 8px;
-    cursor: pointer;
+    cursor: ${(props) =>
+        props.disabled ? 'not-allowed' : 'pointer'};
     margin-bottom: 20px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background: ${(props) =>
+            props.disabled ? '#cccccc' : '#28d075'};
+    }
+
+    &:active {
+        background: ${(props) =>
+            props.disabled ? '#cccccc' : '#24be67'};
+    }
 
     @media (max-width: 768px) {
         height: 52px;
