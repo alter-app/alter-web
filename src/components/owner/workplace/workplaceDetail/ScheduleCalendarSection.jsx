@@ -8,6 +8,8 @@ const ScheduleCalendarSection = ({
     currentMonth,
     onPrevMonth,
     onNextMonth,
+    workplaceId,
+    onScheduleCreated,
 }) => {
     const currentDate = new Date();
     const [selectedDate, setSelectedDate] = useState(
@@ -229,6 +231,10 @@ const ScheduleCalendarSection = ({
                 selectedDate={selectedDate}
                 selectedDay={selectedDayData?.day}
                 schedules={selectedDayData?.schedules || []}
+                workplaceId={workplaceId}
+                currentYear={currentYear}
+                currentMonth={currentMonth}
+                onScheduleCreated={onScheduleCreated}
             />
         </Section>
     );
