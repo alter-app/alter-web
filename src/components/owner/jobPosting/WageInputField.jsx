@@ -25,9 +25,6 @@ const WageInputField = ({
         <WageContainer>
             <TitleRow>
                 <WageTitle>급여</WageTitle>
-                <TitleInfo>
-                    급여는 시급으로 자동 변환 됩니다.
-                </TitleInfo>
             </TitleRow>
             <WageRow>
                 <WageColumn>
@@ -96,12 +93,6 @@ const WageInputField = ({
                 </WageColumn>
                 <Divider />
                 <WageColumn>
-                    <PayInfoNotice>
-                        2025년 기준 최저시급은 {minimumWage}
-                        원 입니다. 근로시간 6시간 이상시
-                        1시간잉상의 휴게시간ㅍ부과되어야
-                        합니다잉 관련법률 어쩌구
-                    </PayInfoNotice>
                     <CalculatedPayContainer>
                         <CalculatedPayBox>
                             <CalculatedPayLabel>
