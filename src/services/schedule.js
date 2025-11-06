@@ -41,3 +41,38 @@ export const createSchedule = async ({
         );
     }
 };
+
+// 근무자 배정 로직
+export const assignWorker = async ({
+    workShiftId,
+    workerId,
+}) => {
+    const accessToken = useAuthStore.getState().accessToken;
+    try {
+        const response = await fetch(
+            `${backend}/manager/schedules/${workShiftId}/workers`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({
+                    workerId,
+                }),
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('근무자 배정 오류:', error);
+        throw new Error(
+            '근무자 배정 중 오류가 발생했습니다.'
+        );
+    }
+};
