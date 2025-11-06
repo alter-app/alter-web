@@ -57,7 +57,7 @@ const Container = styled.div`
     padding: 16px;
     background: #f8f9fa;
     border-radius: 12px;
-    border-left: 4px solid #1976d2;
+    border-left: 4px solid #399982;
     cursor: ${(props) =>
         props.$isClickable ? 'pointer' : 'default'};
     transition: all 0.2s ease;
@@ -66,7 +66,7 @@ const Container = styled.div`
         props.$isClickable &&
         `
         &:hover {
-            background: #e8f4f8;
+            background: #e8f5f0;
             transform: translateY(-2px);
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
@@ -106,5 +106,5 @@ const TimeRange = styled.div`
     font-family: 'Pretendard';
     font-weight: 500;
     font-size: 14px;
-    color: #1976d2;
+    color: #399982;
 `;

@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import {
     createSchedule,
     assignWorker,
+    updateWorker,
+    removeWorker,
 } from '../../../../services/schedule';
 import { autoInsertColon } from '../../../../utils/timeUtil';
 import { getWorkplaceEmployee } from '../../../../services/workplaceService';
@@ -41,6 +43,18 @@ const ScheduleModal = ({
         showAssignConfirmModal,
         setShowAssignConfirmModal,
     ] = useState(false);
+    const [showUpdateModal, setShowUpdateModal] =
+        useState(false);
+    const [
+        showUpdateConfirmModal,
+        setShowUpdateConfirmModal,
+    ] = useState(false);
+    const [
+        showRemoveConfirmModal,
+        setShowRemoveConfirmModal,
+    ] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [isRemoving, setIsRemoving] = useState(false);
 
     // 모달이 열릴 때마다 폼 상태 초기화
     useEffect(() => {
@@ -50,6 +64,7 @@ const ScheduleModal = ({
             setEndTime('');
             setPosition('');
             setShowAssignModal(false);
+            setShowUpdateModal(false);
             setSelectedSchedule(null);
             setSelectedWorkerId(null);
         }
@@ -58,7 +73,10 @@ const ScheduleModal = ({
     // 근무자 목록 조회
     useEffect(() => {
         const fetchWorkers = async () => {
-            if (showAssignModal && workplaceId) {
+            if (
+                (showAssignModal || showUpdateModal) &&
+                workplaceId
+            ) {
                 setIsLoadingWorkers(true);
                 try {
                     const response =
@@ -137,7 +155,7 @@ const ScheduleModal = ({
         };
 
         fetchWorkers();
-    }, [showAssignModal, workplaceId]);
+    }, [showAssignModal, showUpdateModal, workplaceId]);
 
     if (!isOpen) return null;
 
@@ -180,17 +198,21 @@ const ScheduleModal = ({
     };
 
     const handleSubmitClick = () => {
-        if (!startTime || !endTime || !position) {
-            alert('모든 필드를 입력해주세요.');
-            return;
-        }
-
         if (!workplaceId) {
             alert('업장 ID가 없습니다.');
             return;
         }
 
         setShowConfirmModal(true);
+    };
+
+    // 스케줄 추가 폼 유효성 검사
+    const isScheduleFormValid = () => {
+        return (
+            startTime.trim() !== '' &&
+            endTime.trim() !== '' &&
+            position.trim() !== ''
+        );
     };
 
     const handleConfirmSubmit = async () => {
@@ -329,10 +351,18 @@ const ScheduleModal = ({
 
     // 스케줄 클릭 핸들러
     const handleScheduleClick = (schedule) => {
-        // 미배정인 경우에만 근무자 배정 모달 열기
+        setSelectedSchedule(schedule);
+        // 미배정인 경우 근무자 배정 모달, 배정된 경우 근무자 변경/제거 모달
         if (!schedule.assignedWorker) {
-            setSelectedSchedule(schedule);
             setShowAssignModal(true);
+        } else {
+            // 배정된 스케줄의 경우 현재 근무자 ID를 미리 선택
+            const currentWorkerId =
+                schedule.assignedWorker?.workerId ||
+                schedule.assignedWorker?.id ||
+                schedule.assignedWorker?.user?.id;
+            setSelectedWorkerId(currentWorkerId);
+            setShowUpdateModal(true);
         }
     };
 
@@ -401,6 +431,124 @@ const ScheduleModal = ({
             );
         } finally {
             setIsAssigning(false);
+        }
+    };
+
+    // 근무자 변경 모달 취소
+    const handleCancelUpdate = () => {
+        setShowUpdateModal(false);
+        setSelectedSchedule(null);
+        setSelectedWorkerId(null);
+    };
+
+    // 근무자 변경 버튼 클릭 (확인 모달 열기)
+    const handleUpdateClick = () => {
+        if (!selectedSchedule || !selectedWorkerId) {
+            alert('근무자를 선택해주세요.');
+            return;
+        }
+        setShowUpdateConfirmModal(true);
+    };
+
+    // 근무자 변경 확인 (실제 변경 실행)
+    const handleConfirmUpdate = async () => {
+        setShowUpdateConfirmModal(false);
+
+        if (!selectedSchedule || !selectedWorkerId) {
+            alert('근무자를 선택해주세요.');
+            return;
+        }
+
+        try {
+            setIsUpdating(true);
+
+            const workShiftId =
+                selectedSchedule.shiftId ||
+                selectedSchedule.id ||
+                selectedSchedule.workShiftId;
+
+            if (!workShiftId) {
+                throw new Error(
+                    '스케줄 ID를 찾을 수 없습니다.'
+                );
+            }
+
+            await updateWorker({
+                workShiftId: parseInt(workShiftId),
+                workerId: parseInt(selectedWorkerId),
+            });
+
+            // 변경 완료 후 모달 닫기 및 목록 새로고침
+            setShowUpdateModal(false);
+            setSelectedSchedule(null);
+            setSelectedWorkerId(null);
+
+            // 스케줄 목록 새로고침
+            if (onScheduleCreated) {
+                onScheduleCreated();
+            }
+
+            // 메인 모달 닫기
+            handleClose();
+        } catch (error) {
+            alert(
+                error.message ||
+                    '근무자 변경 중 오류가 발생했습니다.'
+            );
+        } finally {
+            setIsUpdating(false);
+        }
+    };
+
+    // 근무자 제거 확인 모달 열기
+    const handleRemoveClick = () => {
+        setShowRemoveConfirmModal(true);
+    };
+
+    // 근무자 제거 확인 (실제 제거 실행)
+    const handleConfirmRemove = async () => {
+        setShowRemoveConfirmModal(false);
+
+        if (!selectedSchedule) {
+            return;
+        }
+
+        try {
+            setIsRemoving(true);
+
+            const workShiftId =
+                selectedSchedule.shiftId ||
+                selectedSchedule.id ||
+                selectedSchedule.workShiftId;
+
+            if (!workShiftId) {
+                throw new Error(
+                    '스케줄 ID를 찾을 수 없습니다.'
+                );
+            }
+
+            await removeWorker({
+                workShiftId: parseInt(workShiftId),
+            });
+
+            // 제거 완료 후 모달 닫기 및 목록 새로고침
+            setShowUpdateModal(false);
+            setSelectedSchedule(null);
+
+            // 스케줄 목록 새로고침
+            if (onScheduleCreated) {
+                onScheduleCreated();
+            }
+
+            // 메인 모달 닫기
+            handleClose();
+        } catch (error) {
+            alert(
+                error.message ||
+                    '근무자 제거 중 오류가 발생했습니다.'
+            );
+        } finally {
+            setIsRemoving(false);
         }
     };
 
@@ -491,7 +639,10 @@ const ScheduleModal = ({
                                     onClick={
                                         handleSubmitClick
                                     }
-                                    disabled={isSubmitting}
+                                    disabled={
+                                        !isScheduleFormValid() ||
+                                        isSubmitting
+                                    }
                                 >
                                     {isSubmitting
                                         ? '생성 중...'
@@ -569,7 +720,7 @@ const ScheduleModal = ({
                 message='스케줄을 생성하시겠습니까?'
                 confirmText='생성'
                 cancelText='취소'
-                confirmColor='#1976d2'
+                confirmColor='#399982'
             />
 
             <ConfirmModal
@@ -582,7 +733,33 @@ const ScheduleModal = ({
                 message='선택한 근무자를 배정하시겠습니까?'
                 confirmText='배정'
                 cancelText='취소'
-                confirmColor='#1976d2'
+                confirmColor='#399982'
+            />
+
+            <ConfirmModal
+                isOpen={showUpdateConfirmModal}
+                onClose={() =>
+                    setShowUpdateConfirmModal(false)
+                }
+                onConfirm={handleConfirmUpdate}
+                title='근무자 변경'
+                message='선택한 근무자로 변경하시겠습니까?'
+                confirmText='변경'
+                cancelText='취소'
+                confirmColor='#399982'
+            />
+
+            <ConfirmModal
+                isOpen={showRemoveConfirmModal}
+                onClose={() =>
+                    setShowRemoveConfirmModal(false)
+                }
+                onConfirm={handleConfirmRemove}
+                title='근무자 제거'
+                message='스케줄에서 근무자를 제거하시겠습니까?'
+                confirmText='제거'
+                cancelText='취소'
+                confirmColor='#399982'
             />
 
             {/* 근무자 배정 모달 */}
@@ -727,6 +904,136 @@ const ScheduleModal = ({
                     </AssignModalContainer>
                 </AssignModalOverlay>
             )}
+
+            {/* 근무자 변경 모달 */}
+            {showUpdateModal && (
+                <AssignModalOverlay
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) {
+                            handleCancelUpdate();
+                        }
+                    }}
+                >
+                    <AssignModalContainer>
+                        <AssignModalHeader>
+                            <AssignModalTitle>
+                                근무자 변경
+                            </AssignModalTitle>
+                            <CloseButton
+                                onClick={handleCancelUpdate}
+                            >
+                                <svg
+                                    width='24'
+                                    height='24'
+                                    viewBox='0 0 24 24'
+                                    fill='none'
+                                >
+                                    <path
+                                        d='M18 6L6 18M6 6L18 18'
+                                        stroke='#666666'
+                                        strokeWidth='2'
+                                        strokeLinecap='round'
+                                        strokeLinejoin='round'
+                                    />
+                                </svg>
+                            </CloseButton>
+                        </AssignModalHeader>
+                        <AssignModalContent>
+                            {isLoadingWorkers ? (
+                                <LoadingText>
+                                    근무자 목록을 불러오는
+                                    중...
+                                </LoadingText>
+                            ) : workers.length === 0 ? (
+                                <EmptyWorkerText>
+                                    변경할 수 있는 근무자가
+                                    없습니다.
+                                </EmptyWorkerText>
+                            ) : (
+                                <WorkerList>
+                                    {workers.map(
+                                        (worker, index) => {
+                                            const workerId =
+                                                worker.workerId ||
+                                                worker.id ||
+                                                worker.user
+                                                    ?.id ||
+                                                worker.userId;
+                                            const workerName =
+                                                worker.workerName ||
+                                                worker.name ||
+                                                worker.user
+                                                    ?.name ||
+                                                worker.userName ||
+                                                '이름 없음';
+
+                                            if (!workerId) {
+                                                return null;
+                                            }
+
+                                            return (
+                                                <WorkerItem
+                                                    key={
+                                                        workerId ||
+                                                        index
+                                                    }
+                                                    onClick={() => {
+                                                        setSelectedWorkerId(
+                                                            workerId
+                                                        );
+                                                    }}
+                                                    $isSelected={
+                                                        selectedWorkerId ===
+                                                        workerId
+                                                    }
+                                                >
+                                                    <WorkerNameText>
+                                                        {
+                                                            workerName
+                                                        }
+                                                    </WorkerNameText>
+                                                    {selectedWorkerId ===
+                                                        workerId && (
+                                                        <CheckIcon>
+                                                            ✓
+                                                        </CheckIcon>
+                                                    )}
+                                                </WorkerItem>
+                                            );
+                                        }
+                                    )}
+                                </WorkerList>
+                            )}
+                        </AssignModalContent>
+                        <AssignModalFooter>
+                            <RemoveButton
+                                onClick={handleRemoveClick}
+                                disabled={isRemoving}
+                            >
+                                {isRemoving
+                                    ? '제거 중...'
+                                    : '제거'}
+                            </RemoveButton>
+                            <CancelAssignButton
+                                onClick={handleCancelUpdate}
+                            >
+                                취소
+                            </CancelAssignButton>
+                            <ConfirmAssignButton
+                                onClick={handleUpdateClick}
+                                disabled={
+                                    !selectedWorkerId ||
+                                    isUpdating
+                                }
+                            >
+                                {isUpdating
+                                    ? '변경 중...'
+                                    : '변경'}
+                            </ConfirmAssignButton>
+                        </AssignModalFooter>
+                    </AssignModalContainer>
+                </AssignModalOverlay>
+            )}
         </ModalOverlay>
     );
 };
@@ -846,7 +1153,7 @@ const Status = styled.div`
 const AddScheduleButton = styled.button`
     width: 100%;
     height: 48px;
-    background: #1976d2;
+    background: #399982;
     color: #ffffff;
     border: none;
     border-radius: 8px;
@@ -862,11 +1169,11 @@ const AddScheduleButton = styled.button`
     transition: background-color 0.2s ease;
 
     &:hover {
-        background: #1565c0;
+        background: #2d8a6f;
     }
 
     &:active {
-        background: #0d47a1;
+        background: #267a63;
     }
 `;
 
@@ -916,7 +1223,7 @@ const TimeInput = styled.input`
     box-sizing: border-box;
 
     &:focus {
-        border-color: #1976d2;
+        border-color: #399982;
     }
 
     &::placeholder {
@@ -937,7 +1244,7 @@ const PositionInput = styled.input`
     box-sizing: border-box;
 
     &:focus {
-        border-color: #1976d2;
+        border-color: #399982;
     }
 
     &::placeholder {
@@ -975,7 +1282,7 @@ const SubmitFormButton = styled.button`
     height: 48px;
     border: none;
     background: ${(props) =>
-        props.disabled ? '#cccccc' : '#1976d2'};
+        props.disabled ? '#cccccc' : '#399982'};
     color: #ffffff;
     border-radius: 8px;
     font-family: 'Pretendard';
@@ -987,7 +1294,7 @@ const SubmitFormButton = styled.button`
 
     &:hover {
         background: ${(props) =>
-            props.disabled ? '#cccccc' : '#1565c0'};
+            props.disabled ? '#cccccc' : '#28d075'};
     }
 `;
 
@@ -1069,17 +1376,17 @@ const WorkerItem = styled.div`
     align-items: center;
     padding: 16px;
     background: ${(props) =>
-        props.$isSelected ? '#e3f2fd' : '#f8f9fa'};
+        props.$isSelected ? '#e8f5f0' : '#f8f9fa'};
     border: 2px solid
         ${(props) =>
-            props.$isSelected ? '#1976d2' : 'transparent'};
+            props.$isSelected ? '#399982' : 'transparent'};
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s ease;
 
     &:hover {
         background: ${(props) =>
-            props.$isSelected ? '#e3f2fd' : '#f0f0f0'};
+            props.$isSelected ? '#e8f5f0' : '#f0f0f0'};
     }
 `;
 
@@ -1092,7 +1399,7 @@ const WorkerNameText = styled.div`
 
 const CheckIcon = styled.div`
     font-size: 20px;
-    color: #1976d2;
+    color: #399982;
     font-weight: bold;
 `;
 
@@ -1128,7 +1435,7 @@ const ConfirmAssignButton = styled.button`
     height: 48px;
     border: none;
     background: ${(props) =>
-        props.disabled ? '#cccccc' : '#1976d2'};
+        props.disabled ? '#cccccc' : '#399982'};
     color: #ffffff;
     border-radius: 8px;
     font-family: 'Pretendard';
@@ -1140,6 +1447,32 @@ const ConfirmAssignButton = styled.button`
 
     &:hover {
         background: ${(props) =>
-            props.disabled ? '#cccccc' : '#1565c0'};
+            props.disabled ? '#cccccc' : '#2d8a6f'};
+    }
+`;
+
+const RemoveButton = styled.button`
+    flex: 1;
+    height: 48px;
+    border: 1px solid #e53e3e;
+    background: #ffffff;
+    color: #e53e3e;
+    border-radius: 8px;
+    font-family: 'Pretendard';
+    font-weight: 500;
+    font-size: 16px;
+    cursor: ${(props) =>
+        props.disabled ? 'not-allowed' : 'pointer'};
+    transition: all 0.2s ease;
+
+    &:hover {
+        background: ${(props) =>
+            props.disabled ? '#ffffff' : '#fee'};
+        border-color: ${(props) =>
+            props.disabled ? '#e53e3e' : '#c53030'};
+    }
+
+    &:disabled {
+        opacity: 0.5;
     }
 `;
