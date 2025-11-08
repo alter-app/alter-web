@@ -85,7 +85,7 @@ const OwnerBottomNavigation = () => {
             </NavItem>
             <NavItem
                 $active={isActive('/owner/mypage')}
-                // onClick={() => navigate('/owner/mypage')}
+                onClick={() => navigate('/owner/mypage')}
             >
                 <ProfileIcon
                     $active={isActive('/owner/mypage')}

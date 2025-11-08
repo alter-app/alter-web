@@ -19,6 +19,7 @@ import ReputationNotificationListPage from './pages/owner/ReputationNotification
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Main from './pages/owner/Main';
 import WorkplaceDetail from './components/owner/workplace/WorkplaceDetail';
+import ManagerMyPage from './pages/owner/ManagerMyPage';
 import WorkplaceDetailPage from './components/user/myJob/workplaceDetail/WorkplaceDetailPage';
 import OwnerWorkplaceDetailPage from './components/owner/workplace/workplaceDetail/WorkplaceDetailPage';
 import ReputationWrite from './pages/ReputationWrite';
@@ -239,6 +240,14 @@ function App() {
                         element={
                             <ProtectedRoute requiredScope='MANAGER'>
                                 <ManagerNotificationListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/owner/mypage'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <ManagerMyPage />
                             </ProtectedRoute>
                         }
                     />

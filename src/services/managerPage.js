@@ -2,6 +2,35 @@ import useAuthStore from '../store/authStore';
 
 const backend = import.meta.env.VITE_API_URL;
 
+// 매니저 정보 조회 로직
+export const getManagerInfo = async () => {
+    const accessToken = useAuthStore.getState().accessToken;
+    try {
+        const response = await fetch(
+            `${backend}/manager/me`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('매니저 정보 조회 오류:', error);
+        throw new Error(
+            '매니저 정보 조회 중 오류가 발생했습니다.'
+        );
+    }
+};
+
 // 공고 지원 목록 조회 로직
 export const getPostingsApplications = async ({
     cursorInfo,
