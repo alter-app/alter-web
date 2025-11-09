@@ -1,10 +1,10 @@
-import JobPostItem from './JobPostItem';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import SearchBar from './SearchBar';
-import FilterBar from './FilterBar';
-import { getPostList } from '../../../services/post';
-import { useEffect, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import searchSvg from '../../../assets/icons/searchSvg.svg';
+import dropdownIcon from '../../../assets/icons/dropdown.svg';
+import JobPostItem from './JobPostItem';
+import { getPostList } from '../../../services/post';
 import Loader from '../../Loader';
 
 const JobPostList = ({
@@ -15,15 +15,32 @@ const JobPostList = ({
     onSelect,
     scrapMap,
     onScrapChange,
+    searchValue,
+    onSearchInputChange,
+    onSearchSubmit,
+    sortValue,
+    onSortChange,
 }) => {
     const [posts, setPosts] = useState([]);
     const [cursorInfo, setCursorInfo] = useState('');
     const [totalCount, setTotalCount] = useState(0);
-    const [searchValue, setSearchValue] = useState('');
-    const [sortValue, setSortValue] = useState('');
-    const [salaryValue, setSalaryValue] = useState('');
-    const [regionValue, setRegionValue] = useState('');
     const [hasMore, setHasMore] = useState(true);
+    const [internalSearch, setInternalSearch] =
+        useState('');
+    const [internalSort, setInternalSort] =
+        useState('LATEST');
+    const [isSortOpen, setIsSortOpen] = useState(false);
+    const sortDropdownRef = useRef(null);
+
+    const isControlled =
+        typeof onSearchInputChange === 'function';
+    const currentSearchValue = isControlled
+        ? searchValue ?? ''
+        : internalSearch;
+    const currentSortValue =
+        typeof onSortChange === 'function' && sortValue
+            ? sortValue
+            : internalSort;
 
     // 외부에서 전달받은 posts가 있으면 업데이트
     useEffect(() => {
@@ -49,7 +66,7 @@ const JobPostList = ({
         }
     }, []);
 
-    const fetchData = async () => {
+    const fetchData = async ({ reset = false } = {}) => {
         try {
             // 외부 데이터가 있으면 지도 API 사용, 없으면 일반 API 사용
             if (
@@ -59,69 +76,198 @@ const JobPostList = ({
                 // 지도 API를 통한 추가 데이터 로드
                 await externalLoadMore();
             } else if (externalPosts === undefined) {
+                const requestCursor = reset
+                    ? ''
+                    : cursorInfo;
+                if (reset) {
+                    setCursorInfo('');
+                }
                 const result = await getPostList({
-                    cursorInfo,
-                    search: searchValue,
-                    sort: sortValue,
-                    salary: salaryValue,
-                    region: regionValue,
+                    cursorInfo: requestCursor,
+                    search: currentSearchValue,
+                    sort: currentSortValue,
                 });
-                setPosts((prev) => [
-                    ...prev,
-                    ...result.data,
-                ]);
+                setPosts((prev) =>
+                    reset
+                        ? result.data
+                        : [...prev, ...result.data]
+                );
                 setCursorInfo(result.page.cursor);
                 setTotalCount(result.page.totalCount);
+                setHasMore(!!result.page.cursor);
             }
         } catch (error) {
             console.error('공고 리스트 조회 오류:', error);
         }
     };
 
-    const handleSearchChange = (e) => {
-        setSearchValue(e.target.value);
-        // 검색어 변경 시 리스트 초기화 및 새로 로드
-        setPosts([]);
-        setCursorInfo('');
-        fetchData();
+    const handleSearchInput = (event) => {
+        const { value } = event.target;
+        if (isControlled) {
+            onSearchInputChange?.(value);
+        } else {
+            setInternalSearch(value);
+        }
     };
 
-    const handleSortChange = () => {
-        // 정렬 옵션 모달 또는 드롭다운 표시
-        console.log('정렬 옵션 선택');
+    const handleSearchSubmit = (event) => {
+        event.preventDefault();
+        if (isControlled) {
+            onSearchSubmit?.();
+        } else {
+            setPosts([]);
+            setCursorInfo('');
+            setHasMore(true);
+            fetchData({ reset: true });
+        }
     };
 
-    const handleSalaryChange = () => {
-        // 급여 옵션 모달 또는 드롭다운 표시
-        console.log('급여 옵션 선택');
+    const closeSortDropdown = () => setIsSortOpen(false);
+
+    useEffect(() => {
+        if (!isSortOpen) return undefined;
+
+        const handleClickOutside = (event) => {
+            if (
+                sortDropdownRef.current &&
+                !sortDropdownRef.current.contains(
+                    event.target
+                )
+            ) {
+                closeSortDropdown();
+            }
+        };
+
+        const handleEscape = (event) => {
+            if (event.key === 'Escape') {
+                closeSortDropdown();
+            }
+        };
+
+        document.addEventListener(
+            'mousedown',
+            handleClickOutside
+        );
+        document.addEventListener('keydown', handleEscape);
+
+        return () => {
+            document.removeEventListener(
+                'mousedown',
+                handleClickOutside
+            );
+            document.removeEventListener(
+                'keydown',
+                handleEscape
+            );
+        };
+    }, [isSortOpen]);
+
+    useEffect(() => {
+        closeSortDropdown();
+    }, [currentSortValue]);
+
+    const handleSortToggle = () => {
+        setIsSortOpen((prev) => !prev);
     };
 
-    const handleRegionChange = () => {
-        // 지역 옵션 모달 또는 드롭다운 표시
-        console.log('지역 옵션 선택');
+    const handleSortOptionSelect = (value) => {
+        if (typeof onSortChange === 'function') {
+            onSortChange(value);
+        } else {
+            setInternalSort(value);
+            setPosts([]);
+            setCursorInfo('');
+            setHasMore(true);
+            fetchData({ reset: true });
+        }
+        closeSortDropdown();
     };
+
+    const loadMorePosts = () => fetchData();
 
     return (
         <Container>
-            <SearchBar
-                value={searchValue}
-                onChange={handleSearchChange}
-                placeholder='알바를 검색해보세요'
-            />
-            <FilterBar
-                sortValue={sortValue}
-                onSortChange={handleSortChange}
-                salaryValue={salaryValue}
-                onSalaryChange={handleSalaryChange}
-                regionValue={regionValue}
-                onRegionChange={handleRegionChange}
-            />
+            <Controls>
+                <SearchForm onSubmit={handleSearchSubmit}>
+                    <SearchInputWrapper>
+                        <SearchInput
+                            type='text'
+                            value={currentSearchValue}
+                            onChange={handleSearchInput}
+                            placeholder='공고 제목 또는 업장명을 검색하세요'
+                        />
+                        <SearchSubmitButton
+                            type='submit'
+                            aria-label='검색 실행'
+                        >
+                            <img
+                                src={searchSvg}
+                                alt='검색'
+                            />
+                        </SearchSubmitButton>
+                    </SearchInputWrapper>
+                </SearchForm>
+                <SortDropdown ref={sortDropdownRef}>
+                    <SortDropdownButton
+                        type='button'
+                        onClick={handleSortToggle}
+                        aria-haspopup='true'
+                        aria-expanded={isSortOpen}
+                        $isOpen={isSortOpen}
+                    >
+                        <span>
+                            {currentSortValue ===
+                            'PAY_AMOUNT'
+                                ? '시급 높은 순'
+                                : '최신 등록 순'}
+                        </span>
+                        <img
+                            src={dropdownIcon}
+                            alt='드롭다운'
+                        />
+                    </SortDropdownButton>
+                    {isSortOpen && (
+                        <SortDropdownMenu role='menu'>
+                            <SortDropdownItem
+                                type='button'
+                                role='menuitem'
+                                aria-selected={
+                                    currentSortValue ===
+                                    'LATEST'
+                                }
+                                onClick={() =>
+                                    handleSortOptionSelect(
+                                        'LATEST'
+                                    )
+                                }
+                            >
+                                최신 등록 순
+                            </SortDropdownItem>
+                            <SortDropdownItem
+                                type='button'
+                                role='menuitem'
+                                aria-selected={
+                                    currentSortValue ===
+                                    'PAY_AMOUNT'
+                                }
+                                onClick={() =>
+                                    handleSortOptionSelect(
+                                        'PAY_AMOUNT'
+                                    )
+                                }
+                            >
+                                시급 높은 순
+                            </SortDropdownItem>
+                        </SortDropdownMenu>
+                    )}
+                </SortDropdown>
+            </Controls>
             <Divider />
             <ListArea id='scrollableListArea'>
                 {/* <Address>서울 구로구 경인로 445</Address> */}
                 <InfiniteScroll
                     dataLength={posts.length}
-                    next={fetchData}
+                    next={loadMorePosts}
                     hasMore={
                         hasMore && posts.length < totalCount
                     }
@@ -189,6 +335,189 @@ const Container = styled.div`
     background-color: #ffffff;
     display: flex;
     flex-direction: column;
+`;
+
+const Controls = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px 0 20px;
+
+    @media (max-width: 768px) {
+        padding: 14px 16px 0 16px;
+    }
+
+    @media (max-width: 480px) {
+        padding: 12px 12px 0 12px;
+    }
+`;
+
+const SearchForm = styled.form`
+    flex: 1;
+    display: flex;
+`;
+
+const SearchInputWrapper = styled.div`
+    position: relative;
+    width: 100%;
+`;
+
+const SearchInput = styled.input`
+    width: 100%;
+    height: 46px;
+    padding: 0 44px 0 16px;
+    border: 1px solid #d9d9d9;
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: 'Pretendard';
+    color: #333333;
+    transition: all 0.2s ease;
+
+    &:focus {
+        outline: none;
+        border-color: #399982;
+        box-shadow: 0 0 0 3px rgba(57, 153, 130, 0.12);
+    }
+
+    &::placeholder {
+        color: #999999;
+    }
+
+    @media (max-width: 768px) {
+        height: 44px;
+    }
+
+    @media (max-width: 480px) {
+        height: 42px;
+        font-size: 15px;
+    }
+`;
+
+const SearchSubmitButton = styled.button`
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+
+    img {
+        width: 20px;
+        height: 20px;
+    }
+`;
+
+const SortDropdown = styled.div`
+    position: relative;
+    flex-shrink: 0;
+    min-width: 150px;
+
+    @media (max-width: 768px) {
+        min-width: 140px;
+    }
+
+    @media (max-width: 480px) {
+        min-width: 130px;
+    }
+`;
+
+const SortDropdownButton = styled.button`
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid #d9d9d9;
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: 'Pretendard';
+    color: #333333;
+    background: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease,
+        background 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+
+    &:focus {
+        outline: none;
+        border-color: #399982;
+        box-shadow: 0 0 0 3px rgba(57, 153, 130, 0.12);
+    }
+
+    &:hover {
+        background: #f8fffe;
+        border-color: #399982;
+    }
+
+    img {
+        width: 16px;
+        height: 16px;
+        transition: transform 0.2s ease;
+        transform: rotate(
+            ${(props) =>
+                props.$isOpen ? '180deg' : '0deg'}
+        );
+    }
+
+    @media (max-width: 768px) {
+        height: 44px;
+        padding: 0 12px;
+    }
+
+    @media (max-width: 480px) {
+        height: 42px;
+        font-size: 14px;
+    }
+`;
+
+const SortDropdownMenu = styled.div`
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 100%;
+    max-width: 220px;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(17, 17, 17, 0.12);
+    padding: 6px 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 30;
+`;
+
+const SortDropdownItem = styled.button`
+    width: 100%;
+    padding: 10px 16px;
+    text-align: left;
+    background: none;
+    border: none;
+    font-family: 'Pretendard';
+    font-weight: 500;
+    font-size: 14px;
+    color: ${(props) =>
+        props['aria-selected'] ? '#256857' : '#333333'};
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+
+    &:hover {
+        background: rgba(57, 153, 130, 0.08);
+        color: #256857;
+    }
+
+    &:active {
+        background: rgba(57, 153, 130, 0.14);
+        color: #174d3b;
+    }
 `;
 
 const ListArea = styled.div`
