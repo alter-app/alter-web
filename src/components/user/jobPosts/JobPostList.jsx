@@ -194,7 +194,7 @@ const JobPostList = ({
                             type='text'
                             value={currentSearchValue}
                             onChange={handleSearchInput}
-                            placeholder='공고 제목 또는 업장명을 검색하세요'
+                            placeholder='공고 또는 업장명 검색'
                         />
                         <SearchSubmitButton
                             type='submit'
