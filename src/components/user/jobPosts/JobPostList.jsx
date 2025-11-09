@@ -218,7 +218,7 @@ const JobPostList = ({
                         <span>
                             {currentSortValue ===
                             'PAY_AMOUNT'
-                                ? '시급 높은 순'
+                                ? '급여 높은 순'
                                 : '최신 등록 순'}
                         </span>
                         <img
@@ -256,7 +256,7 @@ const JobPostList = ({
                                     )
                                 }
                             >
-                                시급 높은 순
+                                급여 높은 순
                             </SortDropdownItem>
                         </SortDropdownMenu>
                     )}
