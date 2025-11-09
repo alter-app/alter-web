@@ -35,10 +35,10 @@ const ManagerMyPage = () => {
     return (
         <>
             <PageHeader
-                title='매니저 마이페이지'
+                title='마이페이지'
                 showBackButton={false}
             />
-            <PageBody>
+            <ContainerColumn>
                 {isLoading && (
                     <LoaderWrapper>
                         <Loader />
@@ -64,7 +64,7 @@ const ManagerMyPage = () => {
                             manager={managerInfo}
                         />
                     )}
-            </PageBody>
+            </ContainerColumn>
             <OwnerBottomNavigation />
         </>
     );
@@ -72,16 +72,22 @@ const ManagerMyPage = () => {
 
 export default ManagerMyPage;
 
-const PageBody = styled.main`
+const ContainerColumn = styled.div`
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    padding: 80px 20px 100px;
-    min-height: calc(100vh - 60px);
-    background: #f3f6f5;
+    min-height: calc(100vh - 80px);
+    padding-top: 60px;
+    padding-bottom: 80px;
+    background: #f8f9fa;
 
     @media (max-width: 480px) {
-        padding: 72px 16px 90px;
+        min-height: calc(100vh - 70px);
+        padding-bottom: 70px;
+    }
+
+    @media (max-width: 360px) {
+        min-height: calc(100vh - 60px);
+        padding-bottom: 60px;
     }
 `;
 
@@ -133,3 +139,83 @@ const RetryButton = styled.button`
     }
 `;
 
+const KebabButton = styled.button`
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    z-index: 110;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 12px;
+    background: rgba(17, 17, 17, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+
+    &:hover {
+        background: rgba(17, 17, 17, 0.08);
+    }
+
+    &:active {
+        background: rgba(17, 17, 17, 0.12);
+        transform: scale(0.94);
+    }
+
+    @supports (padding: max(0px)) {
+        top: calc(12px + env(safe-area-inset-top));
+    }
+
+    @media (max-width: 480px) {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        right: 14px;
+    }
+
+    @media (max-width: 360px) {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        right: 12px;
+    }
+`;
+
+const KebabDots = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+
+    span {
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: #111111;
+    }
+
+    @media (max-width: 480px) {
+        gap: 3px;
+
+        span {
+            width: 3px;
+            height: 3px;
+        }
+    }
+`;
+
+const VisuallyHidden = styled.span`
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+`;
