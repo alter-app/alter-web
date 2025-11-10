@@ -44,6 +44,11 @@ const JobLookupMap = () => {
         useState(false);
     const [applyPostId, setApplyPostId] = useState(null);
     const mapRef = useRef(null);
+    const [searchInput, setSearchInput] = useState('');
+    const [searchKeyword, setSearchKeyword] = useState('');
+    const [sortType, setSortType] = useState('LATEST');
+    const isInitialFilterRef = useRef(true);
+    const valueOrEmpty = (value) => (value || '').trim();
 
     const handleSearchClick = () => {
         if (
@@ -53,7 +58,10 @@ const JobLookupMap = () => {
             // 검색 버튼 숨기기
             setShowSearchButton(false);
             // 마커와 공고 리스트 로드 (콜백으로 자동 업데이트)
-            mapRef.current.refreshMarkers();
+            mapRef.current.refreshMarkers({
+                searchKeyword,
+                sortType,
+            });
         }
     };
 
@@ -124,6 +132,63 @@ const JobLookupMap = () => {
     const handleApplySuccess = () => {
         // 지원 성공 시 추가 처리 (예: 토스트 메시지 등)
         console.log('지원이 완료되었습니다.');
+    };
+
+    useEffect(() => {
+        if (isInitialFilterRef.current) {
+            isInitialFilterRef.current = false;
+            return;
+        }
+
+        if (
+            mapRef.current &&
+            mapRef.current.refreshMarkers
+        ) {
+            setShowSearchButton(false);
+            mapRef.current.refreshMarkers({
+                searchKeyword,
+                sortType,
+            });
+        }
+    }, [searchKeyword, sortType]);
+
+    const handleSearchInputChange = (value) => {
+        setSearchInput(value);
+    };
+
+    const handleSearchSubmit = () => {
+        const trimmedValue = valueOrEmpty(searchInput);
+        if (trimmedValue === searchKeyword) {
+            if (
+                mapRef.current &&
+                mapRef.current.refreshMarkers
+            ) {
+                setShowSearchButton(false);
+                mapRef.current.refreshMarkers({
+                    searchKeyword: trimmedValue,
+                    sortType,
+                });
+            }
+            return;
+        }
+        setSearchKeyword(trimmedValue);
+    };
+
+    const handleSortChange = (value) => {
+        if (value === sortType) {
+            if (
+                mapRef.current &&
+                mapRef.current.refreshMarkers
+            ) {
+                setShowSearchButton(false);
+                mapRef.current.refreshMarkers({
+                    searchKeyword,
+                    sortType: value,
+                });
+            }
+            return;
+        }
+        setSortType(value);
     };
 
     useEffect(() => {
@@ -434,6 +499,8 @@ const JobLookupMap = () => {
                     <NaverMap
                         ref={mapRef}
                         businessName='현재 위치'
+                        searchKeyword={searchKeyword}
+                        sortType={sortType}
                         onJobPostingsUpdate={(data) => {
                             if (
                                 typeof data === 'object' &&
@@ -562,6 +629,15 @@ const JobLookupMap = () => {
                             onSelect={handlePostSelect}
                             scrapMap={scrapMap}
                             onScrapChange={toggleScrap}
+                            searchValue={searchInput}
+                            onSearchInputChange={
+                                handleSearchInputChange
+                            }
+                            onSearchSubmit={
+                                handleSearchSubmit
+                            }
+                            sortValue={sortType}
+                            onSortChange={handleSortChange}
                         />
                     )}
                 </JobListContent>

@@ -31,6 +31,8 @@ const NaverMap = forwardRef(
             onCurrentLocationStatusChange,
             onMapBackgroundClick,
             onMarkerClick,
+            searchKeyword = '',
+            sortType = 'LATEST',
         },
         ref
     ) => {
@@ -63,6 +65,16 @@ const NaverMap = forwardRef(
             isAtCurrentLocation,
             setIsAtCurrentLocation,
         ] = useState(true);
+        const searchKeywordRef = useRef(searchKeyword);
+        const sortTypeRef = useRef(sortType);
+
+        useEffect(() => {
+            searchKeywordRef.current = searchKeyword;
+        }, [searchKeyword]);
+
+        useEffect(() => {
+            sortTypeRef.current = sortType;
+        }, [sortType]);
 
         // hasSearched 상태 변경 시 ref도 업데이트
         useEffect(() => {
@@ -105,8 +117,13 @@ const NaverMap = forwardRef(
                 const response = await getMapJobPostings(
                     coordinate1,
                     coordinate2,
-                    '', // cursorInfo
-                    10 // pageSize - 무한스크롤을 위해 적은 수로 시작
+                    {
+                        cursorInfo: '',
+                        pageSize: 10,
+                        searchKeyword:
+                            searchKeywordRef.current,
+                        sortType: sortTypeRef.current,
+                    }
                 );
                 console.log('공고 리스트 응답:', response);
 
@@ -145,48 +162,57 @@ const NaverMap = forwardRef(
         };
 
         // 저장된 좌표로 공고 리스트 로드
-        const loadJobPostingsInBoundsWithCoordinates = async (map, bounds) => {
-            try {
-                const response = await getMapJobPostings(
-                    bounds.coordinate1,
-                    bounds.coordinate2,
-                    '', // cursorInfo
-                    10 // pageSize
-                );
+        const loadJobPostingsInBoundsWithCoordinates =
+            async (map, bounds) => {
+                try {
+                    const response =
+                        await getMapJobPostings(
+                            bounds.coordinate1,
+                            bounds.coordinate2,
+                            {
+                                cursorInfo: '',
+                                pageSize: 10,
+                                searchKeyword:
+                                    searchKeywordRef.current,
+                                sortType:
+                                    sortTypeRef.current,
+                            }
+                        );
 
-                if (
-                    response.data &&
-                    Array.isArray(response.data)
-                ) {
-                    setJobPostings(response.data);
-                    setJobPostingsCursor(
-                        response.page.cursor || ''
-                    );
-                    setJobPostingsTotalCount(
-                        response.page.totalCount || 0
-                    );
-                    // 외부 컴포넌트에 공고 리스트 업데이트 알림 (렌더링 완료 후)
-                    if (onJobPostingsUpdate) {
-                        setTimeout(() => {
-                            onJobPostingsUpdate({
-                                data: response.data,
-                                cursor:
-                                    response.page.cursor ||
-                                    '',
-                                totalCount:
-                                    response.page
-                                        .totalCount || 0,
-                            });
-                        }, 0);
+                    if (
+                        response.data &&
+                        Array.isArray(response.data)
+                    ) {
+                        setJobPostings(response.data);
+                        setJobPostingsCursor(
+                            response.page.cursor || ''
+                        );
+                        setJobPostingsTotalCount(
+                            response.page.totalCount || 0
+                        );
+                        // 외부 컴포넌트에 공고 리스트 업데이트 알림 (렌더링 완료 후)
+                        if (onJobPostingsUpdate) {
+                            setTimeout(() => {
+                                onJobPostingsUpdate({
+                                    data: response.data,
+                                    cursor:
+                                        response.page
+                                            .cursor || '',
+                                    totalCount:
+                                        response.page
+                                            .totalCount ||
+                                        0,
+                                });
+                            }, 0);
+                        }
                     }
+                } catch (error) {
+                    console.error(
+                        '저장된 좌표로 공고 리스트 로드 실패:',
+                        error
+                    );
                 }
-            } catch (error) {
-                console.error(
-                    '저장된 좌표로 공고 리스트 로드 실패:',
-                    error
-                );
-            }
-        };
+            };
 
         // 특정 업장의 공고 조회 함수
         const loadWorkspacePostings = async (
@@ -281,8 +307,14 @@ const NaverMap = forwardRef(
                         await getMapJobPostings(
                             coordinate1,
                             coordinate2,
-                            currentCursor,
-                            10
+                            {
+                                cursorInfo: currentCursor,
+                                pageSize: 10,
+                                searchKeyword:
+                                    searchKeywordRef.current,
+                                sortType:
+                                    sortTypeRef.current,
+                            }
                         );
 
                     console.log(
@@ -339,7 +371,24 @@ const NaverMap = forwardRef(
 
         // ref를 통해 외부에서 호출할 수 있는 함수들 노출
         useImperativeHandle(ref, () => ({
-            refreshMarkers: () => {
+            refreshMarkers: (filters = {}) => {
+                if (
+                    Object.prototype.hasOwnProperty.call(
+                        filters,
+                        'searchKeyword'
+                    )
+                ) {
+                    searchKeywordRef.current =
+                        filters.searchKeyword;
+                }
+                if (
+                    Object.prototype.hasOwnProperty.call(
+                        filters,
+                        'sortType'
+                    )
+                ) {
+                    sortTypeRef.current = filters.sortType;
+                }
                 if (mapInstance) {
                     // 검색 실행 표시
                     setHasSearched(true);
@@ -354,7 +403,10 @@ const NaverMap = forwardRef(
             loadJobPostingsInBounds: (bounds) => {
                 if (mapInstance && bounds) {
                     // 저장된 좌표로 공고 리스트 로드
-                    loadJobPostingsInBoundsWithCoordinates(mapInstance, bounds);
+                    loadJobPostingsInBoundsWithCoordinates(
+                        mapInstance,
+                        bounds
+                    );
                 }
             },
             getJobPostings: () => ({
@@ -422,25 +474,38 @@ const NaverMap = forwardRef(
             const fetchLocation = async () => {
                 try {
                     console.log('위치 정보 요청 시작...');
-                    const location = await getCurrentLocation();
-                    
-                    console.log('위치 정보 획득 성공:', location);
+                    const location =
+                        await getCurrentLocation();
+
+                    console.log(
+                        '위치 정보 획득 성공:',
+                        location
+                    );
                     setCurrentLocation({
                         latitude: location.latitude,
-                        longitude: location.longitude
+                        longitude: location.longitude,
                     });
                     setLocationPermission('granted');
-
                 } catch (error) {
-                    console.log('위치 정보 획득 실패:', error.message);
-                    
+                    console.log(
+                        '위치 정보 획득 실패:',
+                        error.message
+                    );
+
                     // 에러 처리
-                    if (error.code === 1) { // PERMISSION_DENIED
+                    if (error.code === 1) {
+                        // PERMISSION_DENIED
                         setLocationPermission('denied');
-                        alert('위치 권한이 필요합니다. 브라우저 설정에서 위치 권한을 허용해주세요.');
-                    } else if (error.code === 2) { // POSITION_UNAVAILABLE
-                        setLocationPermission('unavailable');
-                    } else if (error.code === 3) { // TIMEOUT
+                        alert(
+                            '위치 권한이 필요합니다. 브라우저 설정에서 위치 권한을 허용해주세요.'
+                        );
+                    } else if (error.code === 2) {
+                        // POSITION_UNAVAILABLE
+                        setLocationPermission(
+                            'unavailable'
+                        );
+                    } else if (error.code === 3) {
+                        // TIMEOUT
                         setLocationPermission('timeout');
                     } else {
                         setLocationPermission('error');
@@ -448,14 +513,23 @@ const NaverMap = forwardRef(
 
                     // 모든 방법이 실패한 경우 기본값 사용
                     try {
-                        const fallbackLocation = await getLocationWithFallback();
+                        const fallbackLocation =
+                            await getLocationWithFallback();
                         setCurrentLocation({
-                            latitude: fallbackLocation.latitude,
-                            longitude: fallbackLocation.longitude
+                            latitude:
+                                fallbackLocation.latitude,
+                            longitude:
+                                fallbackLocation.longitude,
                         });
-                        console.log('기본 위치 사용:', fallbackLocation);
+                        console.log(
+                            '기본 위치 사용:',
+                            fallbackLocation
+                        );
                     } catch (fallbackError) {
-                        console.log('기본 위치도 사용할 수 없음:', fallbackError.message);
+                        console.log(
+                            '기본 위치도 사용할 수 없음:',
+                            fallbackError.message
+                        );
                     }
                 }
             };
@@ -539,7 +613,10 @@ const NaverMap = forwardRef(
                     'click',
                     (e) => {
                         // 마커가 아닌 지도 배경을 클릭한 경우
-                        if (!e.overlay || e.overlay === null) {
+                        if (
+                            !e.overlay ||
+                            e.overlay === null
+                        ) {
                             // 외부 컴포넌트에 지도 배경 클릭 알림
                             if (onMapBackgroundClick) {
                                 onMapBackgroundClick();
@@ -547,7 +624,6 @@ const NaverMap = forwardRef(
                         }
                     }
                 );
-
 
                 // 초기 마커 로드 제거 (검색 버튼으로만 마커 로드)
                 // loadMarkersInBounds(map);
@@ -733,13 +809,14 @@ const NaverMap = forwardRef(
                             '마커 클릭:',
                             markerData
                         );
-                        
+
                         // 마커 클릭 시 현재 지도 뷰 좌표 저장
                         if (onMarkerClick && mapInstance) {
-                            const bounds = mapInstance.getBounds();
+                            const bounds =
+                                mapInstance.getBounds();
                             const sw = bounds.getSW();
                             const ne = bounds.getNE();
-                            
+
                             const currentBounds = {
                                 coordinate1: {
                                     latitude: sw.lat(),
@@ -748,12 +825,12 @@ const NaverMap = forwardRef(
                                 coordinate2: {
                                     latitude: ne.lat(),
                                     longitude: ne.lng(),
-                                }
+                                },
                             };
-                            
+
                             onMarkerClick(currentBounds);
                         }
-                        
+
                         // 해당 업장의 공고만 조회
                         if (markerData.workspaceId) {
                             loadWorkspacePostings(
