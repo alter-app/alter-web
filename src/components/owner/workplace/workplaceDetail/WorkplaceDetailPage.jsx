@@ -487,6 +487,13 @@ const WorkplaceDetailPage = () => {
                     currentMonth={currentMonth}
                     onPrevMonth={handlePrevMonth}
                     onNextMonth={handleNextMonth}
+                    workplaceId={workplaceId}
+                    onScheduleCreated={() => {
+                        loadScheduleData(
+                            currentYear,
+                            currentMonth
+                        );
+                    }}
                 />
             </Container>
             <FloatingActionButton
