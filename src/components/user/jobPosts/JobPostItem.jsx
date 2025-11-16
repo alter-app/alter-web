@@ -65,7 +65,7 @@ const JobPostItem = ({
                 <WageHighlight>
                     {formatNumber(payAmount)}
                 </WageHighlight>
-                원 · 업무내용없네용 · {timeAgo(createdAt)}
+                원 · {timeAgo(createdAt)}
             </Description>
             <InfoRow>
                 <InfoGroup>

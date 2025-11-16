@@ -30,11 +30,19 @@ const WorkScheduleItem = ({
     const [endTime, setEndTime] = useState(
         schedule.endTime || ''
     );
+    const [position, setPosition] = useState(
+        schedule.position || ''
+    );
+    const [positionsNeeded, setPositionsNeeded] = useState(
+        schedule.positionsNeeded || 1
+    );
 
     useEffect(() => {
         setSelectedDays(schedule.workingDays || []);
         setStartTime(schedule.startTime || '');
         setEndTime(schedule.endTime || '');
+        setPosition(schedule.position || '');
+        setPositionsNeeded(schedule.positionsNeeded || 1);
     }, [schedule]);
 
     // 요일 클릭 시
@@ -60,6 +68,52 @@ const WorkScheduleItem = ({
         const formatted = autoInsertColon(e.target.value);
         setEndTime(formatted);
         if (onChange) onChange({ endTime: formatted });
+    };
+
+    // 포지션 입력 핸들러
+    const handlePositionChange = (e) => {
+        const value = e.target.value;
+        setPosition(value);
+        if (onChange) onChange({ position: value });
+    };
+
+    // 필요 인원 수 입력 핸들러
+    const handlePositionsNeededChange = (e) => {
+        const inputValue = e.target.value;
+
+        // 빈 값이면 빈 값으로 설정 (입력 중에는 자유롭게 입력 가능)
+        if (inputValue === '') {
+            setPositionsNeeded('');
+            return;
+        }
+
+        // 숫자만 허용
+        const numValue = parseInt(inputValue);
+        if (isNaN(numValue)) {
+            return; // 숫자가 아니면 무시
+        }
+
+        // 입력 중에는 자유롭게 입력 가능 (blur 시에만 최소값 검증)
+        setPositionsNeeded(numValue);
+        if (onChange)
+            onChange({ positionsNeeded: numValue });
+    };
+
+    // blur 시 최소값 보장
+    const handlePositionsNeededBlur = (e) => {
+        const inputValue = e.target.value;
+        const numValue = parseInt(inputValue);
+        // 빈 값이거나 1보다 작으면 1로 설정
+        if (
+            !inputValue ||
+            isNaN(numValue) ||
+            numValue < 1
+        ) {
+            const validValue = 1;
+            setPositionsNeeded(validValue);
+            if (onChange)
+                onChange({ positionsNeeded: validValue });
+        }
     };
 
     return (
@@ -125,6 +179,38 @@ const WorkScheduleItem = ({
                     </WeekDiv>
                 </Column>
             </Row>
+            <Row $hasMarginTop>
+                <Column>
+                    <WeekDiv>
+                        <WeekdayLabel>포지션</WeekdayLabel>
+                        <PositionInput
+                            placeholder='예: 홀서빙, 설거지'
+                            value={position}
+                            onChange={handlePositionChange}
+                        />
+                    </WeekDiv>
+                </Column>
+                <Divider />
+                <Column>
+                    <WeekDiv>
+                        <WorkTimeLabel>
+                            필요 인원
+                        </WorkTimeLabel>
+                        <PositionsNeededInput
+                            type='number'
+                            min='1'
+                            placeholder='인원 수'
+                            value={positionsNeeded}
+                            onChange={
+                                handlePositionsNeededChange
+                            }
+                            onBlur={
+                                handlePositionsNeededBlur
+                            }
+                        />
+                    </WeekDiv>
+                </Column>
+            </Row>
         </ScheduleItemContainer>
     );
 };
@@ -176,6 +262,8 @@ const Row = styled.div`
     align-items: center;
     justify-content: space-between;
     gap: 20px;
+    margin-top: ${(props) =>
+        props.$hasMarginTop ? '16px' : '0'};
 
     @media (max-width: 768px) {
         flex-direction: column;
@@ -354,6 +442,64 @@ const WeekDiv = styled.div`
         align-items: flex-start;
         height: auto;
         gap: 12px;
+        width: 100%;
+    }
+`;
+
+const PositionInput = styled.input`
+    width: 200px;
+    height: 48px;
+    padding: 13px 16px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 22px;
+    outline: none;
+    border: 1px solid transparent;
+    border-color: #f6f6f6;
+    background-color: #f6f6f6;
+
+    &::placeholder {
+        color: #999999;
+    }
+
+    &:focus {
+        outline: none;
+        border: 1px solid #2de283;
+    }
+
+    @media (max-width: 768px) {
+        width: 100%;
+    }
+`;
+
+const PositionsNeededInput = styled.input`
+    width: 142px;
+    height: 48px;
+    padding: 13px 16px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 22px;
+    outline: none;
+    border: 1px solid transparent;
+    border-color: #f6f6f6;
+    background-color: #f6f6f6;
+
+    &::placeholder {
+        color: #999999;
+    }
+
+    &:focus {
+        outline: none;
+        border: 1px solid #2de283;
+    }
+
+    @media (max-width: 768px) {
         width: 100%;
     }
 `;

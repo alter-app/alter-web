@@ -48,7 +48,7 @@ const JobPosting = () => {
                 startTime: '',
                 endTime: '',
                 positionsNeeded: 1,
-                position: 1,
+                position: '',
             },
         ],
     });
@@ -116,7 +116,7 @@ const JobPosting = () => {
                     startTime: '',
                     endTime: '',
                     positionsNeeded: 1,
-                    position: 1,
+                    position: '',
                 },
             ],
         }));
