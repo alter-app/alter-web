@@ -25,6 +25,12 @@ const BottomNavigation = () => {
                 location.pathname.startsWith('/mypage/')
             );
         }
+        if (path === '/chat') {
+            return (
+                location.pathname === '/chat' ||
+                location.pathname.startsWith('/chat/rooms/')
+            );
+        }
         return location.pathname === path;
     };
 
@@ -58,7 +64,7 @@ const BottomNavigation = () => {
             </NavItem>
             <NavItem
                 $active={isActive('/chat')}
-                // onClick={() => navigate('/chat')}
+                onClick={() => navigate('/chat')}
             >
                 <ChatIcon $active={isActive('/chat')} />
                 <NavLabel $active={isActive('/chat')}>

@@ -1,9 +1,12 @@
 import styled from 'styled-components';
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { createChatRoom } from '../../../../services/chatService';
 
 const EmployeeCard = ({ employee, workplaceId }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isCreatingChat, setIsCreatingChat] =
+        useState(false);
     const menuRef = useRef(null);
     const navigate = useNavigate();
 
@@ -50,15 +53,82 @@ const EmployeeCard = ({ employee, workplaceId }) => {
             case 'changeWork':
                 handleRequestScheduleChange();
                 break;
+            case 'chat':
+                handleStartChat();
+                break;
             case 'report':
                 console.log(
                     '신고 클릭:',
                     employee.user.name
                 );
-                // TODO: 신고 기능 구현
                 break;
             default:
                 break;
+        }
+    };
+
+    const getOpponentScope = () => {
+        const positionType =
+            employee.position?.type?.toUpperCase();
+        const description =
+            employee.position?.description || '';
+
+        if (
+            positionType === 'OWNER' ||
+            positionType === 'MANAGER' ||
+            description.includes('점주') ||
+            description.includes('매니저')
+        ) {
+            return 'MANAGER';
+        }
+        return 'APP';
+    };
+
+    const handleStartChat = async () => {
+        if (isCreatingChat) return;
+        setIsCreatingChat(true);
+        try {
+            const opponentScope = getOpponentScope();
+            // 모든 경우에 employee.user.id 사용
+            const opponentUserId = employee.user?.id;
+
+            if (!opponentUserId) {
+                console.error(
+                    '사용자 ID를 찾을 수 없습니다:',
+                    employee
+                );
+                alert(
+                    '채팅방 생성에 실패했습니다. 사용자 정보를 확인할 수 없습니다.'
+                );
+                return;
+            }
+
+            const response = await createChatRoom({
+                opponentUserId,
+                opponentScope,
+                scope: 'APP',
+            });
+            const chatRoomId =
+                response.data?.chatRoomId ||
+                response.data?.id;
+            if (chatRoomId) {
+                navigate(`/chat/rooms/${chatRoomId}`, {
+                    state: {
+                        opponentName:
+                            employee.manager?.name ||
+                            employee.user?.name ||
+                            employee.name,
+                        opponentId: opponentUserId,
+                    },
+                });
+            }
+        } catch (error) {
+            console.error(
+                '채팅방 생성 중 오류가 발생했습니다.',
+                error
+            );
+        } finally {
+            setIsCreatingChat(false);
         }
     };
 
@@ -171,6 +241,20 @@ const EmployeeCard = ({ employee, workplaceId }) => {
                                     </MenuItemIcon>
                                     <MenuItemText>
                                         대타 요청
+                                    </MenuItemText>
+                                </MenuItem>
+                                <MenuItem
+                                    onClick={() =>
+                                        handleMenuOptionClick(
+                                            'chat'
+                                        )
+                                    }
+                                >
+                                    <MenuItemIcon>
+                                        💬
+                                    </MenuItemIcon>
+                                    <MenuItemText>
+                                        채팅 하기
                                     </MenuItemText>
                                 </MenuItem>
                                 <MenuItem

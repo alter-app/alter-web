@@ -2,10 +2,13 @@ import styled from 'styled-components';
 import { useState, useRef, useEffect } from 'react';
 import ConfirmModal from '../../../shared/ConfirmModal';
 import { useNavigate } from 'react-router-dom';
+import { createChatRoom } from '../../../../services/chatService';
 
 const EmployeeCard = ({ employee, workplaceId }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isCreatingChat, setIsCreatingChat] =
+        useState(false);
     const menuRef = useRef(null);
     const navigate = useNavigate();
 
@@ -46,15 +49,51 @@ const EmployeeCard = ({ employee, workplaceId }) => {
                 );
                 // TODO: 근무 바꾸기 기능 구현
                 break;
+            case 'chat':
+                handleStartChat();
+                break;
             case 'report':
                 console.log(
                     '신고 클릭:',
                     employee.user.name
                 );
-                // TODO: 신고 기능 구현
                 break;
             default:
                 break;
+        }
+    };
+
+    const handleStartChat = async () => {
+        if (isCreatingChat) return;
+        setIsCreatingChat(true);
+        try {
+            const response = await createChatRoom({
+                opponentUserId: employee.user.id,
+                opponentScope: 'APP',
+                scope: 'MANAGER',
+            });
+            const chatRoomId =
+                response.data?.chatRoomId ||
+                response.data?.id;
+            if (chatRoomId) {
+                navigate(
+                    `/owner/chat/rooms/${chatRoomId}`,
+                    {
+                        state: {
+                            opponentName:
+                                employee.user.name,
+                            opponentId: employee.user.id,
+                        },
+                    }
+                );
+            }
+        } catch (error) {
+            console.error(
+                '채팅방 생성 중 오류가 발생했습니다.',
+                error
+            );
+        } finally {
+            setIsCreatingChat(false);
         }
     };
 
@@ -167,6 +206,20 @@ const EmployeeCard = ({ employee, workplaceId }) => {
                                     </MenuItemIcon>
                                     <MenuItemText>
                                         근무 바꾸기
+                                    </MenuItemText>
+                                </MenuItem>
+                                <MenuItem
+                                    onClick={() =>
+                                        handleMenuOptionClick(
+                                            'chat'
+                                        )
+                                    }
+                                >
+                                    <MenuItemIcon>
+                                        💬
+                                    </MenuItemIcon>
+                                    <MenuItemText>
+                                        채팅 하기
                                     </MenuItemText>
                                 </MenuItem>
                                 <MenuItem

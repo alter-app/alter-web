@@ -25,6 +25,7 @@ const ProtectedRoute = ({ children, requiredScope }) => {
                 '/owner/reputation-notification',
                 '/owner/substitute-requests',
                 '/owner/notifications',
+                '/owner/chat',
                 '/owner/mypage',
             ].includes(location.pathname) ||
             location.pathname.startsWith(
@@ -33,7 +34,8 @@ const ProtectedRoute = ({ children, requiredScope }) => {
             location.pathname.startsWith(
                 '/owner/workplace/'
             ) ||
-            location.pathname.startsWith('/owner/mypage')
+            location.pathname.startsWith('/owner/mypage') ||
+            location.pathname.startsWith('/owner/chat/')
         )
     ) {
         return <Navigate to='/main' replace />;

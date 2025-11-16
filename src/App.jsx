@@ -33,6 +33,10 @@ import ApplicationListPage from './pages/user/ApplicationListPage';
 import ScheduleRequestPage from './pages/user/ScheduleRequestPage';
 import NotificationListPage from './pages/user/NotificationListPage';
 import ManagerNotificationListPage from './pages/owner/ManagerNotificationListPage';
+import ChatListPage from './pages/user/ChatListPage';
+import ChatRoomPage from './pages/user/ChatRoomPage';
+import ManagerChatListPage from './pages/owner/ManagerChatListPage';
+import ManagerChatRoomPage from './pages/owner/ManagerChatRoomPage';
 
 function App() {
     return (
@@ -148,6 +152,22 @@ function App() {
                         }
                     />
                     <Route
+                        path='/chat'
+                        element={
+                            <ProtectedRoute>
+                                <ChatListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/chat/rooms/:chatRoomId'
+                        element={
+                            <ProtectedRoute>
+                                <ChatRoomPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
                         path='/job-lookup-map'
                         element={
                             <ProtectedRoute>
@@ -240,6 +260,22 @@ function App() {
                         element={
                             <ProtectedRoute requiredScope='MANAGER'>
                                 <ManagerNotificationListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/owner/chat'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <ManagerChatListPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/owner/chat/rooms/:chatRoomId'
+                        element={
+                            <ProtectedRoute requiredScope='MANAGER'>
+                                <ManagerChatRoomPage />
                             </ProtectedRoute>
                         }
                     />
