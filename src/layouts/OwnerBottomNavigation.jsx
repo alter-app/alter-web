@@ -74,7 +74,7 @@ const OwnerBottomNavigation = () => {
             </NavItem>
             <NavItem
                 $active={isActive('/owner/chat')}
-                // onClick={() => navigate('/owner/chat')}
+                onClick={() => navigate('/owner/chat')}
             >
                 <ChatIcon
                     $active={isActive('/owner/chat')}

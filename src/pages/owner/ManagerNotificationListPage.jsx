@@ -84,7 +84,10 @@ const ManagerNotificationListPage = () => {
     if (isLoading) {
         return (
             <PageContainer>
-                <PageHeader title='알림' />
+                <PageHeader
+                    title='알림'
+                    showBackButton={false}
+                />
                 <LoadingContainer>
                     <Loader />
                 </LoadingContainer>
@@ -95,7 +98,10 @@ const ManagerNotificationListPage = () => {
 
     return (
         <PageContainer>
-            <PageHeader title='알림' />
+            <PageHeader
+                title='알림'
+                showBackButton={false}
+            />
             <ContentContainer>
                 <InfoWrapper>
                     <TotalCountText>

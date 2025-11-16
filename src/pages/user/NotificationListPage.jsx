@@ -83,7 +83,10 @@ const NotificationListPage = () => {
     if (isLoading) {
         return (
             <PageContainer>
-                <PageHeader title='알림' />
+                <PageHeader
+                    title='알림'
+                    showBackButton={false}
+                />
                 <LoadingContainer>
                     <Loader />
                 </LoadingContainer>
@@ -94,7 +97,10 @@ const NotificationListPage = () => {
 
     return (
         <PageContainer>
-            <PageHeader title='알림' />
+            <PageHeader
+                title='알림'
+                showBackButton={false}
+            />
             <ContentContainer>
                 <InfoWrapper>
                     <TotalCountText>
