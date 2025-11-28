@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getUserInfo } from '../../../services/myPage';
 import { formatJoinDate } from '../../../utils/timeUtil';
 import userIcon from '../../../assets/icons/userIcon.png';
 import styled from 'styled-components';
 
 const UserProfile = () => {
+    const navigate = useNavigate();
     const [userInfo, setUserInfo] = useState({
         name: '',
         nickname: '',
@@ -24,12 +26,29 @@ const UserProfile = () => {
         console.log(userInfo);
     }, []);
 
+    const handleSettingsClick = () => {
+        navigate('/settings');
+    };
+
     return (
         <ProfileContainer>
             <ProfileContent>
                 <ProfileImg src={userIcon} alt='프로필' />
                 <ProfileInfo>
-                    <ProfileName>{userInfo.name || '이름'}</ProfileName>
+                    <NameRow>
+                        <ProfileName>{userInfo.name || '이름'}</ProfileName>
+                        <KebabButton
+                            type='button'
+                            onClick={handleSettingsClick}
+                            aria-label='설정'
+                        >
+                            <KebabDots>
+                                <span />
+                                <span />
+                                <span />
+                            </KebabDots>
+                        </KebabButton>
+                    </NameRow>
                     <ProfileNickname>
                         {userInfo.nickname || '닉네임'}
                     </ProfileNickname>
@@ -84,6 +103,72 @@ const ProfileInfo = styled.div`
     display: flex;
     flex-direction: column;
     gap: 4px;
+    flex: 1;
+`;
+
+const NameRow = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+`;
+
+const KebabButton = styled.button`
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(17, 17, 17, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
+
+    &:hover {
+        background: rgba(17, 17, 17, 0.08);
+    }
+
+    &:active {
+        background: rgba(17, 17, 17, 0.12);
+        transform: scale(0.94);
+    }
+
+    @media (max-width: 480px) {
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+    }
+
+    @media (max-width: 360px) {
+        width: 24px;
+        height: 24px;
+    }
+`;
+
+const KebabDots = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+
+    span {
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: #111111;
+    }
+
+    @media (max-width: 480px) {
+        gap: 2.5px;
+
+        span {
+            width: 2.5px;
+            height: 2.5px;
+        }
+    }
 `;
 
 const ProfileName = styled.div`
