@@ -5,6 +5,7 @@ import {
     signInWithCredential,
 } from 'firebase/auth';
 import { auth } from '../firebase.config';
+import useAuthStore from '../store/authStore';
 
 const backend = import.meta.env.VITE_API_URL;
 
@@ -324,5 +325,31 @@ export const createSignupSession = async (phone) => {
     } catch (error) {
         console.error('회원가입 세션 생성 중 오류:', error);
         throw new Error('회원가입 세션 생성 중 오류가 발생했습니다.');
+    }
+};
+
+// 로그아웃 처리 로직
+export const logout = async () => {
+    const backend = import.meta.env.VITE_API_URL;
+    const accessToken = useAuthStore.getState().accessToken;
+
+    try {
+        const response = await fetch(`${backend}/app/auth/logout`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${accessToken}`,
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('로그아웃에 실패했습니다.');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('로그아웃 오류:', error);
+        // 에러가 발생해도 로컬 상태는 로그아웃 처리
+        throw error;
     }
 };
