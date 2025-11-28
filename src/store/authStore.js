@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { sendAuthDataToNative } from '../utils/nativeAppBridge';
+import {
+    sendAuthDataToNative,
+    sendLogoutToNative,
+} from '../utils/nativeAppBridge';
 
 const useAuthStore = create(
     persist(
@@ -31,14 +34,21 @@ const useAuthStore = create(
             },
 
             // 로그아웃 액션
-            logout: () =>
+            logout: () => {
                 set({
                     accessToken: '',
                     refreshToken: '',
                     authorizationId: '',
                     scope: '',
                     isLoggedIn: false,
-                }),
+                });
+
+                // 네이티브 앱에도 로그아웃 알림 전송
+                // localStorage에서 제거된 후 실행되도록 setTimeout 사용
+                setTimeout(() => {
+                    sendLogoutToNative();
+                }, 100);
+            },
         }),
         {
             name: 'auth-storage',

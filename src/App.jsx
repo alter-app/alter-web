@@ -37,6 +37,8 @@ import ChatListPage from './pages/user/ChatListPage';
 import ChatRoomPage from './pages/user/ChatRoomPage';
 import ManagerChatListPage from './pages/owner/ManagerChatListPage';
 import ManagerChatRoomPage from './pages/owner/ManagerChatRoomPage';
+import UserSettingsPage from './pages/user/UserSettingsPage';
+import OwnerSettingsPage from './pages/owner/OwnerSettingsPage';
 
 function App() {
     return (
@@ -68,6 +70,22 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <MyPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/user/settings'
+                        element={
+                            <ProtectedRoute>
+                                <UserSettingsPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path='/owner/settings'
+                        element={
+                            <ProtectedRoute>
+                                <OwnerSettingsPage />
                             </ProtectedRoute>
                         }
                     />

@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getUserInfo } from '../../../services/myPage';
 import { formatJoinDate } from '../../../utils/timeUtil';
 import userIcon from '../../../assets/icons/userIcon.png';
 import styled from 'styled-components';
+import settingIcon from '../../../assets/icons/setting.svg';
 
 const UserProfile = () => {
+    const navigate = useNavigate();
     const [userInfo, setUserInfo] = useState({
         name: '',
         nickname: '',
@@ -24,32 +27,60 @@ const UserProfile = () => {
         console.log(userInfo);
     }, []);
 
+    const handleSettingsClick = () => {
+        navigate('/user/settings');
+    };
+
     return (
         <ProfileContainer>
             <ProfileContent>
                 <ProfileImg src={userIcon} alt='프로필' />
                 <ProfileInfo>
-                    <ProfileName>{userInfo.name || '이름'}</ProfileName>
+                    <NameRow>
+                        <ProfileName>
+                            {userInfo.name || '이름'}
+                        </ProfileName>
+                        <SettingButton
+                            type='button'
+                            onClick={handleSettingsClick}
+                            aria-label='설정'
+                        >
+                            <SettingIcon
+                                src={settingIcon}
+                                alt='설정'
+                            />
+                        </SettingButton>
+                    </NameRow>
                     <ProfileNickname>
                         {userInfo.nickname || '닉네임'}
                     </ProfileNickname>
                     <CreatedAt>
-                        가입일자 : {formatJoinDate(userInfo.createdAt)}
+                        가입일자 :{' '}
+                        {formatJoinDate(userInfo.createdAt)}
                     </CreatedAt>
                 </ProfileInfo>
             </ProfileContent>
-            {userInfo.reputationSummary?.topKeywords?.length > 0 && (
+            {userInfo.reputationSummary?.topKeywords
+                ?.length > 0 && (
                 <KeywordsSection>
-                    <KeywordsLabel>내가 받은 평판 키워드</KeywordsLabel>
+                    <KeywordsLabel>
+                        내가 받은 평판 키워드
+                    </KeywordsLabel>
                     <KeywordsList>
                         {userInfo.reputationSummary.topKeywords.map(
                             (keyword, index) => (
                                 <KeywordBadge key={index}>
-                                    <KeywordEmoji>{keyword.emoji}</KeywordEmoji>
+                                    <KeywordEmoji>
+                                        {keyword.emoji}
+                                    </KeywordEmoji>
                                     <KeywordText>
-                                        {keyword.description}
+                                        {
+                                            keyword.description
+                                        }
                                     </KeywordText>
-                                    <KeywordCount>{keyword.count}</KeywordCount>
+                                    <KeywordCount>
+                                        {keyword.count}
+                                    </KeywordCount>
                                 </KeywordBadge>
                             )
                         )}
@@ -84,6 +115,34 @@ const ProfileInfo = styled.div`
     display: flex;
     flex-direction: column;
     gap: 4px;
+    flex: 1;
+`;
+
+const NameRow = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+`;
+
+const SettingButton = styled.button`
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+
+    &:hover {
+        opacity: 0.7;
+    }
+
+    &:active {
+        opacity: 0.5;
+    }
 `;
 
 const ProfileName = styled.div`
@@ -156,4 +215,10 @@ const KeywordCount = styled.span`
     font-weight: 600;
     font-size: 12px;
     color: #399982;
+`;
+
+const SettingIcon = styled.img`
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 `;
