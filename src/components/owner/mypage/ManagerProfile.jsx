@@ -2,11 +2,21 @@ import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { formatJoinDate } from '../../../utils/timeUtil';
 import userIcon from '../../../assets/icons/userIcon.png';
+import ConfirmModal from '../../shared/ConfirmModal';
+import { useNavigate } from 'react-router-dom';
+import useAuthStore from '../../../store/authStore';
+import { logout } from '../../../services/auth';
 
 const ManagerProfile = ({ manager }) => {
     const { name, nickname, createdAt } = manager || {};
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isLogoutModalOpen, setIsLogoutModalOpen] =
+        useState(false);
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
     const menuRef = useRef(null);
+    const navigate = useNavigate();
+    const { logout: logoutStore, scope: authScope } =
+        useAuthStore();
 
     const handleToggleMenu = () => {
         setIsMenuOpen((prev) => !prev);
@@ -17,6 +27,29 @@ const ManagerProfile = ({ manager }) => {
         console.info(
             `[ManagerProfile] ${action} 메뉴가 선택되었습니다.`
         );
+    };
+
+    const handleLogoutClick = () => {
+        setIsLogoutModalOpen(true);
+    };
+
+    const handleLogoutCancel = () => {
+        setIsLogoutModalOpen(false);
+    };
+
+    const handleLogoutConfirm = async () => {
+        setIsLoggingOut(true);
+        try {
+            await logout(authScope);
+            logoutStore();
+            navigate('/login');
+        } catch (error) {
+            logoutStore();
+            navigate('/login');
+        } finally {
+            setIsLoggingOut(false);
+            setIsLogoutModalOpen(false);
+        }
     };
 
     useEffect(() => {
@@ -120,6 +153,28 @@ const ManagerProfile = ({ manager }) => {
                             >
                                 업장 추가 등록
                             </MenuItem>
+                            <MenuItem
+                                type='button'
+                                role='menuitem'
+                                onClick={handleLogoutClick}
+                                disabled={isLoggingOut}
+                            >
+                                {isLoggingOut
+                                    ? '로그아웃 중...'
+                                    : '로그아웃'}
+                            </MenuItem>
+                            <ConfirmModal
+                                isOpen={isLogoutModalOpen}
+                                title='로그아웃'
+                                message='정말 로그아웃하시겠습니까?'
+                                confirmText='로그아웃'
+                                cancelText='취소'
+                                onConfirm={
+                                    handleLogoutConfirm
+                                }
+                                onClose={handleLogoutCancel}
+                                confirmColor='#d64545'
+                            />
                         </MenuContainer>
                     )}
                 </MenuWrapper>

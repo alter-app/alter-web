@@ -9,8 +9,10 @@ import ConfirmModal from '../../components/shared/ConfirmModal';
 
 const SettingsPage = () => {
     const navigate = useNavigate();
-    const { logout: logoutStore } = useAuthStore();
-    const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+    const { logout: logoutStore, scope: authScope } =
+        useAuthStore();
+    const [isLogoutModalOpen, setIsLogoutModalOpen] =
+        useState(false);
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
     const handleLogoutClick = () => {
@@ -20,7 +22,7 @@ const SettingsPage = () => {
     const handleLogoutConfirm = async () => {
         setIsLoggingOut(true);
         try {
-            await logout();
+            await logout(authScope);
             logoutStore();
             navigate('/login');
         } catch (error) {
@@ -39,7 +41,10 @@ const SettingsPage = () => {
 
     return (
         <>
-            <PageHeader title='설정' showBackButton={true} />
+            <PageHeader
+                title='설정'
+                showBackButton={true}
+            />
             <Container>
                 <SettingsContent>
                     <SettingsCard>
@@ -48,7 +53,9 @@ const SettingsPage = () => {
                             onClick={handleLogoutClick}
                             disabled={isLoggingOut}
                         >
-                            {isLoggingOut ? '로그아웃 중...' : '로그아웃'}
+                            {isLoggingOut
+                                ? '로그아웃 중...'
+                                : '로그아웃'}
                         </LogoutButton>
                     </SettingsCard>
                 </SettingsContent>
@@ -130,4 +137,3 @@ const LogoutButton = styled.button`
         cursor: not-allowed;
     }
 `;
-
