@@ -4,6 +4,7 @@ import { getUserInfo } from '../../../services/myPage';
 import { formatJoinDate } from '../../../utils/timeUtil';
 import userIcon from '../../../assets/icons/userIcon.png';
 import styled from 'styled-components';
+import settingIcon from '../../../assets/icons/setting.svg';
 
 const UserProfile = () => {
     const navigate = useNavigate();
@@ -27,7 +28,7 @@ const UserProfile = () => {
     }, []);
 
     const handleSettingsClick = () => {
-        navigate('/settings');
+        navigate('/user/settings');
     };
 
     return (
@@ -36,39 +37,50 @@ const UserProfile = () => {
                 <ProfileImg src={userIcon} alt='프로필' />
                 <ProfileInfo>
                     <NameRow>
-                        <ProfileName>{userInfo.name || '이름'}</ProfileName>
-                        <KebabButton
+                        <ProfileName>
+                            {userInfo.name || '이름'}
+                        </ProfileName>
+                        <SettingButton
                             type='button'
                             onClick={handleSettingsClick}
                             aria-label='설정'
                         >
-                            <KebabDots>
-                                <span />
-                                <span />
-                                <span />
-                            </KebabDots>
-                        </KebabButton>
+                            <SettingIcon
+                                src={settingIcon}
+                                alt='설정'
+                            />
+                        </SettingButton>
                     </NameRow>
                     <ProfileNickname>
                         {userInfo.nickname || '닉네임'}
                     </ProfileNickname>
                     <CreatedAt>
-                        가입일자 : {formatJoinDate(userInfo.createdAt)}
+                        가입일자 :{' '}
+                        {formatJoinDate(userInfo.createdAt)}
                     </CreatedAt>
                 </ProfileInfo>
             </ProfileContent>
-            {userInfo.reputationSummary?.topKeywords?.length > 0 && (
+            {userInfo.reputationSummary?.topKeywords
+                ?.length > 0 && (
                 <KeywordsSection>
-                    <KeywordsLabel>내가 받은 평판 키워드</KeywordsLabel>
+                    <KeywordsLabel>
+                        내가 받은 평판 키워드
+                    </KeywordsLabel>
                     <KeywordsList>
                         {userInfo.reputationSummary.topKeywords.map(
                             (keyword, index) => (
                                 <KeywordBadge key={index}>
-                                    <KeywordEmoji>{keyword.emoji}</KeywordEmoji>
+                                    <KeywordEmoji>
+                                        {keyword.emoji}
+                                    </KeywordEmoji>
                                     <KeywordText>
-                                        {keyword.description}
+                                        {
+                                            keyword.description
+                                        }
                                     </KeywordText>
-                                    <KeywordCount>{keyword.count}</KeywordCount>
+                                    <KeywordCount>
+                                        {keyword.count}
+                                    </KeywordCount>
                                 </KeywordBadge>
                             )
                         )}
@@ -112,7 +124,7 @@ const NameRow = styled.div`
     gap: 8px;
 `;
 
-const KebabButton = styled.button`
+const SettingButton = styled.button`
     width: 32px;
     height: 32px;
     border: none;
@@ -122,9 +134,6 @@ const KebabButton = styled.button`
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background 0.2s ease, transform 0.2s ease;
-    -webkit-tap-highlight-color: transparent;
-    flex-shrink: 0;
 
     &:hover {
         background: rgba(17, 17, 17, 0.08);
@@ -144,30 +153,6 @@ const KebabButton = styled.button`
     @media (max-width: 360px) {
         width: 24px;
         height: 24px;
-    }
-`;
-
-const KebabDots = styled.div`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 3px;
-
-    span {
-        width: 3px;
-        height: 3px;
-        border-radius: 50%;
-        background: #111111;
-    }
-
-    @media (max-width: 480px) {
-        gap: 2.5px;
-
-        span {
-            width: 2.5px;
-            height: 2.5px;
-        }
     }
 `;
 
@@ -241,4 +226,20 @@ const KeywordCount = styled.span`
     font-weight: 600;
     font-size: 12px;
     color: #399982;
+`;
+
+const SettingIcon = styled.img`
+    width: 25px;
+    height: 25px;
+    object-fit: contain;
+
+    @media (max-width: 480px) {
+        width: 18px;
+        height: 18px;
+    }
+
+    @media (max-width: 360px) {
+        width: 16px;
+        height: 16px;
+    }
 `;

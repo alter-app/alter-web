@@ -7,7 +7,7 @@ import useAuthStore from '../../store/authStore';
 import { logout } from '../../services/auth';
 import ConfirmModal from '../../components/shared/ConfirmModal';
 
-const SettingsPage = () => {
+const UserSettingsPage = () => {
     const navigate = useNavigate();
     const { logout: logoutStore, scope: authScope } =
         useAuthStore();
@@ -75,7 +75,7 @@ const SettingsPage = () => {
     );
 };
 
-export default SettingsPage;
+export default UserSettingsPage;
 
 const Container = styled.div`
     display: flex;
