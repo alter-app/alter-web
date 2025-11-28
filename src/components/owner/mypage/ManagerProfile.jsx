@@ -137,8 +137,8 @@ const CreatedAt = styled.div`
 `;
 
 const SettingIcon = styled.img`
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
     object-fit: contain;
 
     @media (max-width: 480px) {
