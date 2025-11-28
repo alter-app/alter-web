@@ -121,38 +121,27 @@ const ProfileInfo = styled.div`
 const NameRow = styled.div`
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 8px;
 `;
 
 const SettingButton = styled.button`
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     border: none;
-    border-radius: 8px;
-    background: rgba(17, 17, 17, 0.04);
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    padding: 0;
 
     &:hover {
-        background: rgba(17, 17, 17, 0.08);
+        opacity: 0.7;
     }
 
     &:active {
-        background: rgba(17, 17, 17, 0.12);
-        transform: scale(0.94);
-    }
-
-    @media (max-width: 480px) {
-        width: 28px;
-        height: 28px;
-        border-radius: 6px;
-    }
-
-    @media (max-width: 360px) {
-        width: 24px;
-        height: 24px;
+        opacity: 0.5;
     }
 `;
 
@@ -229,17 +218,7 @@ const KeywordCount = styled.span`
 `;
 
 const SettingIcon = styled.img`
-    width: 30px;
-    height: 30px;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
-
-    @media (max-width: 480px) {
-        width: 18px;
-        height: 18px;
-    }
-
-    @media (max-width: 360px) {
-        width: 16px;
-        height: 16px;
-    }
 `;
