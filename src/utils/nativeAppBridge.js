@@ -98,9 +98,36 @@ export const nativeLog = (level = 'log', message = '') => {
     }
 };
 
+export const sendLogoutToNative = () => {
+    if (!isNativeApp()) {
+        console.log('[Native Bridge] 웹 환경에서는 네이티브 브릿지를 사용하지 않습니다.');
+        return;
+    }
+
+    try {
+        // 로그아웃 처리 함수 호출 (네이티브)
+        if (typeof window.onWebLogout === 'function') {
+            console.log('[Native Bridge] 네이티브에 로그아웃 알림 전송 시작');
+            window.onWebLogout();
+            console.log('[Native Bridge] 네이티브에 로그아웃 알림 전송 완료');
+        } else if (typeof window.LogoutChannel !== 'undefined') {
+            // Flutter Channel 방식일 경우
+            console.log('[Native Bridge] LogoutChannel을 통해 로그아웃 알림 전송');
+            window.LogoutChannel.postMessage(
+                JSON.stringify({ action: 'logout' })
+            );
+        } else {
+            console.warn('[Native Bridge] 로그아웃 핸들러를 찾을 수 없습니다.');
+        }
+    } catch (error) {
+        console.error('[Native Bridge] 로그아웃 알림 실패:', error);
+    }
+};
+
 export default {
     isNativeApp,
     sendAuthDataToNative,
+    sendLogoutToNative,
     getCurrentLocation,
     nativeLog,
 };
