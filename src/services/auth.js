@@ -418,3 +418,32 @@ export const logout = async (scope) => {
         throw error;
     }
 };
+
+// 아이디 찾기 - 휴대폰 인증 후 아이디 조회
+export const findUserIdByPhone = async (phoneNumber) => {
+    try {
+        const response = await fetch(
+            `${backend}/public/users/find-email`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ contact: phoneNumber }),
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || '아이디 찾기에 실패했습니다.'
+            );
+        }
+
+        return data.data.email; // 이메일 반환
+    } catch (error) {
+        console.error('아이디 찾기 오류:', error);
+        throw error;
+    }
+};
