@@ -290,7 +290,7 @@ const FindPasswordPage = () => {
                             verificationCode.length !== 6
                         }
                     >
-                        다 했어요.
+                        완료
                     </DoneButton>
                 </ContentWrapper>
             ) : (
@@ -339,7 +339,7 @@ const FindPasswordPage = () => {
                             newPassword !== confirmPassword
                         }
                     >
-                        다 했어요.
+                        완료
                     </DoneButton>
                 </ContentWrapper>
             )}

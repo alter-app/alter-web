@@ -216,7 +216,7 @@ const FindIdPage = () => {
                             verificationCode.length !== 6
                         }
                     >
-                        다 했어요.
+                        완료
                     </VerifyButton>
                 </>
             ) : (

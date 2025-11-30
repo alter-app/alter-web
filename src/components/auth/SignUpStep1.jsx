@@ -50,7 +50,7 @@ const SignUpStep1 = ({
         </InputSection>
         <InfoGuide>만약 내용이 없다면 모든 내용을 기입해 주세요!</InfoGuide>
         <NextButton disabled={!isValid} onClick={onNext}>
-            다 했어요.
+            완료
         </NextButton>
     </Container>
 );
