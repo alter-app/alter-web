@@ -18,7 +18,8 @@ import chevronLeftIcon from '../assets/icons/chevronLeft.svg';
 
 const FindIdPage = () => {
     const navigate = useNavigate();
-    const [step, setStep] = useState(1); // 1: 입력 단계, 2: 결과 단계
+    // 개발용: 결과 화면을 바로 보려면 step을 2로, foundEmail에 테스트 이메일 설정
+    const [step, setStep] = useState(2); // 1: 입력 단계, 2: 결과 단계
     const [phoneNumber, setPhoneNumber] = useState('');
     const [verificationCode, setVerificationCode] =
         useState('');
@@ -27,7 +28,7 @@ const FindIdPage = () => {
     const [loading, setLoading] = useState(false);
     const [phoneError, setPhoneError] = useState('');
     const [codeError, setCodeError] = useState('');
-    const [foundEmail, setFoundEmail] = useState('');
+    const [foundEmail, setFoundEmail] = useState('test@example.com'); // 테스트용 이메일
 
     useEffect(() => {
         if (step === 1) {
@@ -260,12 +261,13 @@ const FindIdPage = () => {
                     </VerifyButton>
                 </>
             ) : (
-                <>
-                    <Title>회원님의 아이디 입니다.</Title>
-                    <Description>
+                <ResultWrapper>
+                    <ResultTitle>회원님의 아이디 입니다.</ResultTitle>
+                    <ResultDescription>
                         비밀번호를 잊으셨다면 비밀번호 찾기를
+                        <br />
                         통해 재설정 해 주세요
-                    </Description>
+                    </ResultDescription>
                     <EmailDisplay>
                         {maskEmail(foundEmail)}
                     </EmailDisplay>
@@ -279,7 +281,7 @@ const FindIdPage = () => {
                             로그인 하러 가기
                         </PrimaryButton>
                     </ButtonRow>
-                </>
+                </ResultWrapper>
             )}
         </Container>
     );
@@ -396,6 +398,25 @@ const RecaptchaContainer = styled.div`
     pointer-events: none;
 `;
 
+const ResultWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 60px;
+
+    @media (max-width: 480px) {
+        margin-top: 50px;
+        align-items: flex-start;
+    }
+
+    @media (max-width: 360px) {
+        margin-top: 40px;
+        align-items: flex-start;
+    }
+`;
+
 const Title = styled.h1`
     font-family: 'Pretendard';
     font-weight: 700;
@@ -403,7 +424,7 @@ const Title = styled.h1`
     line-height: 32px;
     color: #111111;
     text-align: left;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
     margin-top: 0;
     width: 100%;
     max-width: 400px;
@@ -419,6 +440,54 @@ const Title = styled.h1`
     }
 `;
 
+const ResultTitle = styled.h1`
+    font-family: 'Pretendard';
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 32px;
+    color: #111111;
+    text-align: left;
+    margin-bottom: 8px;
+    margin-top: 0;
+    width: 100%;
+    max-width: 400px;
+
+    @media (max-width: 480px) {
+        font-size: 22px;
+        line-height: 30px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 20px;
+        line-height: 28px;
+    }
+`;
+
+const ResultDescription = styled.p`
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+    color: #767676;
+    text-align: left;
+    margin-top: 0;
+    margin-bottom: 32px;
+    width: 100%;
+    max-width: 400px;
+
+    @media (max-width: 480px) {
+        font-size: 13px;
+        line-height: 19px;
+        margin-bottom: 28px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 12px;
+        line-height: 18px;
+        margin-bottom: 24px;
+    }
+`;
+
 const Description = styled.p`
     font-family: 'Pretendard';
     font-weight: 500;
@@ -426,6 +495,7 @@ const Description = styled.p`
     line-height: 22px;
     color: #767676;
     text-align: left;
+    margin-top: 0;
     margin-bottom: 32px;
     width: 100%;
     max-width: 400px;
