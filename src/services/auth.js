@@ -447,3 +447,65 @@ export const findUserIdByPhone = async (phoneNumber) => {
         throw error;
     }
 };
+
+// 비밀번호 찾기 - 아이디 확인
+export const verifyUserIdForPasswordReset = async (email) => {
+    try {
+        const response = await fetch(
+            `${backend}/public/users/verify-email-for-password-reset`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email }),
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || '아이디 확인에 실패했습니다.'
+            );
+        }
+
+        return data.data; // 성공 여부 반환
+    } catch (error) {
+        console.error('아이디 확인 오류:', error);
+        throw error;
+    }
+};
+
+// 비밀번호 재설정
+export const resetPassword = async (email, phoneNumber, newPassword) => {
+    try {
+        const response = await fetch(
+            `${backend}/public/users/reset-password`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email,
+                    contact: phoneNumber,
+                    newPassword,
+                }),
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(
+                data.message || '비밀번호 재설정에 실패했습니다.'
+            );
+        }
+
+        return data.data;
+    } catch (error) {
+        console.error('비밀번호 재설정 오류:', error);
+        throw error;
+    }
+};

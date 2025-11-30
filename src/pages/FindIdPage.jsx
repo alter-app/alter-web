@@ -18,8 +18,7 @@ import chevronLeftIcon from '../assets/icons/chevronLeft.svg';
 
 const FindIdPage = () => {
     const navigate = useNavigate();
-    // 개발용: 결과 화면을 바로 보려면 step을 2로, foundEmail에 테스트 이메일 설정
-    const [step, setStep] = useState(2); // 1: 입력 단계, 2: 결과 단계
+    const [step, setStep] = useState(1); // 1: 입력 단계, 2: 결과 단계
     const [phoneNumber, setPhoneNumber] = useState('');
     const [verificationCode, setVerificationCode] =
         useState('');
@@ -28,7 +27,7 @@ const FindIdPage = () => {
     const [loading, setLoading] = useState(false);
     const [phoneError, setPhoneError] = useState('');
     const [codeError, setCodeError] = useState('');
-    const [foundEmail, setFoundEmail] = useState('test@example.com'); // 테스트용 이메일
+    const [foundEmail, setFoundEmail] = useState('');
 
     useEffect(() => {
         if (step === 1) {
