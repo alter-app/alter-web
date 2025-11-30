@@ -7,7 +7,7 @@ import {
     clearRecaptcha,
     sendPhoneVerification,
     verifyPhoneCode,
-    verifyUserIdForPasswordReset,
+    createPasswordResetSession,
     resetPassword,
 } from '../services/auth';
 import {
@@ -18,14 +18,14 @@ import chevronLeftIcon from '../assets/icons/chevronLeft.svg';
 
 const FindPasswordPage = () => {
     const navigate = useNavigate();
-    // 개발용: 2단계를 보려면 step을 2로, 3단계를 보려면 step을 3으로 설정
-    const [step, setStep] = useState(3); // 1: 아이디 입력, 2: 휴대폰 인증, 3: 새 비밀번호 설정
+    const [step, setStep] = useState(1); // 1: 아이디 입력, 2: 휴대폰 인증, 3: 새 비밀번호 설정
     const [email, setEmail] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [verificationCode, setVerificationCode] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [verificationId, setVerificationId] = useState('');
+    const [sessionId, setSessionId] = useState('');
     const [isCodeSent, setIsCodeSent] = useState(false);
     const [loading, setLoading] = useState(false);
     const [emailError, setEmailError] = useState('');
@@ -48,28 +48,29 @@ const FindPasswordPage = () => {
         /^\+82\d{9,10}$/.test(number);
 
     const isValidPassword = (password) => {
-        // 비밀번호 조건: 최소 8자리, 숫자 포함
-        return password.length >= 8 && /\d/.test(password);
+        // 비밀번호 조건: 8~16자리, 영문, 숫자, 특수문자 조합
+        const hasMinLength = password.length >= 8 && password.length <= 16;
+        const hasLetter = /[a-zA-Z]/.test(password);
+        const hasNumber = /\d/.test(password);
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+        return hasMinLength && hasLetter && hasNumber && hasSpecialChar;
     };
 
-    const handleNextStep1 = async () => {
+    const handleNextStep1 = () => {
         if (!email) {
             setEmailError('아이디를 입력해주세요.');
             return;
         }
 
-        setLoading(true);
-        setEmailError('');
-        try {
-            await verifyUserIdForPasswordReset(email);
-            setStep(2);
-        } catch (error) {
-            setEmailError(
-                error.message || '아이디 확인에 실패했습니다.'
-            );
-        } finally {
-            setLoading(false);
+        // 이메일 형식 기본 검증
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            setEmailError('올바른 이메일 형식을 입력해주세요.');
+            return;
         }
+
+        setEmailError('');
+        setStep(2);
     };
 
     const handleSendCode = async (e) => {
@@ -111,7 +112,16 @@ const FindPasswordPage = () => {
         setLoading(true);
         setCodeError('');
         try {
+            // 휴대폰 인증 확인
             await verifyPhoneCode(verificationId, verificationCode);
+            
+            // 인증 성공 후 비밀번호 재설정 세션 생성
+            const formattedE164 = formatPhoneNumberToE164(phoneNumber);
+            const session = await createPasswordResetSession(
+                email,
+                formattedE164
+            );
+            setSessionId(session);
             setStep(3);
         } catch (error) {
             setCodeError(
@@ -130,7 +140,7 @@ const FindPasswordPage = () => {
 
         if (!isValidPassword(newPassword)) {
             setPasswordError(
-                '비밀번호는 8자리 이상이며 숫자를 포함해야 합니다.'
+                '비밀번호는 8~16자리이며 영문, 숫자, 특수문자를 조합해야 합니다.'
             );
             return;
         }
@@ -140,11 +150,17 @@ const FindPasswordPage = () => {
             return;
         }
 
+        if (!sessionId) {
+            alert('세션이 만료되었습니다. 처음부터 다시 시도해주세요.');
+            navigate('/find-password');
+            return;
+        }
+
         setLoading(true);
         setPasswordError('');
         setConfirmPasswordError('');
         try {
-            await resetPassword(email, phoneNumber, newPassword);
+            await resetPassword(sessionId, newPassword);
             alert('비밀번호가 성공적으로 변경되었습니다.');
             navigate('/login');
         } catch (error) {

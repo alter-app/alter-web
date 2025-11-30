@@ -87,10 +87,10 @@ const FindIdPage = () => {
             );
 
             // 인증 성공 후 아이디 찾기 API 호출
-            const email = await findUserIdByPhone(
+            const maskedEmail = await findUserIdByPhone(
                 phoneNumber
             );
-            setFoundEmail(email);
+            setFoundEmail(maskedEmail); // 이미 마스킹된 이메일 반환
             setStep(2);
         } catch (error) {
             setCodeError(
@@ -101,46 +101,6 @@ const FindIdPage = () => {
         }
     };
 
-    const maskEmail = (email) => {
-        if (!email) return '';
-        const [localPart, domain] = email.split('@');
-        if (!domain) return email;
-
-        let maskedLocal = '';
-        if (localPart.length <= 2) {
-            maskedLocal = localPart[0] + '*';
-        } else {
-            const visibleStart = Math.floor(localPart.length / 3);
-            const visibleEnd = Math.floor(
-                (localPart.length * 2) / 3
-            );
-            maskedLocal =
-                localPart.substring(0, visibleStart) +
-                '*'.repeat(
-                    visibleEnd - visibleStart
-                ) +
-                localPart.substring(visibleEnd);
-        }
-
-        const [domainName, domainExt] = domain.split('.');
-        let maskedDomain = '';
-        if (domainName.length <= 2) {
-            maskedDomain = domainName[0] + '*';
-        } else {
-            const visibleStart = Math.floor(
-                domainName.length / 3
-            );
-            const visibleEnd = Math.floor(
-                (domainName.length * 2) / 3
-            );
-            maskedDomain =
-                domainName.substring(0, visibleStart) +
-                '*'.repeat(visibleEnd - visibleStart) +
-                domainName.substring(visibleEnd);
-        }
-
-        return `${maskedLocal}@${maskedDomain}.${domainExt}`;
-    };
 
     const handleGoToLogin = () => {
         navigate('/login');
@@ -268,7 +228,7 @@ const FindIdPage = () => {
                         통해 재설정 해 주세요
                     </ResultDescription>
                     <EmailDisplay>
-                        {maskEmail(foundEmail)}
+                        {foundEmail}
                     </EmailDisplay>
                     <ButtonRow>
                         <SecondaryButton
