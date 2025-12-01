@@ -216,7 +216,7 @@ const FindPasswordPage = () => {
                 <ContentWrapper>
                     <Title>휴대폰 번호를 입력해 주세요!</Title>
                     <Description>
-                        비밀번호를 찾기 위한 인증 번호를
+                        비밀번호를 찾기 위한 인증번호를
                         <br />
                         휴대폰 문자로 발송해 드려요.
                     </Description>
