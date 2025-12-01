@@ -82,11 +82,7 @@ const Login = () => {
                                 : undefined
                         }
                     />
-                    {emailError && (
-                        <LoginErrorMessage>
-                            {emailError}
-                        </LoginErrorMessage>
-                    )}
+
                     <AuthInput
                         type='password'
                         placeholder='비밀번호'
@@ -102,11 +98,6 @@ const Login = () => {
                                 : undefined
                         }
                     />
-                    {passwordError && (
-                        <LoginErrorMessage>
-                            {passwordError}
-                        </LoginErrorMessage>
-                    )}
                 </Column>
                 <LoginButton
                     onClick={handleLogin}
@@ -116,9 +107,13 @@ const Login = () => {
                 >
                     로그인
                 </LoginButton>
-                {errorMessage && (
+                {(emailError ||
+                    passwordError ||
+                    errorMessage) && (
                     <LoginErrorMessage>
-                        {errorMessage}
+                        {emailError ||
+                            passwordError ||
+                            errorMessage}
                     </LoginErrorMessage>
                 )}
             </InputSection>
