@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import AuthInput from '../components/auth/AuthInput';
+import ConfirmModal from '../components/shared/ConfirmModal';
 import {
     initializeRecaptcha,
     clearRecaptcha,
@@ -34,6 +35,13 @@ const FindPasswordPage = () => {
     const [passwordError, setPasswordError] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] =
         useState('');
+    const [modalState, setModalState] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: null,
+        showCancel: false,
+    });
 
     useEffect(() => {
         if (step === 2) {
@@ -151,8 +159,16 @@ const FindPasswordPage = () => {
         }
 
         if (!sessionId) {
-            alert('세션이 만료되었습니다. 처음부터 다시 시도해주세요.');
-            navigate('/find-password');
+            setModalState({
+                isOpen: true,
+                title: '알림',
+                message: '세션이 만료되었습니다. 처음부터 다시 시도해주세요.',
+                onConfirm: () => {
+                    setModalState((prev) => ({ ...prev, isOpen: false }));
+                    navigate('/find-password');
+                },
+                showCancel: false,
+            });
             return;
         }
 
@@ -161,10 +177,26 @@ const FindPasswordPage = () => {
         setConfirmPasswordError('');
         try {
             await resetPassword(sessionId, newPassword);
-            alert('비밀번호가 성공적으로 변경되었습니다.');
-            navigate('/login');
+            setModalState({
+                isOpen: true,
+                title: '알림',
+                message: '비밀번호가 성공적으로 변경되었습니다.',
+                onConfirm: () => {
+                    setModalState((prev) => ({ ...prev, isOpen: false }));
+                    navigate('/login');
+                },
+                showCancel: false,
+            });
         } catch (error) {
-            alert(error.message || '비밀번호 재설정에 실패했습니다.');
+            setModalState({
+                isOpen: true,
+                title: '알림',
+                message: error.message || '비밀번호 재설정에 실패했습니다.',
+                onConfirm: () => {
+                    setModalState((prev) => ({ ...prev, isOpen: false }));
+                },
+                showCancel: false,
+            });
         } finally {
             setLoading(false);
         }
@@ -350,6 +382,16 @@ const FindPasswordPage = () => {
                     </DoneButton>
                 </ContentWrapper>
             )}
+            <ConfirmModal
+                isOpen={modalState.isOpen}
+                onClose={() =>
+                    setModalState((prev) => ({ ...prev, isOpen: false }))
+                }
+                onConfirm={modalState.onConfirm || (() => {})}
+                title={modalState.title}
+                message={modalState.message}
+                showCancel={modalState.showCancel}
+            />
         </Container>
     );
 };
