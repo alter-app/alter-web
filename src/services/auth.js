@@ -363,6 +363,9 @@ export const loginIDPW = async (
 // IDPW 회원가입 세션 생성 로직
 export const createSignupSession = async (phone) => {
     try {
+        // 하이픈 제거
+        const phoneWithoutHyphen = phone.replace(/-/g, '');
+
         const response = await fetch(
             `${backend}/public/users/signup-session`,
             {
@@ -370,7 +373,9 @@ export const createSignupSession = async (phone) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ contact: phone }),
+                body: JSON.stringify({
+                    contact: phoneWithoutHyphen,
+                }),
             }
         );
 
