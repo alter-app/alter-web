@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
     initializeRecaptcha,
     clearRecaptcha,
+    resetRecaptcha,
     sendPhoneVerification,
     verifyPhoneCode,
     createSignupSession,
@@ -28,11 +29,41 @@ const PhoneAuthForm = () => {
     const [phoneError, setPhoneError] = useState(''); // 전화번호 에러 메시지 상태
     const [codeError, setCodeError] = useState(''); // 인증 코드 에러 메시지 상태
 
+    // 초기화 여부를 추적하기 위한 ref
+    const isRecaptchaInitialized = useRef(false);
+
     useEffect(() => {
-        initializeRecaptcha('recaptcha-container', () => {
-            console.log('reCAPTCHA verified');
-        });
-        return clearRecaptcha;
+        const containerId = 'recaptcha-container';
+        
+        // 컴포넌트 마운트 시 한 번만 실행
+        if (!isRecaptchaInitialized.current) {
+            // DOM 요소가 준비될 때까지 대기
+            const containerElement = document.getElementById(containerId);
+            if (!containerElement) {
+                console.warn('reCAPTCHA 컨테이너 요소를 찾을 수 없습니다.');
+                return;
+            }
+            
+            const verifier = initializeRecaptcha(containerId, () => {
+                console.log('reCAPTCHA verified');
+            });
+            
+            // 초기화 실패 시 에러 메시지 표시
+            if (!verifier) {
+                setPhoneError(
+                    'reCAPTCHA 초기화에 실패했습니다. 페이지를 새로고침하고 다시 시도해주세요.'
+                );
+                console.error('reCAPTCHA 초기화 실패');
+            }
+            
+            isRecaptchaInitialized.current = true;
+        }
+
+        // 컴포넌트 언마운트 시에만 정리
+        return () => {
+            clearRecaptcha(containerId);
+            isRecaptchaInitialized.current = false;
+        };
     }, []);
 
     const isValidPhoneNumber = (number) =>
@@ -51,7 +82,8 @@ const PhoneAuthForm = () => {
         }
 
         setLoading(true);
-        setPhoneError(''); // 에러 메시지 초기화
+        setPhoneError('');
+
         try {
             const vId = await sendPhoneVerification(
                 formattedE164
@@ -59,11 +91,12 @@ const PhoneAuthForm = () => {
             setVerificationId(vId);
             setIsCodeSent(true);
         } catch (error) {
-            clearRecaptcha();
-            initializeRecaptcha('recaptcha-container');
+            resetRecaptcha();
+
             setPhoneError(
                 error.message || '인증번호 전송 실패'
             );
+            console.error('인증번호 전송 실패:', error);
         } finally {
             setLoading(false);
         }
