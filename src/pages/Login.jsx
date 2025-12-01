@@ -67,9 +67,23 @@ const Login = () => {
                 <KakaoLoginButton />
                 <AppleLoginButton />
                 <AuthLinks>
-                    <span>아이디 찾기</span>
+                    <span
+                        style={{
+                            cursor: 'pointer',
+                        }}
+                        onClick={() => navigate('/find-id')}
+                    >
+                        아이디 찾기
+                    </span>
                     <span>|</span>
-                    <span>비밀번호 찾기</span>
+                    <span
+                        style={{
+                            cursor: 'pointer',
+                        }}
+                        onClick={() => navigate('/find-password')}
+                    >
+                        비밀번호 찾기
+                    </span>
                     <span>|</span>
                     <span
                         style={{

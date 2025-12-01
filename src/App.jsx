@@ -5,6 +5,8 @@ import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import NotFound from './pages/NotFound';
 import PhoneAuthPage from './pages/PhoneAuth';
+import FindIdPage from './pages/FindIdPage';
+import FindPasswordPage from './pages/FindPasswordPage';
 import KakaoCallback from './pages/callback/KakaoCallback';
 import AppleCallback from './pages/callback/AppleCallback';
 import MainLayout from './layouts/MainLayout';
@@ -61,10 +63,18 @@ function App() {
                         path='/signup'
                         element={<SignUp />}
                     />
-                    <Route
-                        path='/phoneauth'
-                        element={<PhoneAuthPage />}
-                    />
+                <Route
+                    path='/phoneauth'
+                    element={<PhoneAuthPage />}
+                />
+                <Route
+                    path='/find-id'
+                    element={<FindIdPage />}
+                />
+                <Route
+                    path='/find-password'
+                    element={<FindPasswordPage />}
+                />
                     <Route
                         path='/mypage'
                         element={
