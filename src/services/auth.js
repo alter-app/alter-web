@@ -349,20 +349,23 @@ export const loginIDPW = async (
         }
 
         // 실패 시 에러 메시지 처리
-        const errorMessage =
-            data.message || '로그인에 실패했습니다.';
-        alert(errorMessage);
-        throw new Error(errorMessage);
+        const error = new Error(
+            data.message || '로그인에 실패했습니다.'
+        );
+        error.data = data; // 또는 error.fieldErrors = data.data
+        throw error;
     } catch (error) {
         console.error('로그인 오류:', error);
-        alert('네트워크 오류가 발생했습니다.');
-        navigate('/error');
+        throw error;
     }
 };
 
 // IDPW 회원가입 세션 생성 로직
 export const createSignupSession = async (phone) => {
     try {
+        // 하이픈 제거
+        const phoneWithoutHyphen = phone.replace(/-/g, '');
+
         const response = await fetch(
             `${backend}/public/users/signup-session`,
             {
@@ -370,18 +373,30 @@ export const createSignupSession = async (phone) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ contact: phone }),
+                body: JSON.stringify({
+                    contact: phoneWithoutHyphen,
+                }),
             }
         );
 
+        const data = await response.json();
+
         if (!response.ok) {
-            throw new Error('서버 응답 오류');
+            // 백엔드에서 오는 에러 메시지 사용
+            throw new Error(
+                data.message ||
+                    '회원가입 세션 생성에 실패했습니다.'
+            );
         }
 
-        const data = await response.json();
         return data.data.signupSessionId;
     } catch (error) {
         console.error('회원가입 세션 생성 중 오류:', error);
+        // 이미 Error 객체이고 message가 있으면 그대로 throw
+        // 네트워크 오류 등 다른 경우에만 기본 메시지 사용
+        if (error.message) {
+            throw error;
+        }
         throw new Error(
             '회원가입 세션 생성 중 오류가 발생했습니다.'
         );
@@ -429,7 +444,9 @@ export const findUserIdByPhone = async (phoneNumber) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ contact: phoneNumber }),
+                body: JSON.stringify({
+                    contact: phoneNumber,
+                }),
             }
         );
 
@@ -437,7 +454,8 @@ export const findUserIdByPhone = async (phoneNumber) => {
 
         if (!response.ok) {
             throw new Error(
-                data.message || '아이디 찾기에 실패했습니다.'
+                data.message ||
+                    '아이디 찾기에 실패했습니다.'
             );
         }
 
@@ -449,7 +467,10 @@ export const findUserIdByPhone = async (phoneNumber) => {
 };
 
 // 비밀번호 재설정 세션 생성
-export const createPasswordResetSession = async (email, phoneNumber) => {
+export const createPasswordResetSession = async (
+    email,
+    phoneNumber
+) => {
     try {
         const response = await fetch(
             `${backend}/public/users/password-reset/session`,
@@ -469,19 +490,26 @@ export const createPasswordResetSession = async (email, phoneNumber) => {
 
         if (!response.ok) {
             throw new Error(
-                data.message || '비밀번호 재설정 세션 생성에 실패했습니다.'
+                data.message ||
+                    '비밀번호 재설정 세션 생성에 실패했습니다.'
             );
         }
 
         return data.data.sessionId; // 세션 ID 반환
     } catch (error) {
-        console.error('비밀번호 재설정 세션 생성 오류:', error);
+        console.error(
+            '비밀번호 재설정 세션 생성 오류:',
+            error
+        );
         throw error;
     }
 };
 
 // 비밀번호 재설정
-export const resetPassword = async (sessionId, newPassword) => {
+export const resetPassword = async (
+    sessionId,
+    newPassword
+) => {
     try {
         const response = await fetch(
             `${backend}/public/users/password-reset`,
@@ -501,7 +529,8 @@ export const resetPassword = async (sessionId, newPassword) => {
 
         if (!response.ok) {
             throw new Error(
-                data.message || '비밀번호 재설정에 실패했습니다.'
+                data.message ||
+                    '비밀번호 재설정에 실패했습니다.'
             );
         }
 

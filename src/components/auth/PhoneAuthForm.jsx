@@ -122,6 +122,7 @@ const PhoneAuthForm = () => {
                                 )
                             );
                             setPhoneError('');
+                            setCodeError('');
                         }}
                         maxLength={13}
                         required
