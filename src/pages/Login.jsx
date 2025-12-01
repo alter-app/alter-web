@@ -35,7 +35,7 @@ const Login = () => {
 
             // 필드별 에러가 있는 경우
             if (error.data) {
-                const { fieldErrors, global } =
+                const { fieldErrors, globalError } =
                     parseErrorResponse(error.data);
 
                 // 필드별 에러 설정
@@ -45,7 +45,8 @@ const Login = () => {
                     setPasswordError(fieldErrors.password);
 
                 // 일반 에러 메시지
-                if (global) setErrorMessage(global);
+                if (globalError)
+                    setErrorMessage(globalError);
             } else {
                 setErrorMessage(
                     error.message ||
