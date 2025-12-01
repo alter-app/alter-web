@@ -10,32 +10,23 @@ import useAuthStore from '../store/authStore';
 const backend = import.meta.env.VITE_API_URL;
 
 // reCAPTCHA 초기화
-export function initializeRecaptcha(
+export async function initializeRecaptcha(
     containerId = 'recaptcha-container',
     onVerified
 ) {
-    // 이미 인스턴스가 존재하면 렌더링하지 않고 기존 인스턴스 반환 (중복 렌더링 방지)
-    if (window.recaptchaVerifier) {
-        return window.recaptchaVerifier;
-    }
-
-    // DOM 요소 확인 및 정리
-    const containerElement = document.getElementById(containerId);
-    if (containerElement) {
-        // 이미 reCAPTCHA가 렌더링되어 있는지 확인 (iframe이나 reCAPTCHA 관련 요소가 있는지 체크)
-        const hasRecaptchaElements = 
-            containerElement.querySelector('iframe[src*="recaptcha"]') ||
-            containerElement.querySelector('.grecaptcha-badge') ||
-            containerElement.hasAttribute('data-recaptcha-id');
-        
-        if (hasRecaptchaElements) {
-            // 이미 렌더링된 reCAPTCHA가 있으면 요소를 비움
-            containerElement.innerHTML = '';
-            console.warn('기존 reCAPTCHA 요소를 정리했습니다.');
-        }
-    }
-
     try {
+        // 1. 이미 인스턴스가 있고 위젯도 렌더링된 상태라면 기존 것 반환
+        if (window.recaptchaVerifier && window.recaptchaWidgetId !== undefined) {
+            return window.recaptchaVerifier;
+        }
+
+        // 2. DOM 요소 정리 (중복 렌더링 방지)
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.innerHTML = '';
+        }
+
+        // 3. 인스턴스 생성
         window.recaptchaVerifier = new RecaptchaVerifier(
             auth,
             containerId,
@@ -45,10 +36,7 @@ export function initializeRecaptcha(
                     if (onVerified) onVerified(response);
                 },
                 'expired-callback': () => {
-                    // 만료 시 위젯 리셋 (삭제가 아님)
-                    if (window.recaptchaVerifier) {
-                        window.recaptchaVerifier.reset();
-                    }
+                    resetRecaptcha(); // 만료 시 리셋
                     alert('reCAPTCHA가 만료되었습니다. 다시 시도해주세요.');
                 },
                 'error-callback': (error) => {
@@ -61,100 +49,52 @@ export function initializeRecaptcha(
                             console.error('Error clearing recaptcha:', e);
                         }
                         window.recaptchaVerifier = null;
+                        window.recaptchaWidgetId = undefined;
                     }
                 },
             }
         );
-        
-        // render()는 Promise를 반환하므로 await 처리
-        const renderPromise = window.recaptchaVerifier.render();
-        
-        // render()가 Promise를 반환하는 경우 에러 처리
-        if (renderPromise && typeof renderPromise.catch === 'function') {
-            renderPromise.catch((error) => {
-                console.error('reCAPTCHA render failed:', error);
-                
-                // "already been rendered" 에러인 경우 특별 처리
-                if (error?.message?.includes('already been rendered')) {
-                    console.warn('reCAPTCHA가 이미 렌더링되어 있습니다. 기존 인스턴스를 재사용합니다.');
-                    // DOM 요소를 다시 정리하고 재시도하지 않음 (기존 인스턴스 사용)
-                    if (containerElement) {
-                        containerElement.innerHTML = '';
-                    }
-                    // 인스턴스는 유지하되, 다음 호출 시 재사용될 수 있도록 함
-                    return;
-                }
-                
-                // 401 Unauthorized 에러인 경우 명확한 메시지
-                if (error?.message?.includes('401') || error?.code === 401) {
-                    console.error(
-                        'reCAPTCHA 401 에러: Firebase 콘솔에서 현재 도메인(로컬호스트 포함)이 승인되었는지 확인하세요.'
-                    );
-                }
-                // 실패한 인스턴스 정리
-                if (window.recaptchaVerifier) {
-                    try {
-                        window.recaptchaVerifier.clear();
-                    } catch (e) {
-                        // 무시
-                    }
-                    window.recaptchaVerifier = null;
-                }
-            });
-        }
-    } catch (error) {
-        // "already been rendered" 에러인 경우 특별 처리
-        if (error?.message?.includes('already been rendered')) {
-            console.warn('reCAPTCHA가 이미 렌더링되어 있습니다. DOM 요소를 정리합니다.');
-            if (containerElement) {
-                containerElement.innerHTML = '';
-            }
-            // 인스턴스를 정리하고 null 반환하여 재시도 가능하도록 함
-            window.recaptchaVerifier = null;
-            return null;
-        }
-        
-        // 이미 렌더링 되었다면 무시하거나 기존 것 반환
-        console.warn('Recaptcha initialization error:', error);
-        // 에러 발생 시 인스턴스 정리
-        if (window.recaptchaVerifier) {
-            try {
-                window.recaptchaVerifier.clear();
-            } catch (e) {
-                // 무시
-            }
-            window.recaptchaVerifier = null;
-        }
-    }
 
-    return window.recaptchaVerifier;
+        // 4. 렌더링 후 Widget ID 저장 (핵심: reset을 위해 필요)
+        const widgetId = await window.recaptchaVerifier.render();
+        window.recaptchaWidgetId = widgetId;
+
+        return window.recaptchaVerifier;
+    } catch (error) {
+        console.warn('Recaptcha initialization warning:', error);
+        // 이미 렌더링된 경우 등은 기존 인스턴스 사용 시도
+        if (window.recaptchaVerifier) return window.recaptchaVerifier;
+        return null;
+    }
 }
 
-// reCAPTCHA 정리 (완전 삭제 시에만 사용)
+// reCAPTCHA 정리 (완전 삭제)
 export function clearRecaptcha(containerId = 'recaptcha-container') {
     if (window.recaptchaVerifier) {
         try {
             window.recaptchaVerifier.clear();
         } catch (e) {
-            console.error(e);
+            console.warn(e);
         }
-        window.recaptchaVerifier = null;
     }
-    
-    // DOM 요소도 정리
-    const containerElement = document.getElementById(containerId);
-    if (containerElement) {
-        containerElement.innerHTML = '';
+    window.recaptchaVerifier = null;
+    window.recaptchaWidgetId = undefined; // ID도 초기화
+
+    const container = document.getElementById(containerId);
+    if (container) {
+        container.innerHTML = '';
     }
 }
 
-// reCAPTCHA 리셋 (실패 후 재시도 시 사용)
+// reCAPTCHA 리셋 (에러 수정됨)
 export function resetRecaptcha() {
-    if (window.recaptchaVerifier) {
+    // window.recaptchaVerifier.reset()은 존재하지 않는 함수입니다.
+    // 대신 grecaptcha.reset(widgetId)를 사용해야 합니다.
+    if (window.grecaptcha && window.recaptchaWidgetId !== undefined) {
         try {
-            window.recaptchaVerifier.reset(); // clear() 대신 reset() 사용 권장
+            window.grecaptcha.reset(window.recaptchaWidgetId);
         } catch (error) {
-            console.error('Error resetting recaptcha:', error);
+            console.error('Error resetting recaptcha widget:', error);
         }
     }
 }
@@ -162,7 +102,13 @@ export function resetRecaptcha() {
 // reCAPTCHA 인증번호 전송
 export async function sendPhoneVerification(phoneNumber) {
     if (!window.recaptchaVerifier) {
-        throw new Error('reCAPTCHA가 초기화되지 않았습니다.');
+        // 인스턴스가 없으면 재초기화 시도 (방어 코드)
+        await initializeRecaptcha();
+    }
+
+    // 그래도 없으면 에러
+    if (!window.recaptchaVerifier) {
+        throw new Error('reCAPTCHA 초기화에 실패했습니다. 새로고침 후 다시 시도해주세요.');
     }
 
     try {
@@ -174,7 +120,10 @@ export async function sendPhoneVerification(phoneNumber) {
         );
         return confirmationResult.verificationId;
     } catch (error) {
-        // 에러 발생 시 여기서 reset 하지 않고, UI 컴포넌트에서 처리하도록 에러만 던짐
+        // 실패 시 리셋하여 다시 시도 가능하게 함
+        resetRecaptcha();
+
+        // 에러 메시지 매핑
         throw new Error(getFirebaseErrorMsg(error.code));
     }
 }
@@ -218,7 +167,7 @@ function getFirebaseErrorMsg(code) {
             // code가 없거나 알 수 없는 에러인 경우 원본 메시지 포함
             if (code && typeof code === 'string') {
                 if (code.includes('401') || code.includes('Unauthorized')) {
-                    return 'reCAPTCHA 인증 실패: Firebase 콘솔에서 도메인 설정을 확인하세요.';
+                    return '관리자 설정 오류: API 키 권한을 확인해주세요.';
                 }
             }
             return '인증 처리 중 오류가 발생했습니다.';
