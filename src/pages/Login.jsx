@@ -8,6 +8,7 @@ import AuthButton from '../components/auth/AuthButton';
 import { loginIDPW } from '../services/auth';
 import useAuthStore from '../store/authStore';
 import { useNavigate } from 'react-router-dom';
+import { parseErrorResponse } from '../utils/errorUtils';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -33,23 +34,19 @@ const Login = () => {
             setErrorMessage('');
 
             // 필드별 에러가 있는 경우
-            if (
-                error.data &&
-                error.data.data &&
-                Array.isArray(error.data.data)
-            ) {
-                error.data.data.forEach((fieldError) => {
-                    if (fieldError.field === 'email') {
-                        setEmailError(fieldError.message);
-                    }
-                    if (fieldError.field === 'password') {
-                        setPasswordError(
-                            fieldError.message
-                        );
-                    }
-                });
-            } else {
+            if (error.data) {
+                const { fieldErrors, global } =
+                    parseErrorResponse(error.data);
+
+                // 필드별 에러 설정
+                if (fieldErrors.email)
+                    setEmailError(fieldErrors.email);
+                if (fieldErrors.password)
+                    setPasswordError(fieldErrors.password);
+
                 // 일반 에러 메시지
+                if (global) setErrorMessage(global);
+            } else {
                 setErrorMessage(
                     error.message ||
                         '로그인에 실패했습니다.'
