@@ -340,6 +340,11 @@ const FindPasswordPage = () => {
                             !confirmPassword ||
                             newPassword !== confirmPassword
                         }
+                        $isActive={
+                            newPassword &&
+                            confirmPassword &&
+                            newPassword === confirmPassword
+                        }
                     >
                         완료
                     </DoneButton>
