@@ -290,6 +290,7 @@ const FindPasswordPage = () => {
                             !isCodeSent ||
                             verificationCode.length !== 6
                         }
+                        $isActive={verificationCode.length === 6 && isCodeSent}
                     >
                         완료
                     </DoneButton>
@@ -879,7 +880,7 @@ const DoneButton = styled.button`
     left: 50%;
     transform: translateX(-50%);
     border: none;
-    background: #d6d3d1;
+    background: ${({ $isActive }) => ($isActive ? '#2de283' : '#d6d3d1')};
     color: #ffffff;
     font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
     font-weight: 600;
@@ -888,15 +889,26 @@ const DoneButton = styled.button`
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: ${({ $isActive }) =>
+        $isActive
+            ? '0 2px 8px rgba(45, 226, 131, 0.3)'
+            : '0 2px 8px rgba(0, 0, 0, 0.1)'};
     z-index: 100;
 
     &:hover:not(:disabled) {
-        background: #c4c1bf;
+        background: ${({ $isActive }) => ($isActive ? '#25c973' : '#c4c1bf')};
+        box-shadow: ${({ $isActive }) =>
+            $isActive
+                ? '0 4px 12px rgba(45, 226, 131, 0.4)'
+                : '0 2px 8px rgba(0, 0, 0, 0.1)'};
     }
 
     &:active:not(:disabled) {
-        background: #b3b0ae;
+        background: ${({ $isActive }) => ($isActive ? '#1fb865' : '#b3b0ae')};
+        box-shadow: ${({ $isActive }) =>
+            $isActive
+                ? '0 2px 6px rgba(45, 226, 131, 0.3)'
+                : '0 2px 8px rgba(0, 0, 0, 0.1)'};
     }
 
     &:disabled {
