@@ -167,6 +167,7 @@ const FindIdPage = () => {
                                         phoneNumber.length !== 11 ||
                                         isCodeSent
                                     }
+                                    $isActive={phoneNumber.length === 11 && !isCodeSent}
                                 >
                                     {loading
                                         ? '전송 중...'
@@ -215,6 +216,7 @@ const FindIdPage = () => {
                             !isCodeSent ||
                             verificationCode.length !== 6
                         }
+                        $isActive={verificationCode.length === 6 && isCodeSent}
                     >
                         완료
                     </VerifyButton>
@@ -560,7 +562,7 @@ const SendButton = styled.button`
     height: 56px;
     padding: 0 20px;
     border: none;
-    background: #767676;
+    background: ${({ $isActive }) => ($isActive ? '#2de283' : '#767676')};
     color: #ffffff;
     font-family: 'Pretendard';
     font-weight: 500;
@@ -571,7 +573,7 @@ const SendButton = styled.button`
     transition: all 0.2s ease;
 
     &:hover:not(:disabled) {
-        background: #5a5a5a;
+        background: ${({ $isActive }) => ($isActive ? '#25c973' : '#5a5a5a')};
     }
 
     &:disabled {
@@ -674,7 +676,7 @@ const VerifyButton = styled.button`
     left: 50%;
     transform: translateX(-50%);
     border: none;
-    background: #d6d3d1;
+    background: ${({ $isActive }) => ($isActive ? '#2de283' : '#d6d3d1')};
     color: #ffffff;
     font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
     font-weight: 600;
@@ -683,15 +685,26 @@ const VerifyButton = styled.button`
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: ${({ $isActive }) =>
+        $isActive
+            ? '0 2px 8px rgba(45, 226, 131, 0.3)'
+            : '0 2px 8px rgba(0, 0, 0, 0.1)'};
     z-index: 100;
 
     &:hover:not(:disabled) {
-        background: #c4c1bf;
+        background: ${({ $isActive }) => ($isActive ? '#25c973' : '#c4c1bf')};
+        box-shadow: ${({ $isActive }) =>
+            $isActive
+                ? '0 4px 12px rgba(45, 226, 131, 0.4)'
+                : '0 2px 8px rgba(0, 0, 0, 0.1)'};
     }
 
     &:active:not(:disabled) {
-        background: #b3b0ae;
+        background: ${({ $isActive }) => ($isActive ? '#1fb865' : '#b3b0ae')};
+        box-shadow: ${({ $isActive }) =>
+            $isActive
+                ? '0 2px 6px rgba(45, 226, 131, 0.3)'
+                : '0 2px 8px rgba(0, 0, 0, 0.1)'};
     }
 
     &:disabled {

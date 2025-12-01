@@ -116,10 +116,10 @@ const FindPasswordPage = () => {
             await verifyPhoneCode(verificationId, verificationCode);
             
             // 인증 성공 후 비밀번호 재설정 세션 생성
-            const formattedE164 = formatPhoneNumberToE164(phoneNumber);
+            const contactNumber = phoneNumber.replace(/[^0-9]/g, '');
             const session = await createPasswordResetSession(
                 email,
-                formattedE164
+                contactNumber
             );
             setSessionId(session);
             setStep(3);
@@ -207,6 +207,7 @@ const FindPasswordPage = () => {
                     <NextButton
                         onClick={handleNextStep1}
                         disabled={loading || !email}
+                        $isActive={email.endsWith('.com') && email.includes('@')}
                     >
                         다음
                     </NextButton>
@@ -804,7 +805,7 @@ const NextButton = styled.button`
     left: 50%;
     transform: translateX(-50%);
     border: none;
-    background: #d6d3d1;
+    background: ${({ $isActive }) => ($isActive ? '#2de283' : '#d6d3d1')};
     color: #ffffff;
     font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
     font-weight: 600;
@@ -813,15 +814,26 @@ const NextButton = styled.button`
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: ${({ $isActive }) =>
+        $isActive
+            ? '0 2px 8px rgba(45, 226, 131, 0.3)'
+            : '0 2px 8px rgba(0, 0, 0, 0.1)'};
     z-index: 100;
 
     &:hover:not(:disabled) {
-        background: #c4c1bf;
+        background: ${({ $isActive }) => ($isActive ? '#25c973' : '#c4c1bf')};
+        box-shadow: ${({ $isActive }) =>
+            $isActive
+                ? '0 4px 12px rgba(45, 226, 131, 0.4)'
+                : '0 2px 8px rgba(0, 0, 0, 0.1)'};
     }
 
     &:active:not(:disabled) {
-        background: #b3b0ae;
+        background: ${({ $isActive }) => ($isActive ? '#1fb865' : '#b3b0ae')};
+        box-shadow: ${({ $isActive }) =>
+            $isActive
+                ? '0 2px 6px rgba(45, 226, 131, 0.3)'
+                : '0 2px 8px rgba(0, 0, 0, 0.1)'};
     }
 
     &:disabled {
