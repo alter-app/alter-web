@@ -12,6 +12,9 @@ import { useNavigate } from 'react-router-dom';
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
     const setAuth = useAuthStore((state) => state.setAuth);
     const navigate = useNavigate();
 
@@ -24,7 +27,34 @@ const Login = () => {
             );
             console.log('로그인 성공:', data);
         } catch (error) {
-            alert(error.message);
+            // 필드별 에러 초기화
+            setEmailError('');
+            setPasswordError('');
+            setErrorMessage('');
+
+            // 필드별 에러가 있는 경우
+            if (
+                error.data &&
+                error.data.data &&
+                Array.isArray(error.data.data)
+            ) {
+                error.data.data.forEach((fieldError) => {
+                    if (fieldError.field === 'email') {
+                        setEmailError(fieldError.message);
+                    }
+                    if (fieldError.field === 'password') {
+                        setPasswordError(
+                            fieldError.message
+                        );
+                    }
+                });
+            } else {
+                // 일반 에러 메시지
+                setErrorMessage(
+                    error.message ||
+                        '로그인에 실패했습니다.'
+                );
+            }
         }
     };
 
@@ -41,22 +71,56 @@ const Login = () => {
                         type='text'
                         placeholder='이메일'
                         value={email}
-                        onChange={(e) =>
-                            setEmail(e.target.value)
+                        onChange={(e) => {
+                            setEmail(e.target.value);
+                            setEmailError('');
+                            setErrorMessage('');
+                        }}
+                        borderColor={
+                            emailError
+                                ? '1px solid #DC0000'
+                                : undefined
                         }
                     />
+                    {emailError && (
+                        <LoginErrorMessage>
+                            {emailError}
+                        </LoginErrorMessage>
+                    )}
                     <AuthInput
                         type='password'
                         placeholder='비밀번호'
                         value={password}
-                        onChange={(e) =>
-                            setPassword(e.target.value)
+                        onChange={(e) => {
+                            setPassword(e.target.value);
+                            setPasswordError('');
+                            setErrorMessage('');
+                        }}
+                        borderColor={
+                            passwordError
+                                ? '1px solid #DC0000'
+                                : undefined
                         }
                     />
+                    {passwordError && (
+                        <LoginErrorMessage>
+                            {passwordError}
+                        </LoginErrorMessage>
+                    )}
                 </Column>
-                <LoginButton onClick={handleLogin}>
+                <LoginButton
+                    onClick={handleLogin}
+                    disabled={
+                        !email.trim() || !password.trim()
+                    }
+                >
                     로그인
                 </LoginButton>
+                {errorMessage && (
+                    <LoginErrorMessage>
+                        {errorMessage}
+                    </LoginErrorMessage>
+                )}
             </InputSection>
             <DividerWithText>
                 <Line />
@@ -80,7 +144,9 @@ const Login = () => {
                         style={{
                             cursor: 'pointer',
                         }}
-                        onClick={() => navigate('/find-password')}
+                        onClick={() =>
+                            navigate('/find-password')
+                        }
                     >
                         비밀번호 찾기
                     </span>
@@ -163,16 +229,24 @@ const LoginButton = styled.button`
     transition: all 0.2s ease;
     box-shadow: 0 2px 8px rgba(45, 226, 131, 0.3);
 
-    &:hover {
+    &:hover:not(:disabled) {
         background: #25c973;
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(45, 226, 131, 0.4);
     }
 
-    &:active {
+    &:active:not(:disabled) {
         background: #1fb865;
         transform: translateY(0);
         box-shadow: 0 2px 6px rgba(45, 226, 131, 0.3);
+    }
+
+    &:disabled {
+        background: #cbcbcb;
+        color: #ffffff;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
     }
 
     @media (max-width: 480px) {
@@ -315,5 +389,25 @@ const CenterText = styled.span`
     @media (max-width: 360px) {
         font-size: 13px;
         margin: 0 8px;
+    }
+`;
+
+const LoginErrorMessage = styled.div`
+    color: #dc0000;
+    font-family: 'Pretendard';
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 18px;
+    text-align: left;
+    width: 100%;
+
+    @media (max-width: 480px) {
+        font-size: 11px;
+        line-height: 17px;
+    }
+
+    @media (max-width: 360px) {
+        font-size: 10px;
+        line-height: 16px;
     }
 `;

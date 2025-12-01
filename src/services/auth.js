@@ -349,14 +349,14 @@ export const loginIDPW = async (
         }
 
         // 실패 시 에러 메시지 처리
-        const errorMessage =
-            data.message || '로그인에 실패했습니다.';
-        alert(errorMessage);
-        throw new Error(errorMessage);
+        const error = new Error(
+            data.message || '로그인에 실패했습니다.'
+        );
+        error.data = data; // 또는 error.fieldErrors = data.data
+        throw error;
     } catch (error) {
         console.error('로그인 오류:', error);
-        alert('네트워크 오류가 발생했습니다.');
-        navigate('/error');
+        throw error;
     }
 };
 
