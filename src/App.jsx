@@ -1,5 +1,6 @@
 import './App.css';
 import { Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
@@ -49,11 +50,18 @@ function App() {
         showTokenExpiredModal,
         closeTokenExpiredModal,
         logout,
+        initializeAuth,
     } = useAuthStore();
+
+    // 앱 시작 시 인증 상태 초기화
+    useEffect(() => {
+        initializeAuth();
+    }, []);
 
     const handleTokenExpiredConfirm = () => {
         closeTokenExpiredModal();
         logout();
+        window.location.href = '/login';
     };
 
     return (

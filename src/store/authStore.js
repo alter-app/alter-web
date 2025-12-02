@@ -7,7 +7,7 @@ import {
 
 const useAuthStore = create(
     persist(
-        (set) => ({
+        (set, get) => ({
             // 인증 관련 상태
             accessToken: '',
             refreshToken: '',
@@ -61,6 +61,18 @@ const useAuthStore = create(
             // 토큰 만료 모달 닫기
             closeTokenExpiredModal: () => {
                 set({ showTokenExpiredModal: false });
+            },
+
+            // 초기화 액션: 앱 시작 시 토큰이 있으면 isLoggedIn을 true로 설정
+            initializeAuth: () => {
+                const state = get();
+                // 토큰이 있으면 isLoggedIn을 true로 설정
+                if (
+                    state.accessToken &&
+                    !state.isLoggedIn
+                ) {
+                    set({ isLoggedIn: true });
+                }
             },
         }),
         {
