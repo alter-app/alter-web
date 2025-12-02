@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import AuthInput from '../components/auth/AuthInput';
@@ -6,6 +6,7 @@ import ConfirmModal from '../components/shared/ConfirmModal';
 import {
     initializeRecaptcha,
     clearRecaptcha,
+    resetRecaptcha,
     sendPhoneVerification,
     verifyPhoneCode,
     createPasswordResetSession,
@@ -43,13 +44,46 @@ const FindPasswordPage = () => {
         showCancel: false,
     });
 
+    // 초기화 여부를 추적하기 위한 ref
+    const isRecaptchaInitialized = useRef(false);
+    const containerId = 'recaptcha-container';
+
     useEffect(() => {
-        if (step === 2) {
-            initializeRecaptcha('recaptcha-container', () => {
-                console.log('reCAPTCHA verified');
-            });
-            return clearRecaptcha;
-        }
+        let isMounted = true;
+
+        const init = async () => {
+            if (step === 2 && !isRecaptchaInitialized.current) {
+                const containerElement = document.getElementById(containerId);
+                if (containerElement) {
+                    // await 추가하여 초기화 완료 대기
+                    const verifier = await initializeRecaptcha(containerId, () => {
+                        console.log('reCAPTCHA verified');
+                    });
+                    if (isMounted) {
+                        // 초기화 실패 시 에러 메시지 표시
+                        if (!verifier) {
+                            setPhoneError(
+                                'reCAPTCHA 초기화에 실패했습니다. 페이지를 새로고침하고 다시 시도해주세요.'
+                            );
+                            console.error('reCAPTCHA 초기화 실패');
+                        }
+                        isRecaptchaInitialized.current = true;
+                    }
+                }
+            }
+        };
+
+        init();
+
+        // cleanup: step이 변경되거나 컴포넌트가 언마운트될 때 정리
+        return () => {
+            isMounted = false;
+            // 페이지를 벗어날 때만 clear (step 변경 시에는 유지하는 것이 UX상 좋을 수 있음)
+            if (step !== 2) {
+                clearRecaptcha(containerId);
+                isRecaptchaInitialized.current = false;
+            }
+        };
     }, [step]);
 
     const isValidPhoneNumber = (number) =>
@@ -95,18 +129,17 @@ const FindPasswordPage = () => {
 
         setLoading(true);
         setPhoneError('');
+
         try {
-            const vId = await sendPhoneVerification(
-                formattedE164
-            );
+            // sendPhoneVerification 내부에서 resetRecaptcha를 호출하므로
+            // 여기서는 try-catch만 잘 잡아주면 됩니다.
+            const vId = await sendPhoneVerification(formattedE164);
             setVerificationId(vId);
             setIsCodeSent(true);
         } catch (error) {
-            clearRecaptcha();
-            initializeRecaptcha('recaptcha-container');
-            setPhoneError(
-                error.message || '인증번호 전송 실패'
-            );
+            // 이미 auth.js에서 reset되었으므로 에러 메시지만 표시
+            setPhoneError(error.message || '인증번호 전송 실패');
+            console.error('인증번호 전송 실패:', error);
         } finally {
             setLoading(false);
         }
