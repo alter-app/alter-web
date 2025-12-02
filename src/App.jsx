@@ -41,10 +41,32 @@ import ManagerChatListPage from './pages/owner/ManagerChatListPage';
 import ManagerChatRoomPage from './pages/owner/ManagerChatRoomPage';
 import UserSettingsPage from './pages/user/UserSettingsPage';
 import OwnerSettingsPage from './pages/owner/OwnerSettingsPage';
+import ConfirmModal from './components/shared/ConfirmModal';
+import useAuthStore from './store/authStore';
 
 function App() {
+    const {
+        showTokenExpiredModal,
+        closeTokenExpiredModal,
+        logout,
+    } = useAuthStore();
+
+    const handleTokenExpiredConfirm = () => {
+        closeTokenExpiredModal();
+        logout();
+    };
+
     return (
         <>
+            <ConfirmModal
+                isOpen={showTokenExpiredModal}
+                onClose={handleTokenExpiredConfirm}
+                onConfirm={handleTokenExpiredConfirm}
+                title='로그인 만료'
+                message={`로그인 정보가 만료되었습니다.\n다시 로그인해 주세요.`}
+                confirmText='확인'
+                showCancel={false}
+            />
             <Routes>
                 <Route element={<FooterLayout />}>
                     <Route
@@ -63,18 +85,18 @@ function App() {
                         path='/signup'
                         element={<SignUp />}
                     />
-                <Route
-                    path='/phoneauth'
-                    element={<PhoneAuthPage />}
-                />
-                <Route
-                    path='/find-id'
-                    element={<FindIdPage />}
-                />
-                <Route
-                    path='/find-password'
-                    element={<FindPasswordPage />}
-                />
+                    <Route
+                        path='/phoneauth'
+                        element={<PhoneAuthPage />}
+                    />
+                    <Route
+                        path='/find-id'
+                        element={<FindIdPage />}
+                    />
+                    <Route
+                        path='/find-password'
+                        element={<FindPasswordPage />}
+                    />
                     <Route
                         path='/mypage'
                         element={

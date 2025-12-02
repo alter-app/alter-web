@@ -461,7 +461,7 @@ export const refreshAccessToken = async () => {
             refreshToken: newRefreshToken,
         };
     } catch (error) {
-        useAuthStore.getState().logout();
+        // logout은 apiClient에서 모달 확인 후 처리하도록 함
         throw error;
     }
 };

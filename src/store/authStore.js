@@ -14,6 +14,7 @@ const useAuthStore = create(
             authorizationId: '',
             scope: '',
             isLoggedIn: false,
+            showTokenExpiredModal: false,
 
             // 로그인 액션
             setAuth: (authData) => {
@@ -24,6 +25,7 @@ const useAuthStore = create(
                         authData.authorizationId,
                     scope: authData.scope,
                     isLoggedIn: true,
+                    showTokenExpiredModal: false,
                 });
 
                 // 네이티브 앱에 인증 데이터 전송 및 FCM 토큰 등록
@@ -41,6 +43,7 @@ const useAuthStore = create(
                     authorizationId: '',
                     scope: '',
                     isLoggedIn: false,
+                    showTokenExpiredModal: false,
                 });
 
                 // 네이티브 앱에도 로그아웃 알림 전송
@@ -49,10 +52,28 @@ const useAuthStore = create(
                     sendLogoutToNative();
                 }, 100);
             },
+
+            // 토큰 만료 모달 표시
+            openTokenExpiredModal: () => {
+                set({ showTokenExpiredModal: true });
+            },
+
+            // 토큰 만료 모달 닫기
+            closeTokenExpiredModal: () => {
+                set({ showTokenExpiredModal: false });
+            },
         }),
         {
             name: 'auth-storage',
             getStorage: () => localStorage,
+            // showTokenExpiredModal은 localStorage에 저장하지 않음
+            partialize: (state) => ({
+                accessToken: state.accessToken,
+                refreshToken: state.refreshToken,
+                authorizationId: state.authorizationId,
+                scope: state.scope,
+                isLoggedIn: state.isLoggedIn,
+            }),
         }
     )
 );

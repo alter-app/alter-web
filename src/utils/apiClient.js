@@ -72,13 +72,17 @@ apiClient.interceptors.response.use(
             isRefreshing = true;
 
             try {
-                const { accessToken } = await refreshAccessToken();
+                const { accessToken } =
+                    await refreshAccessToken();
                 processQueue(null, accessToken);
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return apiClient(originalRequest);
             } catch (refreshError) {
                 processQueue(refreshError, null);
-                useAuthStore.getState().logout();
+                // 토큰 만료 모달 표시
+                useAuthStore
+                    .getState()
+                    .openTokenExpiredModal();
                 return Promise.reject(refreshError);
             } finally {
                 isRefreshing = false;
@@ -90,4 +94,3 @@ apiClient.interceptors.response.use(
 );
 
 export default apiClient;
-
