@@ -1,7 +1,4 @@
-import axios from 'axios';
-import useAuthStore from '../store/authStore';
-
-const backend = import.meta.env.VITE_API_URL;
+import apiClient from '../utils/apiClient';
 
 /**
  * 교환 가능한 스케줄 조회
@@ -15,18 +12,13 @@ export const getExchangeableSchedules = async (
     year,
     month
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
-
     try {
-        const response = await axios.get(
-            `${backend}/app/workspaces/${workspaceId}/exchangeable-schedules`,
+        const response = await apiClient.get(
+            `/app/workspaces/${workspaceId}/exchangeable-schedules`,
             {
                 params: {
                     year,
                     month,
-                },
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
                 },
             }
         );
@@ -52,22 +44,19 @@ export const getSentSubstituteRequests = async (
     cursor = null,
     status = null
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
-
     try {
-        let url = `${backend}/app/users/me/substitute-requests/sent?pageSize=${pageSize}`;
+        const params = { pageSize };
         if (cursor) {
-            url += `&cursor=${cursor}`;
+            params.cursor = cursor;
         }
         if (status) {
-            url += `&status=${status}`;
+            params.status = status;
         }
 
-        const response = await axios.get(url, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        });
+        const response = await apiClient.get(
+            '/app/users/me/substitute-requests/sent',
+            { params }
+        );
         return response.data;
     } catch (error) {
         console.error(
@@ -91,18 +80,10 @@ export const createSubstituteRequest = async (
     scheduleId,
     data
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
-
     try {
-        const response = await axios.post(
-            `${backend}/app/schedules/${scheduleId}/substitute-requests`,
-            data,
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
+        const response = await apiClient.post(
+            `/app/schedules/${scheduleId}/substitute-requests`,
+            data
         );
         return response.data;
     } catch (error) {
@@ -119,15 +100,9 @@ export const createSubstituteRequest = async (
 export const cancelSubstituteRequest = async (
     requestId
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await axios.delete(
-            `${backend}/app/users/me/substitute-requests/${requestId}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
+        const response = await apiClient.delete(
+            `/app/users/me/substitute-requests/${requestId}`
         );
         return response.data;
     } catch (error) {
@@ -148,20 +123,19 @@ export const getReceivedSubstituteRequests = async (
     cursor = null,
     status = null
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        let url = `${backend}/app/users/me/substitute-requests/received?pageSize=${pageSize}`;
+        const params = { pageSize };
         if (cursor) {
-            url += `&cursor=${cursor}`;
+            params.cursor = cursor;
         }
         if (status) {
-            url += `&status=${status}`;
+            params.status = status;
         }
-        const response = await axios.get(url, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        });
+
+        const response = await apiClient.get(
+            '/app/users/me/substitute-requests/received',
+            { params }
+        );
         return response.data;
     } catch (error) {
         console.error(
@@ -180,17 +154,10 @@ export const getReceivedSubstituteRequests = async (
 export const acceptSubstituteRequest = async (
     requestId
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await axios.post(
-            `${backend}/app/substitute-requests/${requestId}/accept`,
-            {},
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
+        const response = await apiClient.post(
+            `/app/substitute-requests/${requestId}/accept`,
+            {}
         );
         return response.data;
     } catch (error) {
@@ -209,18 +176,11 @@ export const rejectSubstituteRequest = async (
     requestId,
     rejectionReason = '개인 사정으로 인한 거절'
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await axios.post(
-            `${backend}/app/substitute-requests/${requestId}/reject`,
+        const response = await apiClient.post(
+            `/app/substitute-requests/${requestId}/reject`,
             {
                 targetRejectionReason: rejectionReason,
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
             }
         );
         return response.data;

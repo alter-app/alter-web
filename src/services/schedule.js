@@ -1,6 +1,4 @@
-import useAuthStore from '../store/authStore';
-
-const backend = import.meta.env.VITE_API_URL;
+import apiClient from '../utils/apiClient';
 
 // 스케줄 생성 로직
 export const createSchedule = async ({
@@ -9,31 +7,15 @@ export const createSchedule = async ({
     endDateTime,
     position,
 }) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/manager/schedules`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                body: JSON.stringify({
-                    workspaceId,
-                    startDateTime,
-                    endDateTime,
-                    position,
-                }),
-            }
-        );
+        const response = await apiClient.post('/manager/schedules', {
+            workspaceId,
+            startDateTime,
+            endDateTime,
+            position,
+        });
 
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('스케줄 생성 오류:', error);
         throw new Error(
@@ -47,28 +29,15 @@ export const assignWorker = async ({
     workShiftId,
     workerId,
 }) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/manager/schedules/${workShiftId}/workers`,
+        const response = await apiClient.post(
+            `/manager/schedules/${workShiftId}/workers`,
             {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                body: JSON.stringify({
-                    workerId,
-                }),
+                workerId,
             }
         );
 
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('근무자 배정 오류:', error);
         throw new Error(
@@ -82,28 +51,15 @@ export const updateWorker = async ({
     workShiftId,
     workerId,
 }) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/manager/schedules/${workShiftId}/workers`,
+        const response = await apiClient.put(
+            `/manager/schedules/${workShiftId}/workers`,
             {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                body: JSON.stringify({
-                    workerId,
-                }),
+                workerId,
             }
         );
 
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('근무자 변경 오류:', error);
         throw new Error(
@@ -114,25 +70,12 @@ export const updateWorker = async ({
 
 // 근무자 제거 로직
 export const removeWorker = async ({ workShiftId }) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/manager/schedules/${workShiftId}/workers`,
-            {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
+        const response = await apiClient.delete(
+            `/manager/schedules/${workShiftId}/workers`
         );
 
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('근무자 제거 오류:', error);
         throw new Error(

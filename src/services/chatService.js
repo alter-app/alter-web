@@ -1,6 +1,4 @@
-import useAuthStore from '../store/authStore';
-
-const backend = import.meta.env.VITE_API_URL;
+import apiClient from '../utils/apiClient';
 
 const getBasePath = (scope) =>
     scope === 'MANAGER' ? 'manager' : 'app';
@@ -10,27 +8,30 @@ const request = async ({
     method = 'GET',
     body,
     scope = 'APP',
+    params,
 }) => {
-    const accessToken = useAuthStore.getState().accessToken;
+    const basePath = getBasePath(scope);
+    const config = {
+        method,
+        url: `/${basePath}/chat${path}`,
+    };
 
-    const response = await fetch(
-        `${backend}/${getBasePath(scope)}/chat${path}`,
-        {
-            method,
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`,
-            },
-            body: body ? JSON.stringify(body) : undefined,
-        }
-    );
-
-    if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || '채팅 API 오류');
+    if (body) {
+        config.data = body;
     }
 
-    return response.json();
+    if (params) {
+        config.params = params;
+    }
+
+    try {
+        const response = await apiClient(config);
+        return response.data;
+    } catch (error) {
+        throw new Error(
+            error.response?.data?.message || error.message || '채팅 API 오류'
+        );
+    }
 };
 
 export const createChatRoom = async ({
@@ -53,13 +54,15 @@ export const getChatRooms = async ({
     pageSize = 10,
     scope = 'APP',
 }) => {
-    const params = new URLSearchParams();
-    if (cursor) params.append('cursor', cursor);
-    if (pageSize) params.append('pageSize', pageSize);
+    const params = {};
+    if (cursor) params.cursor = cursor;
+    if (pageSize) params.pageSize = pageSize;
 
     return request({
-        path: `/rooms?${params.toString()}`,
+        path: '/rooms',
+        method: 'GET',
         scope,
+        params,
     });
 };
 
@@ -78,12 +81,14 @@ export const getChatMessages = async ({
     pageSize = 20,
     scope = 'APP',
 }) => {
-    const params = new URLSearchParams();
-    if (cursor) params.append('cursor', cursor);
-    if (pageSize) params.append('pageSize', pageSize);
+    const params = {};
+    if (cursor) params.cursor = cursor;
+    if (pageSize) params.pageSize = pageSize;
 
     return request({
-        path: `/rooms/${chatRoomId}/messages?${params.toString()}`,
+        path: `/rooms/${chatRoomId}/messages`,
+        method: 'GET',
         scope,
+        params,
     });
 };

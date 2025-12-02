@@ -1,7 +1,4 @@
-import axios from 'axios';
-import useAuthStore from '../store/authStore';
-
-const backend = import.meta.env.VITE_API_URL;
+import apiClient from '../utils/apiClient';
 
 /**
  * 알림 목록 조회
@@ -19,18 +16,16 @@ export const getNotifications = async (
     pageSize = 10,
     cursor = null
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        let url = `${backend}/app/users/me/notifications?pageSize=${pageSize}`;
+        const params = { pageSize };
         if (cursor) {
-            url += `&cursor=${cursor}`;
+            params.cursor = cursor;
         }
 
-        const response = await axios.get(url, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        });
+        const response = await apiClient.get(
+            '/app/users/me/notifications',
+            { params }
+        );
         return response.data;
     } catch (error) {
         console.error('알림 목록 조회 실패:', error);
@@ -48,18 +43,16 @@ export const getManagerNotifications = async (
     pageSize = 10,
     cursor = null
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        let url = `${backend}/manager/notifications/me?pageSize=${pageSize}`;
+        const params = { pageSize };
         if (cursor) {
-            url += `&cursor=${cursor}`;
+            params.cursor = cursor;
         }
 
-        const response = await axios.get(url, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        });
+        const response = await apiClient.get(
+            '/manager/notifications/me',
+            { params }
+        );
         return response.data;
     } catch (error) {
         console.error('매니저 알림 목록 조회 실패:', error);

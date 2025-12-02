@@ -1,28 +1,16 @@
-import useAuthStore from '../store/authStore';
-
-const backend = import.meta.env.VITE_API_URL;
+import apiClient from '../utils/apiClient';
 
 // 공고 스크랩 리스트 목록 조회 로직
 export const getScrapPostList = async ({ cursorInfo }) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/app/users/me/postings/favorites?cursor=${cursorInfo}&pageSize=10`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
+        const response = await apiClient.get('/app/users/me/postings/favorites', {
+            params: {
+                cursor: cursorInfo,
+                pageSize: 10,
+            },
+        });
 
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error(
             '공고 스크랩 리스트 목록 조회 오류:',
@@ -40,35 +28,39 @@ export const getApplicationList = async ({
     cursor = null,
     status = null,
 }) => {
-    const accessToken = useAuthStore.getState().accessToken;
-
     try {
-        let url = `${backend}/app/users/me/postings/applications?pageSize=${pageSize}`;
+        const params = { pageSize };
         if (cursor) {
-            url += `&cursor=${cursor}`;
+            params.cursor = cursor;
         }
         if (status && status.length > 0) {
-            // status 배열을 쿼리 파라미터로 변환
-            const statusParams = status
-                .map((s) => `status=${s}`)
-                .join('&');
-            url += `&${statusParams}`;
+            // status 배열을 반복 파라미터로 변환 (status[] 대신 status=value&status=value 형식)
+            params.status = status;
         }
 
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`,
-            },
-        });
+        const response = await apiClient.get(
+            '/app/users/me/postings/applications',
+            {
+                params,
+                paramsSerializer: (params) => {
+                    const searchParams = new URLSearchParams();
+                    Object.keys(params).forEach((key) => {
+                        const value = params[key];
+                        if (Array.isArray(value)) {
+                            // 배열인 경우 각 값을 반복 파라미터로 추가
+                            value.forEach((item) => {
+                                searchParams.append(key, item);
+                            });
+                        } else if (value !== null && value !== undefined) {
+                            searchParams.append(key, value);
+                        }
+                    });
+                    return searchParams.toString();
+                },
+            }
+        );
 
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('공고 지원 목록 조회 오류:', error);
         throw new Error(
@@ -81,28 +73,15 @@ export const getApplicationList = async ({
 export const cancelApplication = async ({
     applicationId,
 }) => {
-    const accessToken = useAuthStore.getState().accessToken;
-
     try {
-        const response = await fetch(
-            `${backend}/app/users/me/postings/applications/${applicationId}/status`,
+        const response = await apiClient.patch(
+            `/app/users/me/postings/applications/${applicationId}/status`,
             {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                body: JSON.stringify({
-                    status: 'CANCELLED',
-                }),
+                status: 'CANCELLED',
             }
         );
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
 
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('공고 지원 취소 중 오류:', error);
         throw new Error(
@@ -113,26 +92,9 @@ export const cancelApplication = async ({
 
 // 사용자 정보 조회 로직
 export const getUserInfo = async () => {
-    const accessToken = useAuthStore.getState().accessToken;
-
     try {
-        const response = await fetch(
-            `${backend}/app/users/me`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        const response = await apiClient.get('/app/users/me');
+        return response.data;
     } catch (error) {
         console.error('사용자 정보 조회 오류:', error);
         throw new Error(
@@ -143,26 +105,9 @@ export const getUserInfo = async () => {
 
 // 자격 정보 목록 조회 로직
 export const getCertificates = async () => {
-    const accessToken = useAuthStore.getState().accessToken;
-
     try {
-        const response = await fetch(
-            `${backend}/app/users/me/certificates`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        const response = await apiClient.get('/app/users/me/certificates');
+        return response.data;
     } catch (error) {
         console.error('자격 정보 목록 조회 오류:', error);
         throw new Error(
@@ -175,25 +120,12 @@ export const getCertificates = async () => {
 export const deleteCertificates = async ({
     certificateId,
 }) => {
-    const accessToken = useAuthStore.getState().accessToken;
-
     try {
-        const response = await fetch(
-            `${backend}/app/users/me/certificates/${certificateId}`,
-            {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
+        const response = await apiClient.delete(
+            `/app/users/me/certificates/${certificateId}`
         );
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
 
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('자격 정보 삭제 중 오류:', error);
         throw new Error(
@@ -204,29 +136,13 @@ export const deleteCertificates = async ({
 
 // 자격 정보 등록 로직
 export const addCertificates = async (addCertificate) => {
-    const accessToken = useAuthStore.getState().accessToken;
-
     try {
-        const response = await fetch(
-            `${backend}/app/users/me/certificates`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                body: JSON.stringify({
-                    type: 'CERTIFICATE',
-                    ...addCertificate,
-                }),
-            }
-        );
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
+        const response = await apiClient.post('/app/users/me/certificates', {
+            type: 'CERTIFICATE',
+            ...addCertificate,
+        });
 
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('자격 정보 등록 중 오류:', error);
         throw new Error(
@@ -240,29 +156,16 @@ export const eidtCertificates = async (
     editCertificate,
     certificateId
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
-
     try {
-        const response = await fetch(
-            `${backend}/app/users/me/certificates/${certificateId}`,
+        const response = await apiClient.put(
+            `/app/users/me/certificates/${certificateId}`,
             {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                body: JSON.stringify({
-                    type: 'CERTIFICATE',
-                    ...editCertificate,
-                }),
+                type: 'CERTIFICATE',
+                ...editCertificate,
             }
         );
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
 
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('자격 정보 수정 중 오류:', error);
         throw new Error(
@@ -275,26 +178,12 @@ export const eidtCertificates = async (
 export const getCertificateDetail = async (
     certificateId
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
-
     try {
-        const response = await fetch(
-            `${backend}/app/users/me/certificates/${certificateId}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
+        const response = await apiClient.get(
+            `/app/users/me/certificates/${certificateId}`
         );
 
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('자격 정보 상세 조회 오류:', error);
         throw new Error(

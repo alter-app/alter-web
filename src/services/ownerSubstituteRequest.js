@@ -1,7 +1,4 @@
-import axios from 'axios';
-import useAuthStore from '../store/authStore';
-
-const backend = import.meta.env.VITE_API_URL;
+import apiClient from '../utils/apiClient';
 
 /**
  * Owner 대타 요청 목록 조회
@@ -15,21 +12,19 @@ export const getOwnerSubstituteRequests = async (
     cursor = null,
     status = null
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        let url = `${backend}/manager/substitute-requests?pageSize=${pageSize}`;
+        const params = { pageSize };
         if (cursor) {
-            url += `&cursor=${cursor}`;
+            params.cursor = cursor;
         }
         if (status) {
-            url += `&status=${status}`;
+            params.status = status;
         }
 
-        const response = await axios.get(url, {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        });
+        const response = await apiClient.get(
+            '/manager/substitute-requests',
+            { params }
+        );
         return response.data;
     } catch (error) {
         console.error(
@@ -50,18 +45,11 @@ export const approveOwnerSubstituteRequest = async (
     requestId,
     approvalComment = '승인합니다'
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await axios.post(
-            `${backend}/manager/substitute-requests/${requestId}/approve`,
+        const response = await apiClient.post(
+            `/manager/substitute-requests/${requestId}/approve`,
             {
                 approvalComment: approvalComment,
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
             }
         );
         return response.data;
@@ -81,19 +69,12 @@ export const rejectOwnerSubstituteRequest = async (
     requestId,
     approverRejectionReason = '승인 불가'
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await axios.post(
-            `${backend}/manager/substitute-requests/${requestId}/reject`,
+        const response = await apiClient.post(
+            `/manager/substitute-requests/${requestId}/reject`,
             {
                 approverRejectionReason:
                     approverRejectionReason,
-            },
-            {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
             }
         );
         return response.data;
