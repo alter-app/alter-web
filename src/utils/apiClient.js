@@ -15,6 +15,7 @@ const apiClient = axios.create({
 // 요청 interceptor: 모든 요청에 accessToken 추가
 apiClient.interceptors.request.use(
     (config) => {
+        config.headers = config.headers || {};
         const { accessToken } = useAuthStore.getState();
         if (accessToken) {
             config.headers.Authorization = `Bearer ${accessToken}`;
@@ -60,6 +61,8 @@ apiClient.interceptors.response.use(
                     failedQueue.push({ resolve, reject });
                 })
                     .then((token) => {
+                        originalRequest.headers =
+                            originalRequest.headers || {};
                         originalRequest.headers.Authorization = `Bearer ${token}`;
                         return apiClient(originalRequest);
                     })
@@ -75,6 +78,8 @@ apiClient.interceptors.response.use(
                 const { accessToken } =
                     await refreshAccessToken();
                 processQueue(null, accessToken);
+                originalRequest.headers =
+                    originalRequest.headers || {};
                 originalRequest.headers.Authorization = `Bearer ${accessToken}`;
                 return apiClient(originalRequest);
             } catch (refreshError) {
