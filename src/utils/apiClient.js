@@ -1,6 +1,6 @@
 import axios from 'axios';
 import useAuthStore from '../store/authStore';
-import { refreshAccessToken } from '../services/auth';
+import { refreshAccessToken } from '../services/refreshToken';
 
 const backend = import.meta.env.VITE_API_URL;
 
