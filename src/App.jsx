@@ -1,7 +1,6 @@
 import './App.css';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import Home from './pages/Home';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 import NotFound from './pages/NotFound';
@@ -84,7 +83,12 @@ function App() {
                 </Route>
 
                 <Route element={<MainLayout />}>
-                    <Route path='/' element={<Home />} />
+                    <Route
+                        path='/'
+                        element={
+                            <Navigate to='/login' replace />
+                        }
+                    />
                     <Route
                         path='/login'
                         element={<Login />}
