@@ -1,28 +1,10 @@
-import useAuthStore from '../store/authStore';
-
-const backend = import.meta.env.VITE_API_URL;
+import apiClient from '../utils/apiClient';
 
 // 업장 목록 조회 로직
 export const getWorkplaceList = async () => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/manager/workspaces`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        const response = await apiClient.get('/manager/workspaces');
+        return response.data;
     } catch (error) {
         console.error('업장 목록 조회 오류:', error);
         throw new Error(
@@ -36,27 +18,17 @@ export const getApplicants = async (
     pageSize = 5,
     status = null
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        let url = `${backend}/manager/postings/applications?pageSize=${pageSize}`;
+        const params = { pageSize };
         if (status) {
-            url += `&status=${status}`;
+            params.status = status;
         }
 
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${accessToken}`,
-            },
+        const response = await apiClient.get('/manager/postings/applications', {
+            params,
         });
 
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('지원자 목록 조회 오류:', error);
         throw new Error(
@@ -69,25 +41,12 @@ export const getApplicants = async (
 export const getReputationRequestList = async (
     pageSize = 5
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/manager/reputations/requests?pageSize=${pageSize}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
+        const response = await apiClient.get('/manager/reputations/requests', {
+            params: { pageSize },
+        });
 
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('평판 요청 목록 조회 오류:', error);
         throw new Error(

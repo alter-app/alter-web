@@ -1,28 +1,10 @@
-import useAuthStore from '../store/authStore';
-
-const backend = import.meta.env.VITE_API_URL;
+import apiClient from '../utils/apiClient';
 
 // 매니저 정보 조회 로직
 export const getManagerInfo = async () => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/manager/me`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        const response = await apiClient.get('/manager/me');
+        return response.data;
     } catch (error) {
         console.error('매니저 정보 조회 오류:', error);
         throw new Error(
@@ -37,25 +19,20 @@ export const getPostingsApplications = async ({
     checkedWorkplaceId,
     checkedStatusId,
 }) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/manager/postings/applications?cursor=${cursorInfo}&pageSize=10&workspaceId=${checkedWorkplaceId}&status=${checkedStatusId}`,
+        const response = await apiClient.get(
+            '/manager/postings/applications',
             {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
+                params: {
+                    cursor: cursorInfo,
+                    pageSize: 10,
+                    workspaceId: checkedWorkplaceId,
+                    status: checkedStatusId,
                 },
             }
         );
 
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('공고 지원 목록 조회 오류:', error);
         throw new Error(
@@ -68,25 +45,12 @@ export const getPostingsApplications = async ({
 export const getPostingsApplicationDetail = async (
     postingApplicationId
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/manager/postings/applications/${postingApplicationId}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
+        const response = await apiClient.get(
+            `/manager/postings/applications/${postingApplicationId}`
         );
 
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('공고 지원 상세 조회 오류:', error);
         throw new Error(
@@ -100,27 +64,13 @@ export const updateApplicationStatus = async ({
     postingApplicationId,
     status,
 }) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/manager/postings/applications/${postingApplicationId}/status`,
-            {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                body: JSON.stringify({
-                    status,
-                }),
-            }
+        const response = await apiClient.patch(
+            `/manager/postings/applications/${postingApplicationId}/status`,
+            { status }
         );
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
 
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error(
             '공고 지원 상태 변경 중 오류:',
@@ -138,27 +88,21 @@ export const getSentReputationRequests = async ({
     status,
     pageSize = 10,
 }) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
         const statusParam =
             status && status.length > 0 ? status[0] : '';
-        const response = await fetch(
-            `${backend}/manager/reputations/requests/sent?cursor=${cursorInfo}&pageSize=${pageSize}&status=${statusParam}`,
+        const response = await apiClient.get(
+            '/manager/reputations/requests/sent',
             {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
+                params: {
+                    cursor: cursorInfo,
+                    pageSize,
+                    status: statusParam,
                 },
             }
         );
 
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error(
             '보낸 평판 요청 목록 조회 오류:',
@@ -174,25 +118,12 @@ export const getSentReputationRequests = async ({
 export const cancelReputationRequest = async (
     requestId
 ) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/manager/reputations/requests/sent/${requestId}/cancel`,
-            {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
+        const response = await apiClient.patch(
+            `/manager/reputations/requests/sent/${requestId}/cancel`
         );
 
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('평판 요청 취소 오류:', error);
         throw new Error(
@@ -207,31 +138,21 @@ export const getManagerReputationRequests = async ({
     pageSize = 10,
     status = [],
 }) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        // status 배열을 쿼리 파라미터로 변환
-        const statusParam =
-            status.length > 0
-                ? `&status=${status.join(',')}`
-                : '';
-
-        const response = await fetch(
-            `${backend}/manager/reputations/requests?cursor=${cursorInfo}&pageSize=${pageSize}${statusParam}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
+        const params = {
+            cursor: cursorInfo,
+            pageSize,
+        };
+        if (status.length > 0) {
+            params.status = status.join(',');
         }
 
-        const data = await response.json();
-        return data;
+        const response = await apiClient.get(
+            '/manager/reputations/requests',
+            { params }
+        );
+
+        return response.data;
     } catch (error) {
         console.error(
             '받은 평판 요청 목록 조회 오류:',
@@ -249,31 +170,18 @@ export const createWorkerReputationByManager = async ({
     targetUserId,
     keywordsPayload,
 }) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/manager/reputations/requests/users`,
+        const response = await apiClient.post(
+            '/manager/reputations/requests/users',
             {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                body: JSON.stringify({
-                    workspaceId: workspaceId,
-                    requestType: 'WORKSPACE_TO_USER',
-                    targetUserId: targetUserId,
-                    keywords: keywordsPayload,
-                }),
+                workspaceId: workspaceId,
+                requestType: 'WORKSPACE_TO_USER',
+                targetUserId: targetUserId,
+                keywords: keywordsPayload,
             }
         );
 
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('근무자 평판 생성 오류:', error);
         throw new Error(

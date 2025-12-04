@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import KakaoLoginButton from '../components/user/KakaoLoginButton';
 import AppleLoginButton from '../components/user/AppleLoginButton';
 import AlterLogo from '../assets/logos/signature CB(상하).png';
@@ -16,8 +16,19 @@ const Login = () => {
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
-    const setAuth = useAuthStore((state) => state.setAuth);
+    const { setAuth, isLoggedIn, scope } = useAuthStore();
     const navigate = useNavigate();
+
+    // 이미 로그인되어 있으면 메인 페이지로 리다이렉트
+    useEffect(() => {
+        if (isLoggedIn) {
+            if (scope === 'MANAGER') {
+                navigate('/main', { replace: true });
+            } else {
+                navigate('/job-lookup-map', { replace: true });
+            }
+        }
+    }, [isLoggedIn, scope, navigate]);
 
     const handleLogin = async () => {
         try {

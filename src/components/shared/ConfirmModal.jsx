@@ -123,6 +123,7 @@ const Message = styled.div`
     color: #333333;
     line-height: 1.5;
     text-align: center;
+    white-space: pre-line;
 `;
 
 const ButtonGroup = styled.div`

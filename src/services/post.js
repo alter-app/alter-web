@@ -1,28 +1,16 @@
-import useAuthStore from '../store/authStore';
-
-const backend = import.meta.env.VITE_API_URL;
+import apiClient from '../utils/apiClient';
 
 // 공고 리스트 조회 로직
 export const getPostList = async ({ cursorInfo }) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/app/postings?cursor=${cursorInfo}&pageSize=10`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
+        const response = await apiClient.get('/app/postings', {
+            params: {
+                cursor: cursorInfo,
+                pageSize: 10,
+            },
+        });
 
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('공고 리스트 조회 오류:', error);
         throw new Error(
@@ -33,25 +21,9 @@ export const getPostList = async ({ cursorInfo }) => {
 
 // 공고 상세 조회 로직
 export const getPostDetail = async (id) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/app/postings/${id}`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        const response = await apiClient.get(`/app/postings/${id}`);
+        return response.data;
     } catch (error) {
         console.error('공고 상세 조회 오류:', error);
         throw new Error(
@@ -62,26 +34,9 @@ export const getPostDetail = async (id) => {
 
 // 공고 등록 로직
 export const postJobPosting = async (inputs) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/manager/postings`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                body: JSON.stringify(inputs),
-            }
-        );
-        console.log(inputs);
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        const response = await apiClient.post('/manager/postings', inputs);
+        return response.data;
     } catch (error) {
         console.error('공고 작성 중 오류:', error);
         throw new Error(
@@ -92,25 +47,9 @@ export const postJobPosting = async (inputs) => {
 
 // 공고 키워드 리스트 조회 로직
 export const getAvailableKeywords = async () => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/manager/postings/available-keywords`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
-
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        const response = await apiClient.get('/manager/postings/available-keywords');
+        return response.data;
     } catch (error) {
         console.error('공고 키워드 조회 오류:', error);
         throw new Error(
@@ -125,29 +64,16 @@ export const postingApply = async ({
     description,
     postingScheduleId,
 }) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/app/postings/apply/${postingId}`,
+        const response = await apiClient.post(
+            `/app/postings/apply/${postingId}`,
             {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-                body: JSON.stringify({
-                    postingScheduleId,
-                    description,
-                }),
+                postingScheduleId,
+                description,
             }
         );
-        console.log(postingScheduleId, description);
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
 
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('공고 지원 중 오류:', error);
         throw new Error(
@@ -158,24 +84,12 @@ export const postingApply = async ({
 
 // 공고 스크랩 등록 로직
 export const addPostingScrap = async ({ postingId }) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/app/users/me/postings/favorites/${postingId}`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
+        const response = await apiClient.post(
+            `/app/users/me/postings/favorites/${postingId}`
         );
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
 
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('공고 스크랩 등록 중 오류:', error);
         throw new Error(
@@ -188,24 +102,12 @@ export const addPostingScrap = async ({ postingId }) => {
 export const deletePostingScrap = async ({
     favoritePostingId,
 }) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/app/users/me/postings/favorites/${favoritePostingId}`,
-            {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
+        const response = await apiClient.delete(
+            `/app/users/me/postings/favorites/${favoritePostingId}`
         );
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
 
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('공고 스크랩 삭제 중 오류:', error);
         throw new Error(
@@ -218,25 +120,15 @@ export const deletePostingScrap = async ({
 export const getPostingScrapList = async ({
     cursorInfo,
 }) => {
-    const accessToken = useAuthStore.getState().accessToken;
     try {
-        const response = await fetch(
-            `${backend}/app/users/me/postings/favorites?cursor=${cursorInfo}&pageSize=10`,
-            {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            }
-        );
+        const response = await apiClient.get('/app/users/me/postings/favorites', {
+            params: {
+                cursor: cursorInfo,
+                pageSize: 10,
+            },
+        });
 
-        if (!response.ok) {
-            throw new Error('서버 응답 오류');
-        }
-
-        const data = await response.json();
-        return data;
+        return response.data;
     } catch (error) {
         console.error('공고 리스트 조회 오류:', error);
         throw new Error(
