@@ -12,59 +12,120 @@ import axios from 'axios';
 const backend = import.meta.env.VITE_API_URL;
 
 // reCAPTCHA 초기화
-export function initializeRecaptcha(
+export async function initializeRecaptcha(
     containerId = 'recaptcha-container',
     onVerified
 ) {
-    if (!window.recaptchaVerifier) {
+    try {
+        // 1. 이미 인스턴스가 있고 위젯도 렌더링된 상태라면 기존 것 반환
+        if (window.recaptchaVerifier && window.recaptchaWidgetId !== undefined) {
+            return window.recaptchaVerifier;
+        }
+
+        // 2. DOM 요소 정리 (중복 렌더링 방지)
+        const container = document.getElementById(containerId);
+        if (container) {
+            container.innerHTML = '';
+        }
+
+        // 3. 인스턴스 생성
         window.recaptchaVerifier = new RecaptchaVerifier(
             auth,
             containerId,
             {
                 size: 'invisible',
-                callback: () => {
-                    if (onVerified) onVerified();
+                callback: (response) => {
+                    if (onVerified) onVerified(response);
                 },
                 'expired-callback': () => {
+                    resetRecaptcha(); // 만료 시 리셋
+                    alert('reCAPTCHA가 만료되었습니다. 다시 시도해주세요.');
+                },
+                'error-callback': (error) => {
+                    console.error('reCAPTCHA error callback:', error);
+                    // 401 에러 등 초기화 실패 시 처리
                     if (window.recaptchaVerifier) {
-                        window.recaptchaVerifier.clear();
-                        delete window.recaptchaVerifier;
+                        try {
+                            window.recaptchaVerifier.clear();
+                        } catch (e) {
+                            console.error('Error clearing recaptcha:', e);
+                        }
+                        window.recaptchaVerifier = null;
+                        window.recaptchaWidgetId = undefined;
                     }
-                    alert(
-                        'reCAPTCHA가 만료되었습니다. 다시 시도해주세요.'
-                    );
                 },
             }
         );
-        window.recaptchaVerifier.render();
+
+        // 4. 렌더링 후 Widget ID 저장 (핵심: reset을 위해 필요)
+        const widgetId = await window.recaptchaVerifier.render();
+        window.recaptchaWidgetId = widgetId;
+
+        return window.recaptchaVerifier;
+    } catch (error) {
+        console.warn('Recaptcha initialization warning:', error);
+        // 이미 렌더링된 경우 등은 기존 인스턴스 사용 시도
+        if (window.recaptchaVerifier) return window.recaptchaVerifier;
+        return null;
     }
-    return window.recaptchaVerifier;
 }
 
-// reCAPTCHA 정리
-export function clearRecaptcha() {
+// reCAPTCHA 정리 (완전 삭제)
+export function clearRecaptcha(containerId = 'recaptcha-container') {
     if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.clear();
-        delete window.recaptchaVerifier;
+        try {
+            window.recaptchaVerifier.clear();
+        } catch (e) {
+            console.warn(e);
+        }
+    }
+    window.recaptchaVerifier = null;
+    window.recaptchaWidgetId = undefined; // ID도 초기화
+
+    const container = document.getElementById(containerId);
+    if (container) {
+        container.innerHTML = '';
+    }
+}
+
+// reCAPTCHA 리셋 (에러 수정됨)
+export function resetRecaptcha() {
+    // window.recaptchaVerifier.reset()은 존재하지 않는 함수입니다.
+    // 대신 grecaptcha.reset(widgetId)를 사용해야 합니다.
+    if (window.grecaptcha && window.recaptchaWidgetId !== undefined) {
+        try {
+            window.grecaptcha.reset(window.recaptchaWidgetId);
+        } catch (error) {
+            console.error('Error resetting recaptcha widget:', error);
+        }
     }
 }
 
 // reCAPTCHA 인증번호 전송
 export async function sendPhoneVerification(phoneNumber) {
-    if (!window.recaptchaVerifier)
-        throw new Error(
-            'reCAPTCHA가 초기화되지 않았습니다.'
-        );
+    if (!window.recaptchaVerifier) {
+        // 인스턴스가 없으면 재초기화 시도 (방어 코드)
+        await initializeRecaptcha();
+    }
+
+    // 그래도 없으면 에러
+    if (!window.recaptchaVerifier) {
+        throw new Error('reCAPTCHA 초기화에 실패했습니다. 새로고침 후 다시 시도해주세요.');
+    }
+
     try {
         const verifier = window.recaptchaVerifier;
-        const confirmationResult =
-            await signInWithPhoneNumber(
-                auth,
-                phoneNumber,
-                verifier
-            );
+        const confirmationResult = await signInWithPhoneNumber(
+            auth,
+            phoneNumber,
+            verifier
+        );
         return confirmationResult.verificationId;
     } catch (error) {
+        // 실패 시 리셋하여 다시 시도 가능하게 함
+        resetRecaptcha();
+
+        // 에러 메시지 매핑
         throw new Error(getFirebaseErrorMsg(error.code));
     }
 }
@@ -100,7 +161,17 @@ function getFirebaseErrorMsg(code) {
             return '인증번호가 만료되었습니다. 다시 요청해주세요.';
         case 'auth/invalid-verification-code':
             return '잘못된 인증번호입니다.';
+        case 'auth/recaptcha-not-enabled':
+            return 'reCAPTCHA가 활성화되지 않았습니다. Firebase 콘솔에서 설정을 확인하세요.';
+        case 'auth/recaptcha-error':
+            return 'reCAPTCHA 인증에 실패했습니다. 페이지를 새로고침하고 다시 시도해주세요.';
         default:
+            // code가 없거나 알 수 없는 에러인 경우 원본 메시지 포함
+            if (code && typeof code === 'string') {
+                if (code.includes('401') || code.includes('Unauthorized')) {
+                    return '관리자 설정 오류: API 키 권한을 확인해주세요.';
+                }
+            }
             return '인증 처리 중 오류가 발생했습니다.';
     }
 }
