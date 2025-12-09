@@ -18,6 +18,7 @@ import BottomNavigation from '../../layouts/BottomNavigation';
 import useScrapStore from '../../store/scrapStore';
 import { getPostList } from '../../services/post';
 import Loader from '../../components/Loader';
+import useInfiniteScroll from '../../hooks/useInfiniteScroll';
 import filterIcon from '../../assets/icons/filterIcon.svg';
 import mapIcon from '../../assets/icons/mapIcon.svg';
 import mapViewIcon from '../../assets/icons/mapViewIcon.svg';
@@ -66,15 +67,10 @@ const JobLookupMap = () => {
     const valueOrEmpty = (value) => (value || '').trim();
 
     // 리스트 모드용 state
-    const [listPostings, setListPostings] = useState([]);
-    const [listCursor, setListCursor] = useState('');
-    const [listTotalCount, setListTotalCount] = useState(0);
-    const [listHasMore, setListHasMore] = useState(true);
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [selectedRegions, setSelectedRegions] = useState(
         []
     );
-    const listCursorInfoRef = useRef('');
     const selectedRegionsRef = useRef([]);
 
     const handleSearchClick = () => {
@@ -169,75 +165,55 @@ const JobLookupMap = () => {
         }
     };
 
-    // cursorInfo를 ref로 관리
-    useEffect(() => {
-        listCursorInfoRef.current = listCursor;
-    }, [listCursor]);
-
     // 선택된 지역 정보를 ref로 관리
     useEffect(() => {
         selectedRegionsRef.current = selectedRegions;
     }, [selectedRegions]);
 
-    // 리스트 모드용 공고 리스트 조회
+    // 리스트 모드용 공고 리스트 조회 함수
     const fetchListPostList = useCallback(
-        async ({ reset = false } = {}) => {
-            if (viewMode !== 'list') return;
+        async (cursor) => {
+            // 선택된 지역 정보 파싱
+            let province = '';
+            let district = '';
+            let town = '';
 
-            try {
-                const requestCursor = reset
-                    ? ''
-                    : listCursorInfoRef.current;
-                if (reset) {
-                    setListCursor('');
-                    listCursorInfoRef.current = '';
-                }
-
-                // 선택된 지역 정보 파싱
-                let province = '';
-                let district = '';
-                let town = '';
-
-                const currentRegions =
-                    selectedRegionsRef.current;
-                if (currentRegions.length > 0) {
-                    const firstRegion = currentRegions[0];
-                    province = firstRegion.province || '';
-                    district = firstRegion.district || '';
-                    town = firstRegion.town || '';
-                }
-
-                const result = await getPostList({
-                    cursorInfo: requestCursor,
-                    province,
-                    district,
-                    town,
-                });
-
-                console.log('공고 리스트 응답:', result);
-
-                const postsData = result?.data || [];
-                const pageInfo = result?.page || {};
-
-                setListPostings((prev) =>
-                    reset
-                        ? postsData
-                        : [...prev, ...postsData]
-                );
-                const newCursor = pageInfo.cursor || '';
-                setListCursor(newCursor);
-                listCursorInfoRef.current = newCursor;
-                setListTotalCount(pageInfo.totalCount || 0);
-                setListHasMore(!!newCursor);
-            } catch (error) {
-                console.error(
-                    '공고 리스트 조회 오류:',
-                    error
-                );
+            const currentRegions =
+                selectedRegionsRef.current;
+            if (currentRegions.length > 0) {
+                const firstRegion = currentRegions[0];
+                province = firstRegion.province || '';
+                district = firstRegion.district || '';
+                town = firstRegion.town || '';
             }
+
+            const result = await getPostList({
+                cursorInfo: cursor,
+                province,
+                district,
+                town,
+            });
+
+            console.log('공고 리스트 응답:', result);
+
+            return result;
         },
-        [viewMode]
+        []
     );
+
+    // 리스트 모드용 무한스크롤 훅
+    const {
+        items: listPostings,
+        hasMore: listHasMore,
+        totalCount: listTotalCount,
+        loadMore: listLoadMore,
+        reset: listReset,
+    } = useInfiniteScroll({
+        fetchFunction: fetchListPostList,
+        dependencies: [selectedRegions],
+        enabled: viewMode === 'list',
+        initialLoad: false, // viewMode 변경 시 수동으로 호출
+    });
 
     useEffect(() => {
         if (isInitialFilterRef.current) {
@@ -298,7 +274,7 @@ const JobLookupMap = () => {
 
     const handleListLoadMore = () => {
         if (viewMode === 'list') {
-            fetchListPostList({ reset: false });
+            listLoadMore();
         }
     };
 
@@ -389,14 +365,14 @@ const JobLookupMap = () => {
 
     useEffect(() => {
         if (viewMode === 'list') {
-            fetchListPostList({ reset: true });
+            listReset();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [viewMode]);
 
     useEffect(() => {
         if (viewMode === 'list') {
-            fetchListPostList({ reset: true });
+            listReset();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedRegionsKey]);

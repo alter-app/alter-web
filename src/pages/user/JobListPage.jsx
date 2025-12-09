@@ -16,6 +16,7 @@ import BottomNavigation from '../../layouts/BottomNavigation';
 import useScrapStore from '../../store/scrapStore';
 import { getPostList } from '../../services/post';
 import Loader from '../../components/Loader';
+import useInfiniteScroll from '../../hooks/useInfiniteScroll';
 import searchSvg from '../../assets/icons/searchSvg.svg';
 import dropdownIcon from '../../assets/icons/dropdown.svg';
 import filterIcon from '../../assets/icons/filterIcon.svg';
@@ -27,14 +28,6 @@ const JobListPage = () => {
     const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
     const { scrapMap, initializeScrapMap, toggleScrap } =
         useScrapStore();
-    const [jobPostings, setJobPostings] = useState([]);
-    const [jobPostingsCursor, setJobPostingsCursor] =
-        useState('');
-    const [
-        jobPostingsTotalCount,
-        setJobPostingsTotalCount,
-    ] = useState(0);
-    const [hasMore, setHasMore] = useState(true);
     const [selectedPostId, setSelectedPostId] =
         useState(null);
     const [showDetailOverlay, setShowDetailOverlay] =
@@ -52,9 +45,9 @@ const JobListPage = () => {
         []
     );
     const sortDropdownRef = useRef(null);
-    const cursorInfoRef = useRef('');
     const isInitialFilterRef = useRef(true);
     const valueOrEmpty = (value) => (value || '').trim();
+    const selectedRegionsRef = useRef([]);
 
     const handlePostSelect = (post) => {
         setSelectedPostId(post.id);
@@ -85,86 +78,58 @@ const JobListPage = () => {
     };
 
     const handleJobPostingsUpdate = (data) => {
-        if (viewMode === 'map') {
-            setJobPostings(data.postings || []);
-            setJobPostingsCursor(data.cursor || '');
-            setJobPostingsTotalCount(data.totalCount || 0);
-        }
+        // 지도 모드에서 사용 (필요시 구현)
     };
 
-    // cursorInfo를 ref로 관리
-    useEffect(() => {
-        cursorInfoRef.current = jobPostingsCursor;
-    }, [jobPostingsCursor]);
-
     // 선택된 지역 정보를 ref로 관리
-    const selectedRegionsRef = useRef([]);
     useEffect(() => {
         selectedRegionsRef.current = selectedRegions;
     }, [selectedRegions]);
 
-    // 공고 리스트 조회
+    // 공고 리스트 조회 함수
     const fetchPostList = useCallback(
-        async ({ reset = false } = {}) => {
-            if (viewMode !== 'list') return;
+        async (cursor) => {
+            // 선택된 지역 정보 파싱
+            let province = '';
+            let district = '';
+            let town = '';
 
-            try {
-                const requestCursor = reset
-                    ? ''
-                    : cursorInfoRef.current;
-                if (reset) {
-                    setJobPostingsCursor('');
-                    cursorInfoRef.current = '';
-                }
-
-                // 선택된 지역 정보 파싱
-                let province = '';
-                let district = '';
-                let town = '';
-
-                const currentRegions =
-                    selectedRegionsRef.current;
-                if (currentRegions.length > 0) {
-                    const firstRegion = currentRegions[0];
-                    province = firstRegion.province || '';
-                    district = firstRegion.district || '';
-                    town = firstRegion.town || '';
-                }
-
-                const result = await getPostList({
-                    cursorInfo: requestCursor,
-                    search: searchKeyword,
-                    province,
-                    district,
-                    town,
-                });
-
-                console.log('공고 리스트 응답:', result);
-
-                const postsData = result?.data || [];
-                const pageInfo = result?.page || {};
-
-                setJobPostings((prev) =>
-                    reset
-                        ? postsData
-                        : [...prev, ...postsData]
-                );
-                const newCursor = pageInfo.cursor || '';
-                setJobPostingsCursor(newCursor);
-                cursorInfoRef.current = newCursor;
-                setJobPostingsTotalCount(
-                    pageInfo.totalCount || 0
-                );
-                setHasMore(!!newCursor);
-            } catch (error) {
-                console.error(
-                    '공고 리스트 조회 오류:',
-                    error
-                );
+            const currentRegions = selectedRegionsRef.current;
+            if (currentRegions.length > 0) {
+                const firstRegion = currentRegions[0];
+                province = firstRegion.province || '';
+                district = firstRegion.district || '';
+                town = firstRegion.town || '';
             }
+
+            const result = await getPostList({
+                cursorInfo: cursor,
+                search: searchKeyword,
+                province,
+                district,
+                town,
+            });
+
+            console.log('공고 리스트 응답:', result);
+
+            return result;
         },
-        [viewMode, searchKeyword, sortType]
+        [searchKeyword]
     );
+
+    // 리스트 모드용 무한스크롤 훅
+    const {
+        items: jobPostings,
+        hasMore,
+        totalCount: jobPostingsTotalCount,
+        loadMore: loadMorePosts,
+        reset: resetPosts,
+    } = useInfiniteScroll({
+        fetchFunction: fetchPostList,
+        dependencies: [searchKeyword, selectedRegions],
+        enabled: viewMode === 'list',
+        initialLoad: false, // viewMode 변경 시 수동으로 호출
+    });
 
     const handleMapMoved = () => {
         // 지도 이동 시 처리
@@ -192,7 +157,7 @@ const JobListPage = () => {
     // 초기 로드 및 리스트 모드일 때 데이터 로드
     useEffect(() => {
         if (viewMode === 'list') {
-            fetchPostList({ reset: true });
+            resetPosts();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [viewMode]);
@@ -200,7 +165,7 @@ const JobListPage = () => {
     // 검색어, 정렬, 지역 필터 변경 시 리스트 다시 불러오기
     useEffect(() => {
         if (viewMode === 'list') {
-            fetchPostList({ reset: true });
+            resetPosts();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchKeyword, sortType, selectedRegionsKey]);
@@ -274,7 +239,7 @@ const JobListPage = () => {
 
     const handleLoadMore = () => {
         if (viewMode === 'list') {
-            fetchPostList({ reset: false });
+            loadMorePosts();
         } else if (
             viewMode === 'map' &&
             mapRef.current &&

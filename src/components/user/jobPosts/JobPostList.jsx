@@ -11,6 +11,7 @@ import dropdownIcon from '../../../assets/icons/dropdown.svg';
 import JobPostItem from './JobPostItem';
 import { getPostList } from '../../../services/post';
 import Loader from '../../Loader';
+import useInfiniteScroll from '../../../hooks/useInfiniteScroll';
 
 const JobPostList = ({
     posts: externalPosts,
@@ -26,10 +27,6 @@ const JobPostList = ({
     sortValue,
     onSortChange,
 }) => {
-    const [posts, setPosts] = useState([]);
-    const [cursorInfo, setCursorInfo] = useState('');
-    const [totalCount, setTotalCount] = useState(0);
-    const [hasMore, setHasMore] = useState(true);
     const [internalSearch, setInternalSearch] =
         useState('');
     const [internalSort, setInternalSort] =
@@ -47,96 +44,87 @@ const JobPostList = ({
             ? sortValue
             : internalSort;
 
+    // 외부 데이터가 있으면 외부 데이터 사용, 없으면 내부 훅 사용
+    const isExternalMode = externalPosts !== undefined;
+
+    // 내부 무한스크롤 훅 (외부 데이터가 없을 때만 사용)
+    const fetchPostList = useCallback(
+        async (cursor) => {
+            const result = await getPostList({
+                cursorInfo: cursor,
+                search: currentSearchValue,
+            });
+
+            console.log('공고 리스트 응답:', result);
+
+            return result;
+        },
+        [currentSearchValue]
+    );
+
+    const {
+        items: internalPosts,
+        hasMore: internalHasMore,
+        totalCount: internalTotalCount,
+        loadMore: internalLoadMore,
+        reset: internalReset,
+    } = useInfiniteScroll({
+        fetchFunction: fetchPostList,
+        dependencies: [currentSearchValue],
+        enabled: !isExternalMode,
+        initialLoad: !isExternalMode,
+    });
+
+    // 외부 데이터 상태 관리
+    const [externalPostsState, setExternalPostsState] =
+        useState([]);
+    const [externalCursorState, setExternalCursorState] =
+        useState('');
+    const [externalTotalCountState, setExternalTotalCountState] =
+        useState(0);
+    const [externalHasMore, setExternalHasMore] =
+        useState(true);
+
     // 외부에서 전달받은 posts가 있으면 업데이트
     useEffect(() => {
-        if (externalPosts !== undefined) {
-            setPosts(externalPosts);
+        if (isExternalMode) {
+            setExternalPostsState(externalPosts || []);
             if (externalCursor !== undefined) {
-                setCursorInfo(externalCursor);
+                setExternalCursorState(externalCursor);
             }
             if (externalTotalCount !== undefined) {
-                setTotalCount(externalTotalCount);
+                setExternalTotalCountState(externalTotalCount);
             }
             // cursor가 있으면 무한스크롤 활성화, 없으면 비활성화
-            setHasMore(
+            setExternalHasMore(
                 externalCursor && externalCursor !== ''
             );
         }
-    }, [externalPosts, externalCursor, externalTotalCount]);
+    }, [
+        isExternalMode,
+        externalPosts,
+        externalCursor,
+        externalTotalCount,
+    ]);
 
-    // cursorInfo를 ref로 관리하여 dependency 문제 해결
-    const cursorInfoRef = useRef('');
+    // 최종 사용할 값들
+    const posts = isExternalMode
+        ? externalPostsState
+        : internalPosts;
+    const hasMore = isExternalMode
+        ? externalHasMore
+        : internalHasMore;
+    const totalCount = isExternalMode
+        ? externalTotalCountState
+        : internalTotalCount;
 
-    useEffect(() => {
-        cursorInfoRef.current = cursorInfo;
-    }, [cursorInfo]);
-
-    const fetchData = useCallback(
-        async ({ reset = false } = {}) => {
-            try {
-                // 외부 데이터가 있으면 지도 API 사용, 없으면 일반 API 사용
-                if (
-                    externalPosts !== undefined &&
-                    externalLoadMore
-                ) {
-                    // 지도 API를 통한 추가 데이터 로드
-                    await externalLoadMore();
-                } else if (externalPosts === undefined) {
-                    const requestCursor = reset
-                        ? ''
-                        : cursorInfoRef.current;
-                    if (reset) {
-                        setCursorInfo('');
-                        cursorInfoRef.current = '';
-                    }
-                    const result = await getPostList({
-                        cursorInfo: requestCursor,
-                        search: currentSearchValue,
-                    });
-
-                    console.log(
-                        '공고 리스트 응답:',
-                        result
-                    );
-
-                    // API 응답 형식 확인 및 처리
-                    const postsData = result?.data || [];
-                    const pageInfo = result?.page || {};
-
-                    setPosts((prev) =>
-                        reset
-                            ? postsData
-                            : [...prev, ...postsData]
-                    );
-                    const newCursor = pageInfo.cursor || '';
-                    setCursorInfo(newCursor);
-                    cursorInfoRef.current = newCursor;
-                    setTotalCount(pageInfo.totalCount || 0);
-                    setHasMore(!!newCursor);
-                }
-            } catch (error) {
-                console.error(
-                    '공고 리스트 조회 오류:',
-                    error
-                );
-            }
-        },
-        [
-            externalPosts,
-            externalLoadMore,
-            currentSearchValue,
-            currentSortValue,
-        ]
-    );
-
-    // 초기 로드
-    useEffect(() => {
-        // externalPosts가 전달되지 않았을 때만 자체 fetchData 호출
-        if (externalPosts === undefined) {
-            fetchData({ reset: true });
+    const loadMorePosts = useCallback(() => {
+        if (isExternalMode && externalLoadMore) {
+            externalLoadMore();
+        } else if (!isExternalMode) {
+            internalLoadMore();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [isExternalMode, externalLoadMore, internalLoadMore]);
 
     const handleSearchInput = (event) => {
         const { value } = event.target;
@@ -152,14 +140,8 @@ const JobPostList = ({
         if (isControlled) {
             onSearchSubmit?.();
         } else {
-            setPosts([]);
-            setCursorInfo('');
-            cursorInfoRef.current = '';
-            setHasMore(true);
-            // 검색 시에는 약간의 지연을 두어 상태 업데이트 후 호출
-            setTimeout(() => {
-                fetchData({ reset: true });
-            }, 0);
+            // 검색 시 리셋
+            internalReset();
         }
     };
 
@@ -216,19 +198,11 @@ const JobPostList = ({
             onSortChange(value);
         } else {
             setInternalSort(value);
-            setPosts([]);
-            setCursorInfo('');
-            cursorInfoRef.current = '';
-            setHasMore(true);
-            // 정렬 변경 시에는 약간의 지연을 두어 상태 업데이트 후 호출
-            setTimeout(() => {
-                fetchData({ reset: true });
-            }, 0);
+            // 정렬 변경 시 리셋
+            internalReset();
         }
         closeSortDropdown();
     };
-
-    const loadMorePosts = () => fetchData();
 
     return (
         <Container>
