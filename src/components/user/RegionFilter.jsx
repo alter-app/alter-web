@@ -235,17 +235,6 @@ const RegionFilter = ({
         setSearchResults([]);
     };
 
-    const handleResetAndApply = () => {
-        // 전체 지역으로 되돌리기 (빈 배열로 적용)
-        if (onRegionsChange) {
-            onRegionsChange([]);
-        }
-        handleReset();
-        if (onClose) {
-            onClose();
-        }
-    };
-
     const handleApply = () => {
         // 적용 버튼 클릭 시에만 부모에게 알림
         if (onRegionsChange) {
@@ -280,7 +269,6 @@ const RegionFilter = ({
                             onChange={
                                 handleSearchInputChange
                             }
-                            placeholder='지역명 검색 예] 강남구, 역삼동'
                         />
                         <SearchIcon>
                             <img
@@ -469,9 +457,7 @@ const RegionFilter = ({
                 </SelectedRegionsSection>
 
                 <ActionButtons>
-                    <ResetButton
-                        onClick={handleResetAndApply}
-                    >
+                    <ResetButton onClick={handleReset}>
                         <ResetIcon>
                             <svg
                                 width='16'
@@ -485,7 +471,7 @@ const RegionFilter = ({
                                 />
                             </svg>
                         </ResetIcon>
-                        전체 지역
+                        초기화
                     </ResetButton>
                     <ApplyButton
                         onClick={handleApply}
@@ -554,8 +540,8 @@ const CloseButton = styled.button`
     justify-content: center;
 
     img {
-        width: 20px;
-        height: 20px;
+        width: 15px;
+        height: 15px;
     }
 `;
 
