@@ -83,11 +83,75 @@ const RegionFilter = ({
         loadSigunguList(sido.code);
     };
 
+    const handleSidoAllSelect = () => {
+        // 시/도 전체 선택
+        if (regions.length >= maxRegions) {
+            alert(
+                `최대 ${maxRegions}개까지 선택할 수 있어요.`
+            );
+            return;
+        }
+
+        // 시/도 전체는 province만 설정, district와 town은 빈 문자열
+        const region = {
+            code: 'ALL_SIDO',
+            name: '전체',
+            fullName: '전체',
+            province: '',
+            district: '',
+            town: '',
+            provinceCode: '',
+            districtCode: '',
+            townCode: '',
+        };
+
+        // 중복 체크 (전체는 하나만)
+        if (!regions.some((r) => r.code === 'ALL_SIDO')) {
+            setRegions([...regions, region]);
+        }
+    };
+
     const handleSigunguSelect = (sigungu) => {
         setSelectedSigungu(sigungu);
         setDongList([]);
         setActiveTab('동/읍/면');
         loadDongList(sigungu.code);
+    };
+
+    const handleSigunguAllSelect = () => {
+        // 시/구/군 전체 선택
+        if (regions.length >= maxRegions) {
+            alert(
+                `최대 ${maxRegions}개까지 선택할 수 있어요.`
+            );
+            return;
+        }
+
+        if (!selectedSido) return;
+
+        // 시/구/군 전체는 province와 district 설정, town은 빈 문자열
+        const region = {
+            code: `ALL_SIGUNGU_${selectedSido.code}`,
+            name: `${selectedSido.name} 전체`,
+            fullName: `${selectedSido.name} 전체`,
+            province: selectedSido.name,
+            district: '',
+            town: '',
+            provinceCode: selectedSido.code,
+            districtCode: '',
+            townCode: '',
+        };
+
+        // 중복 체크
+        if (
+            !regions.some(
+                (r) =>
+                    r.code ===
+                    `ALL_SIGUNGU_${selectedSido.code}`
+            )
+        ) {
+            setRegions([...regions, region]);
+        }
     };
 
     const handleDongSelect = (dong) => {
@@ -112,6 +176,42 @@ const RegionFilter = ({
 
         // 중복 체크
         if (!regions.some((r) => r.code === region.code)) {
+            setRegions([...regions, region]);
+        }
+    };
+
+    const handleDongAllSelect = () => {
+        // 동/읍/면 전체 선택
+        if (regions.length >= maxRegions) {
+            alert(
+                `최대 ${maxRegions}개까지 선택할 수 있어요.`
+            );
+            return;
+        }
+
+        if (!selectedSido || !selectedSigungu) return;
+
+        // 동/읍/면 전체는 province, district 설정, town은 빈 문자열
+        const region = {
+            code: `ALL_DONG_${selectedSigungu.code}`,
+            name: `${selectedSido.name} ${selectedSigungu.name} 전체`,
+            fullName: `${selectedSido.name} ${selectedSigungu.name} 전체`,
+            province: selectedSido.name,
+            district: selectedSigungu.name,
+            town: '',
+            provinceCode: selectedSido.code,
+            districtCode: selectedSigungu.code,
+            townCode: '',
+        };
+
+        // 중복 체크
+        if (
+            !regions.some(
+                (r) =>
+                    r.code ===
+                    `ALL_DONG_${selectedSigungu.code}`
+            )
+        ) {
             setRegions([...regions, region]);
         }
     };
@@ -327,6 +427,14 @@ const RegionFilter = ({
                 <RegionColumns>
                     {activeTab === '시/도' && (
                         <RegionColumn>
+                            <RegionItem
+                                $selected={false}
+                                onClick={
+                                    handleSidoAllSelect
+                                }
+                            >
+                                전체
+                            </RegionItem>
                             {sidoList.map((sido) => (
                                 <RegionItem
                                     key={sido.code}
@@ -350,17 +458,12 @@ const RegionFilter = ({
                         selectedSido && (
                             <RegionColumn>
                                 <RegionItem
-                                    $selected={
-                                        !selectedSigungu
+                                    $selected={false}
+                                    onClick={
+                                        handleSigunguAllSelect
                                     }
-                                    onClick={() => {
-                                        setSelectedSigungu(
-                                            null
-                                        );
-                                        setDongList([]);
-                                    }}
                                 >
-                                    전체
+                                    {selectedSido.name} 전체
                                 </RegionItem>
                                 {sigunguList.map(
                                     (sigungu) => (
@@ -388,6 +491,39 @@ const RegionFilter = ({
                     {activeTab === '동/읍/면' &&
                         selectedSigungu && (
                             <RegionColumn>
+                                <RegionItem
+                                    $selected={regions.some(
+                                        (r) =>
+                                            r.code ===
+                                            `ALL_DONG_${selectedSigungu.code}`
+                                    )}
+                                    onClick={
+                                        handleDongAllSelect
+                                    }
+                                >
+                                    {selectedSido.name}{' '}
+                                    {selectedSigungu.name}{' '}
+                                    전체
+                                    {regions.some(
+                                        (r) =>
+                                            r.code ===
+                                            `ALL_DONG_${selectedSigungu.code}`
+                                    ) && (
+                                        <CheckIcon>
+                                            <svg
+                                                width='16'
+                                                height='16'
+                                                viewBox='0 0 24 24'
+                                                fill='none'
+                                            >
+                                                <path
+                                                    d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'
+                                                    fill='#399982'
+                                                />
+                                            </svg>
+                                        </CheckIcon>
+                                    )}
+                                </RegionItem>
                                 {dongList.map((dong) => (
                                     <RegionItem
                                         key={dong.code}
