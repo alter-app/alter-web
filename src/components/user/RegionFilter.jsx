@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { getAddresses } from '../../services/addressService';
+import useAddressList from '../../hooks/useAddressList';
 import searchSvg from '../../assets/icons/searchSvg.svg';
 import closeIcon from '../../assets/icons/closeIcon.svg';
 
@@ -15,70 +15,34 @@ const RegionFilter = ({
     const [searchResults, setSearchResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
     const [activeTab, setActiveTab] = useState('시/도');
-    const [sidoList, setSidoList] = useState([]);
-    const [sigunguList, setSigunguList] = useState([]);
-    const [dongList, setDongList] = useState([]);
     const [selectedSido, setSelectedSido] = useState(null);
     const [selectedSigungu, setSelectedSigungu] =
         useState(null);
     const [regions, setRegions] = useState(selectedRegions);
     const searchTimeoutRef = useRef(null);
 
+    const {
+        sidoList,
+        sigunguList,
+        dongList,
+        loadSidoList,
+        loadSigunguList,
+        loadDongList,
+        resetSigunguList,
+        resetDongList,
+    } = useAddressList();
+
     // 시/도 목록 로드
     useEffect(() => {
         if (isOpen) {
             loadSidoList();
         }
-    }, [isOpen]);
-
-    // 선택된 지역이 변경되면 부모에게 알림 (적용 버튼 클릭 시에만)
-    // useEffect는 제거하고 handleApply에서만 호출
-
-    const loadSidoList = async () => {
-        try {
-            const response = await getAddresses();
-            if (response?.data?.addresses) {
-                setSidoList(response.data.addresses);
-            }
-        } catch (error) {
-            console.error('시/도 목록 로드 실패:', error);
-        }
-    };
-
-    const loadSigunguList = async (sidoCode) => {
-        try {
-            const response = await getAddresses(sidoCode);
-            if (response?.data?.addresses) {
-                setSigunguList(response.data.addresses);
-            }
-        } catch (error) {
-            console.error(
-                '시/구/군 목록 로드 실패:',
-                error
-            );
-        }
-    };
-
-    const loadDongList = async (sigunguCode) => {
-        try {
-            const response = await getAddresses(
-                sigunguCode
-            );
-            if (response?.data?.addresses) {
-                setDongList(response.data.addresses);
-            }
-        } catch (error) {
-            console.error(
-                '동/읍/면 목록 로드 실패:',
-                error
-            );
-        }
-    };
+    }, [isOpen, loadSidoList]);
 
     const handleSidoSelect = (sido) => {
         setSelectedSido(sido);
         setSelectedSigungu(null);
-        setDongList([]);
+        resetDongList();
         setActiveTab('시/구/군');
         loadSigunguList(sido.code);
     };
@@ -113,7 +77,7 @@ const RegionFilter = ({
 
     const handleSigunguSelect = (sigungu) => {
         setSelectedSigungu(sigungu);
-        setDongList([]);
+        resetDongList();
         setActiveTab('동/읍/면');
         loadDongList(sigungu.code);
     };
@@ -328,8 +292,8 @@ const RegionFilter = ({
         setRegions([]);
         setSelectedSido(null);
         setSelectedSigungu(null);
-        setDongList([]);
-        setSigunguList([]);
+        resetDongList();
+        resetSigunguList();
         setActiveTab('시/도');
         setSearchInput('');
         setSearchResults([]);
@@ -428,12 +392,35 @@ const RegionFilter = ({
                     {activeTab === '시/도' && (
                         <RegionColumn>
                             <RegionItem
-                                $selected={false}
+                                $selected={regions.some(
+                                    (r) =>
+                                        r.code ===
+                                        'ALL_SIDO'
+                                )}
                                 onClick={
                                     handleSidoAllSelect
                                 }
                             >
                                 전체
+                                {regions.some(
+                                    (r) =>
+                                        r.code ===
+                                        'ALL_SIDO'
+                                ) && (
+                                    <CheckIcon>
+                                        <svg
+                                            width='16'
+                                            height='16'
+                                            viewBox='0 0 24 24'
+                                            fill='none'
+                                        >
+                                            <path
+                                                d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'
+                                                fill='#399982'
+                                            />
+                                        </svg>
+                                    </CheckIcon>
+                                )}
                             </RegionItem>
                             {sidoList.map((sido) => (
                                 <RegionItem
@@ -458,12 +445,35 @@ const RegionFilter = ({
                         selectedSido && (
                             <RegionColumn>
                                 <RegionItem
-                                    $selected={false}
+                                    $selected={regions.some(
+                                        (r) =>
+                                            r.code ===
+                                            `ALL_SIGUNGU_${selectedSido.code}`
+                                    )}
                                     onClick={
                                         handleSigunguAllSelect
                                     }
                                 >
                                     {selectedSido.name} 전체
+                                    {regions.some(
+                                        (r) =>
+                                            r.code ===
+                                            `ALL_SIGUNGU_${selectedSido.code}`
+                                    ) && (
+                                        <CheckIcon>
+                                            <svg
+                                                width='16'
+                                                height='16'
+                                                viewBox='0 0 24 24'
+                                                fill='none'
+                                            >
+                                                <path
+                                                    d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'
+                                                    fill='#399982'
+                                                />
+                                            </svg>
+                                        </CheckIcon>
+                                    )}
                                 </RegionItem>
                                 {sigunguList.map(
                                     (sigungu) => (
