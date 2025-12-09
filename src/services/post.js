@@ -1,14 +1,61 @@
 import apiClient from '../utils/apiClient';
 
 // 공고 리스트 조회 로직
-export const getPostList = async ({ cursorInfo }) => {
+export const getPostList = async ({
+    cursorInfo = '',
+    search = '',
+    province = '',
+    district = '',
+    town = '',
+    minPayAmount = '',
+    maxPayAmount = '',
+    startTime = '',
+    endTime = '',
+}) => {
     try {
-        const response = await apiClient.get('/app/postings', {
-            params: {
-                cursor: cursorInfo,
-                pageSize: 10,
-            },
-        });
+        const params = {
+            cursor: cursorInfo,
+            pageSize: 10,
+        };
+
+        if (search) {
+            params.search = search;
+        }
+
+        if (province) {
+            params.province = province;
+        }
+
+        if (district) {
+            params.district = district;
+        }
+
+        if (town) {
+            params.town = town;
+        }
+
+        if (minPayAmount) {
+            params.minPayAmount = minPayAmount;
+        }
+
+        if (maxPayAmount) {
+            params.maxPayAmount = maxPayAmount;
+        }
+
+        if (startTime) {
+            params.startTime = startTime;
+        }
+
+        if (endTime) {
+            params.endTime = endTime;
+        }
+
+        const response = await apiClient.get(
+            '/app/postings',
+            {
+                params,
+            }
+        );
 
         return response.data;
     } catch (error) {
@@ -22,7 +69,9 @@ export const getPostList = async ({ cursorInfo }) => {
 // 공고 상세 조회 로직
 export const getPostDetail = async (id) => {
     try {
-        const response = await apiClient.get(`/app/postings/${id}`);
+        const response = await apiClient.get(
+            `/app/postings/${id}`
+        );
         return response.data;
     } catch (error) {
         console.error('공고 상세 조회 오류:', error);
@@ -35,7 +84,10 @@ export const getPostDetail = async (id) => {
 // 공고 등록 로직
 export const postJobPosting = async (inputs) => {
     try {
-        const response = await apiClient.post('/manager/postings', inputs);
+        const response = await apiClient.post(
+            '/manager/postings',
+            inputs
+        );
         return response.data;
     } catch (error) {
         console.error('공고 작성 중 오류:', error);
@@ -48,7 +100,9 @@ export const postJobPosting = async (inputs) => {
 // 공고 키워드 리스트 조회 로직
 export const getAvailableKeywords = async () => {
     try {
-        const response = await apiClient.get('/manager/postings/available-keywords');
+        const response = await apiClient.get(
+            '/manager/postings/available-keywords'
+        );
         return response.data;
     } catch (error) {
         console.error('공고 키워드 조회 오류:', error);
@@ -121,12 +175,15 @@ export const getPostingScrapList = async ({
     cursorInfo,
 }) => {
     try {
-        const response = await apiClient.get('/app/users/me/postings/favorites', {
-            params: {
-                cursor: cursorInfo,
-                pageSize: 10,
-            },
-        });
+        const response = await apiClient.get(
+            '/app/users/me/postings/favorites',
+            {
+                params: {
+                    cursor: cursorInfo,
+                    pageSize: 10,
+                },
+            }
+        );
 
         return response.data;
     } catch (error) {

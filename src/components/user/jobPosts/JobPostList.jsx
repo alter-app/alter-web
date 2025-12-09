@@ -1,4 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import {
+    useEffect,
+    useRef,
+    useState,
+    useCallback,
+} from 'react';
 import styled from 'styled-components';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import searchSvg from '../../../assets/icons/searchSvg.svg';
@@ -59,47 +64,79 @@ const JobPostList = ({
         }
     }, [externalPosts, externalCursor, externalTotalCount]);
 
+    // cursorInfo를 ref로 관리하여 dependency 문제 해결
+    const cursorInfoRef = useRef('');
+
+    useEffect(() => {
+        cursorInfoRef.current = cursorInfo;
+    }, [cursorInfo]);
+
+    const fetchData = useCallback(
+        async ({ reset = false } = {}) => {
+            try {
+                // 외부 데이터가 있으면 지도 API 사용, 없으면 일반 API 사용
+                if (
+                    externalPosts !== undefined &&
+                    externalLoadMore
+                ) {
+                    // 지도 API를 통한 추가 데이터 로드
+                    await externalLoadMore();
+                } else if (externalPosts === undefined) {
+                    const requestCursor = reset
+                        ? ''
+                        : cursorInfoRef.current;
+                    if (reset) {
+                        setCursorInfo('');
+                        cursorInfoRef.current = '';
+                    }
+                    const result = await getPostList({
+                        cursorInfo: requestCursor,
+                        search: currentSearchValue,
+                    });
+
+                    console.log(
+                        '공고 리스트 응답:',
+                        result
+                    );
+
+                    // API 응답 형식 확인 및 처리
+                    const postsData = result?.data || [];
+                    const pageInfo = result?.page || {};
+
+                    setPosts((prev) =>
+                        reset
+                            ? postsData
+                            : [...prev, ...postsData]
+                    );
+                    const newCursor = pageInfo.cursor || '';
+                    setCursorInfo(newCursor);
+                    cursorInfoRef.current = newCursor;
+                    setTotalCount(pageInfo.totalCount || 0);
+                    setHasMore(!!newCursor);
+                }
+            } catch (error) {
+                console.error(
+                    '공고 리스트 조회 오류:',
+                    error
+                );
+            }
+        },
+        [
+            externalPosts,
+            externalLoadMore,
+            currentSearchValue,
+            currentSortValue,
+        ]
+    );
+
+    // 초기 로드
     useEffect(() => {
         // externalPosts가 전달되지 않았을 때만 자체 fetchData 호출
         if (externalPosts === undefined) {
-            fetchData();
+            fetchData({ reset: true });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    const fetchData = async ({ reset = false } = {}) => {
-        try {
-            // 외부 데이터가 있으면 지도 API 사용, 없으면 일반 API 사용
-            if (
-                externalPosts !== undefined &&
-                externalLoadMore
-            ) {
-                // 지도 API를 통한 추가 데이터 로드
-                await externalLoadMore();
-            } else if (externalPosts === undefined) {
-                const requestCursor = reset
-                    ? ''
-                    : cursorInfo;
-                if (reset) {
-                    setCursorInfo('');
-                }
-                const result = await getPostList({
-                    cursorInfo: requestCursor,
-                    search: currentSearchValue,
-                    sort: currentSortValue,
-                });
-                setPosts((prev) =>
-                    reset
-                        ? result.data
-                        : [...prev, ...result.data]
-                );
-                setCursorInfo(result.page.cursor);
-                setTotalCount(result.page.totalCount);
-                setHasMore(!!result.page.cursor);
-            }
-        } catch (error) {
-            console.error('공고 리스트 조회 오류:', error);
-        }
-    };
 
     const handleSearchInput = (event) => {
         const { value } = event.target;
@@ -117,8 +154,12 @@ const JobPostList = ({
         } else {
             setPosts([]);
             setCursorInfo('');
+            cursorInfoRef.current = '';
             setHasMore(true);
-            fetchData({ reset: true });
+            // 검색 시에는 약간의 지연을 두어 상태 업데이트 후 호출
+            setTimeout(() => {
+                fetchData({ reset: true });
+            }, 0);
         }
     };
 
@@ -177,8 +218,12 @@ const JobPostList = ({
             setInternalSort(value);
             setPosts([]);
             setCursorInfo('');
+            cursorInfoRef.current = '';
             setHasMore(true);
-            fetchData({ reset: true });
+            // 정렬 변경 시에는 약간의 지연을 두어 상태 업데이트 후 호출
+            setTimeout(() => {
+                fetchData({ reset: true });
+            }, 0);
         }
         closeSortDropdown();
     };
@@ -265,43 +310,44 @@ const JobPostList = ({
             <Divider />
             <ListArea id='scrollableListArea'>
                 {/* <Address>서울 구로구 경인로 445</Address> */}
-                <InfiniteScroll
-                    dataLength={posts.length}
-                    next={loadMorePosts}
-                    hasMore={
-                        hasMore && posts.length < totalCount
-                    }
-                    loader={
-                        <CenteredDiv>
-                            <Loader />
-                        </CenteredDiv>
-                    }
-                    scrollableTarget='scrollableListArea'
-                >
-                    {posts.length === 0 ? (
-                        <EmptyMessage>
-                            <EmptyIcon>
-                                <svg
-                                    width='48'
-                                    height='48'
-                                    viewBox='0 0 24 24'
-                                    fill='none'
-                                >
-                                    <path
-                                        d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'
-                                        fill='#ccc'
-                                    />
-                                </svg>
-                            </EmptyIcon>
-                            <EmptyText>
-                                공고가 없습니다
-                            </EmptyText>
-                            <EmptySubText>
-                                다른 지역을 검색해보세요
-                            </EmptySubText>
-                        </EmptyMessage>
-                    ) : (
-                        posts.map((post) => (
+                {posts.length === 0 && !hasMore ? (
+                    <EmptyMessage>
+                        <EmptyIcon>
+                            <svg
+                                width='48'
+                                height='48'
+                                viewBox='0 0 24 24'
+                                fill='none'
+                            >
+                                <path
+                                    d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'
+                                    fill='#ccc'
+                                />
+                            </svg>
+                        </EmptyIcon>
+                        <EmptyText>
+                            공고가 없습니다
+                        </EmptyText>
+                        <EmptySubText>
+                            다른 지역을 검색해보세요
+                        </EmptySubText>
+                    </EmptyMessage>
+                ) : (
+                    <InfiniteScroll
+                        dataLength={posts.length}
+                        next={loadMorePosts}
+                        hasMore={
+                            hasMore &&
+                            posts.length < totalCount
+                        }
+                        loader={
+                            <CenteredDiv>
+                                <Loader />
+                            </CenteredDiv>
+                        }
+                        scrollableTarget='scrollableListArea'
+                    >
+                        {posts.map((post) => (
                             <JobPostItem
                                 key={post.id}
                                 {...post}
@@ -319,9 +365,9 @@ const JobPostList = ({
                                     )
                                 }
                             />
-                        ))
-                    )}
-                </InfiniteScroll>
+                        ))}
+                    </InfiniteScroll>
+                )}
             </ListArea>
         </Container>
     );
@@ -523,7 +569,10 @@ const SortDropdownItem = styled.button`
 const ListArea = styled.div`
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
     min-height: 0; /* flexbox에서 overflow 작동 위해 필요 */
+    -webkit-overflow-scrolling: touch;
+    position: relative;
 `;
 
 const Address = styled.div`
