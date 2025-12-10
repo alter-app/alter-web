@@ -1,16 +1,32 @@
-import { useState, useEffect, useRef } from 'react';
+import {
+    useState,
+    useEffect,
+    useRef,
+    useCallback,
+} from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import NaverMap from '../../components/owner/NaverMap';
 import JobPostList from '../../components/user/jobPosts/JobPostList';
+import JobPostItem from '../../components/user/jobPosts/JobPostItem';
 import MarkerJobPostList from '../../components/user/jobPosts/MarkerJobPostList';
 import JobPostDetailOverlay from '../../components/user/jobPosts/JobPostDetailOverlay';
 import JobApplyOverlay from '../../components/user/jobPosts/JobApplyOverlay';
+import RegionFilter from '../../components/user/RegionFilter';
 import BottomNavigation from '../../layouts/BottomNavigation';
 import useScrapStore from '../../store/scrapStore';
+import { getPostList } from '../../services/post';
+import Loader from '../../components/Loader';
+import useInfiniteScroll from '../../hooks/useInfiniteScroll';
+import filterIcon from '../../assets/icons/filterIcon.svg';
+import mapIcon from '../../assets/icons/mapIcon.svg';
+import mapViewIcon from '../../assets/icons/mapViewIcon.svg';
+import listIcon from '../../assets/icons/listIcon.svg';
 
 const JobLookupMap = () => {
     const navigate = useNavigate();
+    const [viewMode, setViewMode] = useState('map'); // 'map' or 'list'
     const [listHeight, setListHeight] = useState(40);
     const [isDragging, setIsDragging] = useState(false);
     const [startY, setStartY] = useState(0);
@@ -49,6 +65,13 @@ const JobLookupMap = () => {
     const [sortType, setSortType] = useState('LATEST');
     const isInitialFilterRef = useRef(true);
     const valueOrEmpty = (value) => (value || '').trim();
+
+    // 리스트 모드용 state
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [selectedRegions, setSelectedRegions] = useState(
+        []
+    );
+    const selectedRegionsRef = useRef([]);
 
     const handleSearchClick = () => {
         if (
@@ -134,6 +157,64 @@ const JobLookupMap = () => {
         console.log('지원이 완료되었습니다.');
     };
 
+    const handleJobPostingsUpdate = (data) => {
+        if (viewMode === 'map') {
+            setJobPostings(data.postings || []);
+            setJobPostingsCursor(data.cursor || '');
+            setJobPostingsTotalCount(data.totalCount || 0);
+        }
+    };
+
+    // 선택된 지역 정보를 ref로 관리
+    useEffect(() => {
+        selectedRegionsRef.current = selectedRegions;
+    }, [selectedRegions]);
+
+    // 리스트 모드용 공고 리스트 조회 함수
+    const fetchListPostList = useCallback(
+        async (cursor) => {
+            // 선택된 지역 정보 파싱
+            let province = '';
+            let district = '';
+            let town = '';
+
+            const currentRegions =
+                selectedRegionsRef.current;
+            if (currentRegions.length > 0) {
+                const firstRegion = currentRegions[0];
+                province = firstRegion.province || '';
+                district = firstRegion.district || '';
+                town = firstRegion.town || '';
+            }
+
+            const result = await getPostList({
+                cursorInfo: cursor,
+                province,
+                district,
+                town,
+            });
+
+            console.log('공고 리스트 응답:', result);
+
+            return result;
+        },
+        []
+    );
+
+    // 리스트 모드용 무한스크롤 훅
+    const {
+        items: listPostings,
+        hasMore: listHasMore,
+        totalCount: listTotalCount,
+        loadMore: listLoadMore,
+        reset: listReset,
+    } = useInfiniteScroll({
+        fetchFunction: fetchListPostList,
+        dependencies: [selectedRegions],
+        enabled: viewMode === 'list',
+        initialLoad: false, // viewMode 변경 시 수동으로 호출
+    });
+
     useEffect(() => {
         if (isInitialFilterRef.current) {
             isInitialFilterRef.current = false;
@@ -189,6 +270,18 @@ const JobLookupMap = () => {
             return;
         }
         setSortType(value);
+    };
+
+    const handleListLoadMore = () => {
+        if (viewMode === 'list') {
+            listLoadMore();
+        }
+    };
+
+    const handleToggleView = () => {
+        setViewMode((prev) =>
+            prev === 'map' ? 'list' : 'map'
+        );
     };
 
     useEffect(() => {
@@ -257,6 +350,32 @@ const JobLookupMap = () => {
             initializeScrapMap(jobPostings);
         }
     }, [jobPostings, initializeScrapMap]);
+
+    // 리스트 모드용 스크랩 상태 초기화
+    useEffect(() => {
+        if (listPostings.length > 0) {
+            initializeScrapMap(listPostings);
+        }
+    }, [listPostings, initializeScrapMap]);
+
+    // 리스트 모드일 때 초기 로드 및 필터 변경 시 데이터 로드
+    const selectedRegionsKey = JSON.stringify(
+        selectedRegions.map((r) => r.code)
+    );
+
+    useEffect(() => {
+        if (viewMode === 'list') {
+            listReset();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [viewMode]);
+
+    useEffect(() => {
+        if (viewMode === 'list') {
+            listReset();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedRegionsKey]);
 
     const handleTouchStart = (e) => {
         setIsDragging(true);
@@ -485,163 +604,313 @@ const JobLookupMap = () => {
 
     return (
         <Container>
-            <MapSection>
-                {showSearchButton && (
-                    <SearchButton
-                        onClick={handleSearchClick}
-                    >
-                        <SearchText>
-                            이 지역에서 검색
-                        </SearchText>
-                    </SearchButton>
-                )}
-                <MapContainer data-testid='map-container'>
-                    <NaverMap
-                        ref={mapRef}
-                        businessName='현재 위치'
-                        searchKeyword={searchKeyword}
-                        sortType={sortType}
-                        onJobPostingsUpdate={(data) => {
-                            if (
-                                typeof data === 'object' &&
-                                data.data
-                            ) {
-                                setJobPostings(data.data);
-                                setJobPostingsCursor(
-                                    data.cursor || ''
-                                );
-                                setJobPostingsTotalCount(
-                                    data.totalCount || 0
-                                );
-
-                                // 마커별 조회인지 전체 조회인지 구분
-                                const isWorkspaceSpecific =
-                                    data.cursor === '' &&
-                                    data.totalCount <= 50;
-
-                                if (isWorkspaceSpecific) {
-                                    // 마커별 조회 모드
-                                    setIsWorkspaceView(
-                                        true
+            {viewMode === 'map' && (
+                <MapSection>
+                    {showSearchButton && (
+                        <SearchButton
+                            onClick={handleSearchClick}
+                        >
+                            <SearchText>
+                                이 지역에서 검색
+                            </SearchText>
+                        </SearchButton>
+                    )}
+                    <MapContainer data-testid='map-container'>
+                        <NaverMap
+                            ref={mapRef}
+                            businessName='현재 위치'
+                            searchKeyword={searchKeyword}
+                            sortType={sortType}
+                            onJobPostingsUpdate={(data) => {
+                                if (
+                                    typeof data ===
+                                        'object' &&
+                                    data.data
+                                ) {
+                                    setJobPostings(
+                                        data.data
+                                    );
+                                    setJobPostingsCursor(
+                                        data.cursor || ''
+                                    );
+                                    setJobPostingsTotalCount(
+                                        data.totalCount || 0
                                     );
 
-                                    // 마커별 조회 시 리스트 펼치기
+                                    // 마커별 조회인지 전체 조회인지 구분
+                                    const isWorkspaceSpecific =
+                                        data.cursor ===
+                                            '' &&
+                                        data.totalCount <=
+                                            50;
+
                                     if (
-                                        data.data.length > 0
+                                        isWorkspaceSpecific
                                     ) {
-                                        setListHeight(
-                                            Math.min(
-                                                window.innerHeight *
-                                                    0.8,
-                                                400
-                                            )
+                                        // 마커별 조회 모드
+                                        setIsWorkspaceView(
+                                            true
+                                        );
+
+                                        // 마커별 조회 시 리스트 펼치기
+                                        if (
+                                            data.data
+                                                .length > 0
+                                        ) {
+                                            setListHeight(
+                                                Math.min(
+                                                    window.innerHeight *
+                                                        0.8,
+                                                    400
+                                                )
+                                            );
+                                        }
+                                    } else {
+                                        // 전체 조회 모드
+                                        setIsWorkspaceView(
+                                            false
                                         );
                                     }
                                 } else {
-                                    // 전체 조회 모드
-                                    setIsWorkspaceView(
-                                        false
-                                    );
-                                }
-                            } else {
-                                setJobPostings(data);
-                            }
-                        }}
-                        onMapMoved={() =>
-                            setShowSearchButton(true)
-                        }
-                        onCurrentLocationStatusChange={(
-                            isAtCurrent
-                        ) =>
-                            setIsAtCurrentLocation(
-                                isAtCurrent
-                            )
-                        }
-                        onMapBackgroundClick={
-                            handleMapBackgroundClick
-                        }
-                        onMarkerClick={handleMarkerClick}
-                    />
-                </MapContainer>
-                <CurrentLocationButton
-                    $listHeight={listHeight}
-                    $isAtCurrentLocation={
-                        isAtCurrentLocation
-                    }
-                    onClick={handleCurrentLocationClick}
-                >
-                    <svg
-                        width='20'
-                        height='20'
-                        viewBox='0 0 24 24'
-                        fill='none'
-                    >
-                        <path
-                            d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'
-                            fill={
-                                isAtCurrentLocation
-                                    ? '#ffffff'
-                                    : '#333'
-                            }
-                        />
-                    </svg>
-                </CurrentLocationButton>
-            </MapSection>
-
-            <JobListContainer
-                $height={listHeight}
-                $isDragging={isDragging}
-            >
-                <DragHandle
-                    onMouseDown={handleMouseDown}
-                    onTouchStart={handleTouchStart}
-                >
-                    <DragBar />
-                </DragHandle>
-                <JobListContent>
-                    {isWorkspaceView ? (
-                        // 마커별 조회 모드: 간단한 목록만 표시
-                        <MarkerJobPostList
-                            posts={jobPostings}
-                            onSelect={handlePostSelect}
-                            scrapMap={scrapMap}
-                            onScrapChange={toggleScrap}
-                        />
-                    ) : (
-                        // 전체 조회 모드: 검색, 필터링, 무한스크롤 포함
-                        <JobPostList
-                            posts={jobPostings}
-                            cursor={jobPostingsCursor}
-                            totalCount={
-                                jobPostingsTotalCount
-                            }
-                            onLoadMore={() => {
-                                if (
-                                    mapRef.current &&
-                                    mapRef.current
-                                        .loadMoreJobPostings
-                                ) {
-                                    mapRef.current.loadMoreJobPostings(
-                                        jobPostingsCursor
-                                    );
+                                    setJobPostings(data);
                                 }
                             }}
-                            onSelect={handlePostSelect}
-                            scrapMap={scrapMap}
-                            onScrapChange={toggleScrap}
-                            searchValue={searchInput}
-                            onSearchInputChange={
-                                handleSearchInputChange
+                            onMapMoved={() =>
+                                setShowSearchButton(true)
                             }
-                            onSearchSubmit={
-                                handleSearchSubmit
+                            onCurrentLocationStatusChange={(
+                                isAtCurrent
+                            ) =>
+                                setIsAtCurrentLocation(
+                                    isAtCurrent
+                                )
                             }
-                            sortValue={sortType}
-                            onSortChange={handleSortChange}
+                            onMapBackgroundClick={
+                                handleMapBackgroundClick
+                            }
+                            onMarkerClick={
+                                handleMarkerClick
+                            }
                         />
-                    )}
-                </JobListContent>
-            </JobListContainer>
+                    </MapContainer>
+                    <CurrentLocationButton
+                        $listHeight={listHeight}
+                        $isAtCurrentLocation={
+                            isAtCurrentLocation
+                        }
+                        onClick={handleCurrentLocationClick}
+                    >
+                        <svg
+                            width='20'
+                            height='20'
+                            viewBox='0 0 24 24'
+                            fill='none'
+                        >
+                            <path
+                                d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'
+                                fill={
+                                    isAtCurrentLocation
+                                        ? '#ffffff'
+                                        : '#333'
+                                }
+                            />
+                        </svg>
+                    </CurrentLocationButton>
+                </MapSection>
+            )}
+
+            {viewMode === 'list' ? (
+                <ListSection>
+                    <ListContainer>
+                        <Controls>
+                            <FilterButton
+                                type='button'
+                                onClick={() =>
+                                    setIsFilterOpen(true)
+                                }
+                                aria-label='필터'
+                            >
+                                <img
+                                    src={filterIcon}
+                                    alt='필터'
+                                />
+                            </FilterButton>
+                        </Controls>
+                        <Divider />
+                        <ListArea id='scrollableListArea'>
+                            {listPostings.length === 0 &&
+                            !listHasMore ? (
+                                <EmptyMessage>
+                                    <EmptyIcon>
+                                        <svg
+                                            width='48'
+                                            height='48'
+                                            viewBox='0 0 24 24'
+                                            fill='none'
+                                        >
+                                            <path
+                                                d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z'
+                                                fill='#ccc'
+                                            />
+                                        </svg>
+                                    </EmptyIcon>
+                                    <EmptyText>
+                                        공고가 없습니다
+                                    </EmptyText>
+                                    <EmptySubText>
+                                        다른 지역을
+                                        검색해보세요
+                                    </EmptySubText>
+                                </EmptyMessage>
+                            ) : (
+                                <InfiniteScroll
+                                    dataLength={
+                                        listPostings.length
+                                    }
+                                    next={
+                                        handleListLoadMore
+                                    }
+                                    hasMore={
+                                        listHasMore &&
+                                        listPostings.length <
+                                            listTotalCount
+                                    }
+                                    loader={
+                                        <CenteredDiv>
+                                            <Loader />
+                                        </CenteredDiv>
+                                    }
+                                    scrollableTarget='scrollableListArea'
+                                >
+                                    {listPostings.map(
+                                        (post) => (
+                                            <JobPostItem
+                                                key={
+                                                    post.id
+                                                }
+                                                {...post}
+                                                onClick={() =>
+                                                    handlePostSelect(
+                                                        post
+                                                    )
+                                                }
+                                                checked={
+                                                    scrapMap[
+                                                        post
+                                                            .id
+                                                    ] ??
+                                                    post.scrapped
+                                                }
+                                                onScrapChange={(
+                                                    value
+                                                ) =>
+                                                    toggleScrap(
+                                                        post.id,
+                                                        value
+                                                    )
+                                                }
+                                            />
+                                        )
+                                    )}
+                                </InfiniteScroll>
+                            )}
+                        </ListArea>
+                        <RegionFilter
+                            isOpen={isFilterOpen}
+                            onClose={() =>
+                                setIsFilterOpen(false)
+                            }
+                            selectedRegions={
+                                selectedRegions
+                            }
+                            onRegionsChange={
+                                setSelectedRegions
+                            }
+                            maxRegions={10}
+                        />
+                    </ListContainer>
+                </ListSection>
+            ) : (
+                <JobListContainer
+                    $height={listHeight}
+                    $isDragging={isDragging}
+                >
+                    <DragHandle
+                        onMouseDown={handleMouseDown}
+                        onTouchStart={handleTouchStart}
+                    >
+                        <DragBar />
+                    </DragHandle>
+                    <JobListContent>
+                        {isWorkspaceView ? (
+                            // 마커별 조회 모드: 간단한 목록만 표시
+                            <MarkerJobPostList
+                                posts={jobPostings}
+                                onSelect={handlePostSelect}
+                                scrapMap={scrapMap}
+                                onScrapChange={toggleScrap}
+                            />
+                        ) : (
+                            // 전체 조회 모드: 검색, 필터링, 무한스크롤 포함
+                            <JobPostList
+                                posts={jobPostings}
+                                cursor={jobPostingsCursor}
+                                totalCount={
+                                    jobPostingsTotalCount
+                                }
+                                onLoadMore={() => {
+                                    if (
+                                        mapRef.current &&
+                                        mapRef.current
+                                            .loadMoreJobPostings
+                                    ) {
+                                        mapRef.current.loadMoreJobPostings(
+                                            jobPostingsCursor
+                                        );
+                                    }
+                                }}
+                                onSelect={handlePostSelect}
+                                scrapMap={scrapMap}
+                                onScrapChange={toggleScrap}
+                                searchValue={searchInput}
+                                onSearchInputChange={
+                                    handleSearchInputChange
+                                }
+                                onSearchSubmit={
+                                    handleSearchSubmit
+                                }
+                                sortValue={sortType}
+                                onSortChange={
+                                    handleSortChange
+                                }
+                            />
+                        )}
+                    </JobListContent>
+                </JobListContainer>
+            )}
+
+            <ToggleButton
+                $viewMode={viewMode}
+                onClick={handleToggleView}
+                aria-label={
+                    viewMode === 'map'
+                        ? '리스트 보기'
+                        : '지도 보기'
+                }
+            >
+                <img
+                    src={
+                        viewMode === 'map'
+                            ? listIcon
+                            : mapViewIcon
+                    }
+                    alt={
+                        viewMode === 'map'
+                            ? '리스트 보기'
+                            : '지도 보기'
+                    }
+                />
+            </ToggleButton>
 
             <BottomNavigation />
 
@@ -835,14 +1104,7 @@ const MapContainer = styled.div`
 
 const CurrentLocationButton = styled.button`
     position: absolute;
-    bottom: ${(props) => {
-        // 리스트가 접혔을 때(작을 때)만 리스트 위에, 그 외에는 고정 위치
-        if (props.$listHeight < 100) {
-            return Math.max(140, props.$listHeight + 20);
-        }
-        // 리스트가 펼쳐져 있을 때는 고정 위치
-        return 140;
-    }}px;
+    bottom: 160px;
     right: 20px;
     width: 48px;
     height: 48px;
@@ -884,53 +1146,32 @@ const CurrentLocationButton = styled.button`
     @media (max-width: 480px) {
         width: 44px;
         height: 44px;
-        bottom: ${(props) => {
-            // 리스트가 접혔을 때만 리스트 위에, 그 외에는 고정 위치
-            if (props.$listHeight < 100) {
-                return Math.max(
-                    160,
-                    props.$listHeight + 16
-                );
-            }
-            // 리스트가 펼쳐져 있을 때는 고정 위치 (더 높게)
-            return 160;
-        }}px;
+        bottom: 150px;
         right: 16px;
     }
 
     @media (max-width: 360px) {
         width: 40px;
         height: 40px;
-        bottom: ${(props) => {
-            // 리스트가 접혔을 때만 리스트 위에, 그 외에는 고정 위치
-            if (props.$listHeight < 100) {
-                return Math.max(
-                    150,
-                    props.$listHeight + 12
-                );
-            }
-            // 리스트가 펼쳐져 있을 때는 고정 위치 (더 높게)
-            return 150;
-        }}px;
+        bottom: 150px;
         right: 12px;
     }
 
     @media (max-width: 320px) {
         width: 38px;
         height: 38px;
-        bottom: ${(props) => {
-            // 리스트가 접혔을 때만 리스트 위에, 그 외에는 고정 위치
-            if (props.$listHeight < 100) {
-                return Math.max(
-                    140,
-                    props.$listHeight + 10
-                );
-            }
-            // 리스트가 펼쳐져 있을 때는 고정 위치 (더 높게)
-            return 140;
-        }}px;
+        bottom: 150px;
         right: 10px;
     }
+`;
+
+const ListSection = styled.div`
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
 `;
 
 const JobListContainer = styled.div`
@@ -969,6 +1210,92 @@ const JobListContainer = styled.div`
     @media (max-width: 360px) {
         bottom: 40px;
         border-radius: 12px 12px 0 0;
+    }
+`;
+
+const ToggleButton = styled.button`
+    position: absolute;
+    bottom: 100px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 50%;
+    background: ${(props) =>
+        props.$viewMode === 'list' ? '#399982' : '#ffffff'};
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    padding: 0;
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        background: ${(props) =>
+            props.$viewMode === 'list'
+                ? '#399982'
+                : '#ffffff'};
+    }
+
+    &:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    img {
+        width: 20px;
+        height: 20px;
+        filter: ${(props) =>
+            props.$viewMode === 'list'
+                ? 'brightness(0) invert(1)'
+                : 'brightness(0)'};
+    }
+
+    @media (max-width: 768px) {
+        bottom: 100px;
+        right: 20px;
+        width: 48px;
+        height: 48px;
+    }
+
+    @media (max-width: 480px) {
+        width: 44px;
+        height: 44px;
+        bottom: 100px;
+        right: 16px;
+    }
+
+    @media (max-width: 360px) {
+        width: 40px;
+        height: 40px;
+        bottom: 100px;
+        right: 12px;
+    }
+
+    @media (max-width: 320px) {
+        width: 38px;
+        height: 38px;
+        bottom: 100px;
+        right: 10px;
+    }
+
+    @supports (padding: max(0px)) {
+        bottom: max(
+            100px,
+            calc(100px + env(safe-area-inset-bottom))
+        );
+
+        @media (max-width: 768px) {
+            bottom: max(
+                100px,
+                calc(100px + env(safe-area-inset-bottom))
+            );
+        }
     }
 `;
 
@@ -1034,5 +1361,338 @@ const JobListContent = styled.div`
 
     @media (max-width: 360px) {
         height: calc(100% - 30px);
+    }
+`;
+
+const ListContainer = styled.div`
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+`;
+
+const Controls = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 20px 0 20px;
+
+    @media (max-width: 768px) {
+        padding: 14px 16px 0 16px;
+    }
+
+    @media (max-width: 480px) {
+        padding: 12px 12px 0 12px;
+        gap: 10px;
+    }
+`;
+
+const SearchForm = styled.form`
+    width: 100%;
+    display: flex;
+`;
+
+const SearchInputWrapper = styled.div`
+    position: relative;
+    width: 100%;
+`;
+
+const SearchInput = styled.input`
+    width: 100%;
+    height: 46px;
+    padding: 0 44px 0 16px;
+    border: 1px solid #d9d9d9;
+    border-radius: 12px;
+    font-size: 16px;
+    font-family: 'Pretendard';
+    color: #333333;
+    transition: all 0.2s ease;
+
+    &:focus {
+        outline: none;
+        border-color: #399982;
+        box-shadow: 0 0 0 3px rgba(57, 153, 130, 0.12);
+    }
+
+    &::placeholder {
+        color: #999999;
+    }
+
+    @media (max-width: 768px) {
+        height: 44px;
+    }
+
+    @media (max-width: 480px) {
+        height: 42px;
+        font-size: 15px;
+    }
+`;
+
+const SearchSubmitButton = styled.button`
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+
+    img {
+        width: 20px;
+        height: 20px;
+    }
+`;
+
+const FilterRow = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    @media (max-width: 480px) {
+        gap: 10px;
+    }
+`;
+
+const SortDropdown = styled.div`
+    position: relative;
+    flex: 1;
+    min-width: 0;
+`;
+
+const SortDropdownButton = styled.button`
+    width: 100%;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid #d9d9d9;
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: 'Pretendard';
+    color: #333333;
+    background: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease,
+        background 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+
+    &:focus {
+        outline: none;
+        border-color: #399982;
+        box-shadow: 0 0 0 3px rgba(57, 153, 130, 0.12);
+    }
+
+    &:hover {
+        background: #f8fffe;
+        border-color: #399982;
+    }
+
+    img {
+        width: 16px;
+        height: 16px;
+        transition: transform 0.2s ease;
+        transform: rotate(
+            ${(props) =>
+                props.$isOpen ? '180deg' : '0deg'}
+        );
+    }
+
+    @media (max-width: 768px) {
+        height: 44px;
+        padding: 0 12px;
+    }
+
+    @media (max-width: 480px) {
+        height: 42px;
+        font-size: 14px;
+    }
+`;
+
+const SortDropdownMenu = styled.div`
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(17, 17, 17, 0.12);
+    padding: 6px 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 30;
+`;
+
+const SortDropdownItem = styled.button`
+    width: 100%;
+    padding: 10px 16px;
+    text-align: left;
+    background: none;
+    border: none;
+    font-family: 'Pretendard';
+    font-weight: 500;
+    font-size: 14px;
+    color: ${(props) =>
+        props['aria-selected'] ? '#256857' : '#333333'};
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+
+    &:hover {
+        background: rgba(57, 153, 130, 0.08);
+        color: #256857;
+    }
+
+    &:active {
+        background: rgba(57, 153, 130, 0.14);
+        color: #174d3b;
+    }
+`;
+
+const FilterButton = styled.button`
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d9d9d9;
+    border-radius: 12px;
+    background: #ffffff;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+
+    &:focus {
+        outline: none;
+        border-color: #399982;
+        box-shadow: 0 0 0 3px rgba(57, 153, 130, 0.12);
+    }
+
+    &:hover {
+        background: #f8fffe;
+        border-color: #399982;
+    }
+
+    &:active {
+        background: #f0f8f6;
+    }
+
+    img {
+        width: 20px;
+        height: 20px;
+    }
+
+    @media (max-width: 768px) {
+        width: 44px;
+        height: 44px;
+    }
+
+    @media (max-width: 480px) {
+        width: 42px;
+        height: 42px;
+
+        img {
+            width: 18px;
+            height: 18px;
+        }
+    }
+`;
+
+const Divider = styled.div`
+    width: 100%;
+    height: 1px;
+    background: #f6f6f6;
+    margin: 20px 0 16px 0;
+
+    @media (max-width: 768px) {
+        margin: 18px 0 14px 0;
+    }
+
+    @media (max-width: 480px) {
+        margin: 16px 0 12px 0;
+    }
+`;
+
+const ListArea = styled.div`
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+    padding-bottom: 80px;
+
+    @media (max-width: 480px) {
+        padding-bottom: 80px;
+    }
+
+    @media (max-width: 360px) {
+        padding-bottom: 70px;
+    }
+
+    @supports (padding: max(0px)) {
+        padding-bottom: max(
+            80px,
+            calc(80px + env(safe-area-inset-bottom))
+        );
+
+        @media (max-width: 360px) {
+            padding-bottom: max(
+                70px,
+                calc(70px + env(safe-area-inset-bottom))
+            );
+        }
+    }
+`;
+
+const CenteredDiv = styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`;
+
+const EmptyMessage = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+`;
+
+const EmptyIcon = styled.div`
+    margin-bottom: 16px;
+    opacity: 0.6;
+`;
+
+const EmptyText = styled.div`
+    font-size: 18px;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 8px;
+
+    @media (max-width: 480px) {
+        font-size: 16px;
+    }
+`;
+
+const EmptySubText = styled.div`
+    font-size: 14px;
+    color: #999;
+
+    @media (max-width: 480px) {
+        font-size: 13px;
     }
 `;
