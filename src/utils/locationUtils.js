@@ -4,7 +4,7 @@
  */
 
 // 위치정보 획득 타임아웃
-const LOCATION_TIMEOUT = 5000;
+const LOCATION_TIMEOUT = 30000;
 
 /**
  * 네이티브 환경 여부를 판단하는 단순화된 함수
