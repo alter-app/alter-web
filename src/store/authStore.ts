@@ -1,12 +1,30 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, PersistOptions } from 'zustand/middleware';
 import {
     sendAuthDataToNative,
     sendLogoutToNative,
 } from '../utils/nativeAppBridge';
+import { AuthData } from '../types';
+
+interface AuthState {
+    // 인증 관련 상태
+    accessToken: string;
+    refreshToken: string;
+    authorizationId: string;
+    scope: string;
+    isLoggedIn: boolean;
+    showTokenExpiredModal: boolean;
+
+    // 액션
+    setAuth: (authData: AuthData) => void;
+    logout: () => void;
+    openTokenExpiredModal: () => void;
+    closeTokenExpiredModal: () => void;
+    initializeAuth: () => void;
+}
 
 const useAuthStore = create(
-    persist(
+    persist<AuthState>(
         (set, get) => ({
             // 인증 관련 상태
             accessToken: '',
@@ -17,7 +35,7 @@ const useAuthStore = create(
             showTokenExpiredModal: false,
 
             // 로그인 액션
-            setAuth: (authData) => {
+            setAuth: (authData: AuthData) => {
                 set({
                     accessToken: authData.accessToken,
                     refreshToken: authData.refreshToken,
@@ -79,15 +97,16 @@ const useAuthStore = create(
             name: 'auth-storage',
             getStorage: () => localStorage,
             // showTokenExpiredModal은 localStorage에 저장하지 않음
-            partialize: (state) => ({
+            partialize: (state: AuthState) => ({
                 accessToken: state.accessToken,
                 refreshToken: state.refreshToken,
                 authorizationId: state.authorizationId,
                 scope: state.scope,
                 isLoggedIn: state.isLoggedIn,
             }),
-        }
+        } as unknown as PersistOptions<AuthState, AuthState>
     )
 );
 
 export default useAuthStore;
+

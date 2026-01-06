@@ -1,14 +1,25 @@
 import { useState, useCallback } from 'react';
 import { getAddresses } from '../services/addressService';
 
+interface Address {
+    code: string;
+    name: string;
+}
+
+interface AddressResponse {
+    data: {
+        addresses: Address[];
+    };
+}
+
 const useAddressList = () => {
-    const [sidoList, setSidoList] = useState([]);
-    const [sigunguList, setSigunguList] = useState([]);
-    const [dongList, setDongList] = useState([]);
+    const [sidoList, setSidoList] = useState<Address[]>([]);
+    const [sigunguList, setSigunguList] = useState<Address[]>([]);
+    const [dongList, setDongList] = useState<Address[]>([]);
 
     const loadSidoList = useCallback(async () => {
         try {
-            const response = await getAddresses();
+            const response = await getAddresses() as AddressResponse;
             if (response?.data?.addresses) {
                 setSidoList(response.data.addresses);
             }
@@ -17,9 +28,9 @@ const useAddressList = () => {
         }
     }, []);
 
-    const loadSigunguList = useCallback(async (sidoCode) => {
+    const loadSigunguList = useCallback(async (sidoCode: string) => {
         try {
-            const response = await getAddresses(sidoCode);
+            const response = await getAddresses(sidoCode) as AddressResponse;
             if (response?.data?.addresses) {
                 setSigunguList(response.data.addresses);
             }
@@ -28,9 +39,9 @@ const useAddressList = () => {
         }
     }, []);
 
-    const loadDongList = useCallback(async (sigunguCode) => {
+    const loadDongList = useCallback(async (sigunguCode: string) => {
         try {
-            const response = await getAddresses(sigunguCode);
+            const response = await getAddresses(sigunguCode) as AddressResponse;
             if (response?.data?.addresses) {
                 setDongList(response.data.addresses);
             }

@@ -1,4 +1,4 @@
-export const genderToKorean = (gender) => {
+export const genderToKorean = (gender: string): string => {
     switch (gender) {
         case 'GENDER_MALE':
             return '남성';
@@ -8,3 +8,4 @@ export const genderToKorean = (gender) => {
             return '정보 없음';
     }
 };
+

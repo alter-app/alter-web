@@ -1,8 +1,14 @@
 // 페이지 라우팅 안전장치
 import { Navigate, useLocation } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
+import { ReactNode } from 'react';
 
-const ProtectedRoute = ({ children, requiredScope }) => {
+interface ProtectedRouteProps {
+    children: ReactNode;
+    requiredScope?: 'USER' | 'MANAGER';
+}
+
+const ProtectedRoute = ({ children, requiredScope }: ProtectedRouteProps) => {
     const { isLoggedIn, scope } = useAuthStore();
     const location = useLocation();
 
@@ -47,7 +53,8 @@ const ProtectedRoute = ({ children, requiredScope }) => {
         return <Navigate to='/job-lookup-map' replace />;
     }
 
-    return children;
+    return <>{children}</>;
 };
 
 export default ProtectedRoute;
+

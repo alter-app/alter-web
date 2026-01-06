@@ -56,7 +56,7 @@ function App() {
     // 앱 시작 시 인증 상태 초기화
     useEffect(() => {
         initializeAuth();
-    }, []);
+    }, [initializeAuth]);
 
     const handleTokenExpiredConfirm = () => {
         closeTokenExpiredModal();
@@ -365,3 +365,4 @@ function App() {
 }
 
 export default App;
+

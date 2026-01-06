@@ -1,21 +1,42 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
+interface PageInfo {
+    cursor?: string;
+    totalCount?: number;
+}
+
+interface ApiResponse<T> {
+    data: T[];
+    page?: PageInfo;
+}
+
+interface UseInfiniteScrollOptions<T> {
+    fetchFunction: (cursor: string) => Promise<ApiResponse<T>>;
+    dependencies?: unknown[];
+    enabled?: boolean;
+    initialLoad?: boolean;
+}
+
+interface UseInfiniteScrollReturn<T> {
+    items: T[];
+    hasMore: boolean;
+    totalCount: number;
+    loadMore: () => void;
+    reset: () => void;
+    isLoading: boolean;
+    cursor: string;
+}
+
 /**
  * InfiniteScroll과 페이지네이션 로직을 관리하는 커스텀 훅
- * @param {Object} options
- * @param {Function} options.fetchFunction - 데이터를 가져오는 함수 (cursor를 인자로 받음)
- * @param {Array} options.dependencies - fetchFunction이 의존하는 값들의 배열
- * @param {boolean} options.enabled - 훅이 활성화되어야 하는 조건 (기본값: true)
- * @param {boolean} options.initialLoad - 초기 로드 여부 (기본값: true)
- * @returns {Object} { items, hasMore, totalCount, loadMore, reset, isLoading }
  */
-const useInfiniteScroll = ({
+const useInfiniteScroll = <T,>({
     fetchFunction,
     dependencies = [],
     enabled = true,
     initialLoad = true,
-}) => {
-    const [items, setItems] = useState([]);
+}: UseInfiniteScrollOptions<T>): UseInfiniteScrollReturn<T> => {
+    const [items, setItems] = useState<T[]>([]);
     const [cursor, setCursor] = useState('');
     const [totalCount, setTotalCount] = useState(0);
     const [hasMore, setHasMore] = useState(true);
@@ -29,7 +50,7 @@ const useInfiniteScroll = ({
     }, [cursor]);
 
     const fetchData = useCallback(
-        async ({ reset = false } = {}) => {
+        async ({ reset = false }: { reset?: boolean } = {}) => {
             if (!enabled) return;
 
             setIsLoading(true);

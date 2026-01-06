@@ -7,12 +7,26 @@ import {
 import { chatSocketManager } from '../services/chatSocket';
 import { getChatMessages } from '../services/chatService';
 
+interface ChatMessage {
+    id?: string;
+    senderId?: string;
+    content: string;
+    isMine?: boolean;
+    createdAt?: string;
+}
+
+interface UseChatRoomOptions {
+    chatRoomId: string | null | undefined;
+    scope?: 'APP' | 'MANAGER';
+    opponentId?: string | number | null;
+}
+
 const useChatRoom = ({
     chatRoomId,
     scope = 'APP',
     opponentId,
-}) => {
-    const [messages, setMessages] = useState([]);
+}: UseChatRoomOptions) => {
+    const [messages, setMessages] = useState<ChatMessage[]>([]);
     const [cursor, setCursor] = useState('');
     const [hasMore, setHasMore] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
@@ -21,10 +35,10 @@ const useChatRoom = ({
     const cursorRef = useRef('');
     const hasMoreRef = useRef(true);
     const isLoadingRef = useRef(false);
-    const opponentIdRef = useRef(opponentId);
+    const opponentIdRef = useRef<string | number | null | undefined>(opponentId);
 
     const loadMessages = useCallback(
-        async ({ reset = false } = {}) => {
+        async ({ reset = false }: { reset?: boolean } = {}) => {
             if (!chatRoomId) return;
             if (isLoadingRef.current) return;
             if (!reset && !hasMoreRef.current) return;
@@ -40,7 +54,7 @@ const useChatRoom = ({
                     scope,
                 });
 
-                const fetchedMessages = response.data || [];
+                const fetchedMessages = (response.data || []) as ChatMessage[];
                 const nextCursor =
                     response.page?.cursor || '';
                 cursorRef.current = nextCursor;
@@ -91,7 +105,7 @@ const useChatRoom = ({
         if (!chatRoomId) return undefined;
         const unsubscribe = chatSocketManager.subscribe(
             chatRoomId,
-            (message) => {
+            (message: ChatMessage) => {
                 // WebSocket 메시지에 isMine이 없으면 opponentId와 비교해서 설정
                 if (
                     message.isMine === undefined &&
@@ -111,12 +125,12 @@ const useChatRoom = ({
     }, [chatRoomId]);
 
     const handleSendMessage = useCallback(
-        async (content) => {
+        async (content: string) => {
             if (!content || !content.trim()) return;
             setIsSending(true);
             try {
                 chatSocketManager.sendMessage({
-                    chatRoomId,
+                    chatRoomId: chatRoomId!,
                     content,
                     scope,
                 });
@@ -145,3 +159,4 @@ const useChatRoom = ({
 };
 
 export default useChatRoom;
+

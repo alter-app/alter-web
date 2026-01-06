@@ -1,4 +1,5 @@
 import apiClient from '../utils/apiClient';
+import { PostListParams, PostingApplyParams, ScrapParams, DeleteScrapParams, ScrapListParams } from '../types';
 
 // 공고 리스트 조회 로직
 export const getPostList = async ({
@@ -11,9 +12,9 @@ export const getPostList = async ({
     maxPayAmount = '',
     startTime = '',
     endTime = '',
-}) => {
+}: PostListParams = {}) => {
     try {
-        const params = {
+        const params: Record<string, string | number> = {
             cursor: cursorInfo,
             pageSize: 10,
         };
@@ -67,7 +68,7 @@ export const getPostList = async ({
 };
 
 // 공고 상세 조회 로직
-export const getPostDetail = async (id) => {
+export const getPostDetail = async (id: string | number) => {
     try {
         const response = await apiClient.get(
             `/app/postings/${id}`
@@ -82,7 +83,7 @@ export const getPostDetail = async (id) => {
 };
 
 // 공고 등록 로직
-export const postJobPosting = async (inputs) => {
+export const postJobPosting = async (inputs: unknown) => {
     try {
         const response = await apiClient.post(
             '/manager/postings',
@@ -117,7 +118,7 @@ export const postingApply = async ({
     postingId,
     description,
     postingScheduleId,
-}) => {
+}: PostingApplyParams) => {
     try {
         const response = await apiClient.post(
             `/app/postings/apply/${postingId}`,
@@ -137,7 +138,7 @@ export const postingApply = async ({
 };
 
 // 공고 스크랩 등록 로직
-export const addPostingScrap = async ({ postingId }) => {
+export const addPostingScrap = async ({ postingId }: ScrapParams) => {
     try {
         const response = await apiClient.post(
             `/app/users/me/postings/favorites/${postingId}`
@@ -155,7 +156,7 @@ export const addPostingScrap = async ({ postingId }) => {
 // 공고 스크랩 삭제 로직
 export const deletePostingScrap = async ({
     favoritePostingId,
-}) => {
+}: DeleteScrapParams) => {
     try {
         const response = await apiClient.delete(
             `/app/users/me/postings/favorites/${favoritePostingId}`
@@ -173,7 +174,7 @@ export const deletePostingScrap = async ({
 // 공고 스크랩 목록 조회 로직
 export const getPostingScrapList = async ({
     cursorInfo,
-}) => {
+}: ScrapListParams = {}) => {
     try {
         const response = await apiClient.get(
             '/app/users/me/postings/favorites',
@@ -193,3 +194,4 @@ export const getPostingScrapList = async ({
         );
     }
 };
+

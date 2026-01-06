@@ -1,11 +1,12 @@
 import axios from 'axios';
 import useAuthStore from '../store/authStore';
+import { TokenResponse } from '../types';
 
 const backend = import.meta.env.VITE_API_URL;
 
 // 토큰 재발급 함수
 // 주의: 이 함수는 apiClient를 사용하지 않고 직접 axios 사용 (무한 루프 방지)
-export const refreshAccessToken = async () => {
+export const refreshAccessToken = async (): Promise<TokenResponse> => {
     const { refreshToken, scope } = useAuthStore.getState();
 
     if (!refreshToken) {
@@ -17,7 +18,14 @@ export const refreshAccessToken = async () => {
 
     try {
         // apiClient를 사용하지 않고 직접 axios 사용 (interceptor 우회)
-        const response = await axios.post(
+        const response = await axios.post<{
+            data: {
+                accessToken: string;
+                refreshToken: string;
+                authorizationId: string;
+                scope: string;
+            };
+        }>(
             `${backend}/${basePath}/auth/token`,
             {},
             {
@@ -39,7 +47,7 @@ export const refreshAccessToken = async () => {
             accessToken,
             refreshToken: newRefreshToken,
             authorizationId,
-            scope: newScope,
+            scope: newScope as 'USER' | 'MANAGER',
         });
 
         return {

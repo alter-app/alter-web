@@ -3,20 +3,50 @@
  * Flutter WebView와 통신하기 위한 헬퍼 함수들
  */
 
+interface AuthData {
+    accessToken: string;
+    refreshToken: string;
+    authorizationId: string;
+    scope: string;
+}
+
+interface LocationData {
+    latitude: number;
+    longitude: number;
+    accuracy: number;
+    timestamp?: number;
+}
+
+declare global {
+    interface Window {
+        sendAuthDataToNative?: () => void;
+        onWebLogout?: () => void;
+        LocationChannel?: {
+            postMessage: (message: string) => void;
+        };
+        LogoutChannel?: {
+            postMessage: (message: string) => void;
+        };
+        ConsoleChannel?: {
+            postMessage: (message: string) => void;
+        };
+    }
+}
+
 /**
  * 네이티브 앱 환경인지 확인
- * @returns {boolean} 네이티브 앱 여부
+ * @returns 네이티브 앱 여부
  */
-export const isNativeApp = () => {
+export const isNativeApp = (): boolean => {
     const userAgent = navigator.userAgent || '';
     return userAgent.includes('alter-app-native');
 };
 
 /**
  * 로그인 성공 시 네이티브 앱에 인증 데이터 전송 및 FCM 토큰 등록
- * @param {Object} authData - 인증 데이터 (accessToken, refreshToken 등)
+ * @param authData - 인증 데이터 (accessToken, refreshToken 등)
  */
-export const sendAuthDataToNative = (authData) => {
+export const sendAuthDataToNative = (authData: AuthData): void => {
     if (!isNativeApp()) {
         console.log('[Native Bridge] 웹 환경에서는 네이티브 브릿지를 사용하지 않습니다.');
         return;
@@ -37,9 +67,9 @@ export const sendAuthDataToNative = (authData) => {
 
 /**
  * 위치 정보 요청
- * @returns {Promise<Object>} 위치 데이터
+ * @returns 위치 데이터
  */
-export const getCurrentLocation = () => {
+export const getCurrentLocation = (): Promise<LocationData> => {
     return new Promise((resolve, reject) => {
         if (!isNativeApp()) {
             reject(new Error('네이티브 앱 환경이 아닙니다.'));
@@ -52,15 +82,15 @@ export const getCurrentLocation = () => {
                 return;
             }
 
-            const handleLocationReceived = (event) => {
-                window.removeEventListener('locationReceived', handleLocationReceived);
+            const handleLocationReceived = (event: CustomEvent<LocationData>) => {
+                window.removeEventListener('locationReceived', handleLocationReceived as EventListener);
                 resolve(event.detail);
             };
 
-            window.addEventListener('locationReceived', handleLocationReceived);
+            window.addEventListener('locationReceived', handleLocationReceived as EventListener);
 
             setTimeout(() => {
-                window.removeEventListener('locationReceived', handleLocationReceived);
+                window.removeEventListener('locationReceived', handleLocationReceived as EventListener);
                 reject(new Error('위치 정보 요청 시간 초과'));
             }, 5000);
 
@@ -77,10 +107,10 @@ export const getCurrentLocation = () => {
 
 /**
  * 네이티브 로그 출력
- * @param {string} level - 로그 레벨 (log, error, warn, info, debug)
- * @param {string} message - 로그 메시지
+ * @param level - 로그 레벨 (log, error, warn, info, debug)
+ * @param message - 로그 메시지
  */
-export const nativeLog = (level = 'log', message = '') => {
+export const nativeLog = (level: string = 'log', message: string = ''): void => {
     if (!isNativeApp()) return;
 
     try {
@@ -98,7 +128,7 @@ export const nativeLog = (level = 'log', message = '') => {
     }
 };
 
-export const sendLogoutToNative = () => {
+export const sendLogoutToNative = (): void => {
     if (!isNativeApp()) {
         console.log('[Native Bridge] 웹 환경에서는 네이티브 브릿지를 사용하지 않습니다.');
         return;

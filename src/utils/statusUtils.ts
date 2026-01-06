@@ -1,5 +1,10 @@
+interface StatusStyle {
+    color: string;
+    background: string;
+}
+
 // statue 타입에 맞게 스타일 변경하는 함수
-export const statusToStyle = (status) => {
+export const statusToStyle = (status: string): StatusStyle => {
     switch (status) {
         case 'SUBMITTED':
             return {
@@ -45,7 +50,7 @@ export const statusToStyle = (status) => {
 };
 
 // 지원 상태를 한국어로 변환하는 함수
-export const statusToKorean = (status) => {
+export const statusToKorean = (status: string): string => {
     switch (status) {
         case 'SUBMITTED':
             return '지원됨';
@@ -65,3 +70,4 @@ export const statusToKorean = (status) => {
             return '알수없음';
     }
 };
+

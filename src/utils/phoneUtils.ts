@@ -1,5 +1,5 @@
 // 입력된 문자열을 한국 휴대폰 번호 형식(XXX-XXXX-XXXX)으로 변환합니다.
-export const formatPhoneNumber = (value) => {
+export const formatPhoneNumber = (value: string | number | null | undefined): string => {
     // 입력값이 없거나 유효하지 않으면 빈 문자열 반환
     if (!value) {
         return '';
@@ -22,7 +22,7 @@ export const formatPhoneNumber = (value) => {
 };
 
 // 입력된 문자열을 대한민국 E.164 형식 (+82...)으로 변환합니다.
-export const formatPhoneNumberToE164 = (value) => {
+export const formatPhoneNumberToE164 = (value: string | number | null | undefined): string => {
     if (!value) {
         return '';
     }
@@ -47,3 +47,4 @@ export const formatPhoneNumberToE164 = (value) => {
         return e164;
     }
 };
+

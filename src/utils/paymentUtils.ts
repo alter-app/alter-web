@@ -1,9 +1,9 @@
 /**
  * paymentType 값을 한국어로 변환
- * @param {string} type - 예: "HOURLY", "MONTHLY", "YEARLY" 등
- * @returns {string} - 예: "시급", "월급", "연봉" 등
+ * @param type - 예: "HOURLY", "MONTHLY", "YEARLY" 등
+ * @returns 예: "시급", "월급", "연봉" 등
  */
-export function paymentTypeToKorean(type) {
+export function paymentTypeToKorean(type: string): string {
     switch (type) {
         case 'HOURLY':
             return '시급';
@@ -19,10 +19,10 @@ export function paymentTypeToKorean(type) {
 }
 
 export function calculateHourlyWage(
-    payType,
-    value,
-    workHour
-) {
+    payType: string,
+    value: string | number,
+    workHour: string | number
+): number {
     const wage = Number(value);
     const hours = Number(workHour);
 
@@ -45,3 +45,4 @@ export function calculateHourlyWage(
             return 0;
     }
 }
+

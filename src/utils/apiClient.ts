@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import useAuthStore from '../store/authStore';
 import { refreshAccessToken } from '../services/refreshToken';
 
@@ -12,9 +12,14 @@ const apiClient = axios.create({
     },
 });
 
+interface FailedRequest {
+    resolve: (token: string) => void;
+    reject: (error: unknown) => void;
+}
+
 // 요청 interceptor: 모든 요청에 accessToken 추가
 apiClient.interceptors.request.use(
-    (config) => {
+    (config: InternalAxiosRequestConfig) => {
         config.headers = config.headers || {};
         const { accessToken } = useAuthStore.getState();
         if (accessToken) {
@@ -29,14 +34,14 @@ apiClient.interceptors.request.use(
 
 // 응답 interceptor: 401 에러 시 자동으로 refresh token 요청
 let isRefreshing = false;
-let failedQueue = [];
+let failedQueue: FailedRequest[] = [];
 
-const processQueue = (error, token = null) => {
+const processQueue = (error: unknown, token: string | null = null) => {
     failedQueue.forEach((prom) => {
         if (error) {
             prom.reject(error);
         } else {
-            prom.resolve(token);
+            prom.resolve(token!);
         }
     });
     failedQueue = [];
@@ -46,8 +51,8 @@ apiClient.interceptors.response.use(
     (response) => {
         return response;
     },
-    async (error) => {
-        const originalRequest = error.config;
+    async (error: AxiosError) => {
+        const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
         // 401 에러이고, refresh 요청이 아닌 경우에만 처리
         if (
@@ -57,7 +62,7 @@ apiClient.interceptors.response.use(
         ) {
             if (isRefreshing) {
                 // 이미 refresh 중이면 대기
-                return new Promise((resolve, reject) => {
+                return new Promise<string>((resolve, reject) => {
                     failedQueue.push({ resolve, reject });
                 })
                     .then((token) => {
@@ -99,3 +104,4 @@ apiClient.interceptors.response.use(
 );
 
 export default apiClient;
+

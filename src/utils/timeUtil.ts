@@ -1,5 +1,5 @@
 // 근무 시간 초 단위 자르는 함수
-export function formatTimeToHHMM(timeStr) {
+export function formatTimeToHHMM(timeStr: string): string {
     if (typeof timeStr !== 'string') return '';
     const parts = timeStr.split(':');
     if (parts.length < 2) return timeStr;
@@ -7,7 +7,7 @@ export function formatTimeToHHMM(timeStr) {
 }
 
 // 총 근무 시간 구하는 함수
-export function getWorkDuration(start, end) {
+export function getWorkDuration(start: string, end: string): string {
     // "09:00" 또는 "09:00:00" 형태 모두 지원
     const [sh, sm] = start.split(':').map(Number);
     const [eh, em] = end.split(':').map(Number);
@@ -17,7 +17,7 @@ export function getWorkDuration(start, end) {
     const endDate = new Date(0, 0, 0, eh, em);
 
     // 차이(ms) 계산
-    let diffMs = endDate - startDate;
+    let diffMs = endDate.getTime() - startDate.getTime();
     if (diffMs < 0) diffMs += 24 * 60 * 60 * 1000; // 자정 넘는 경우 보정
 
     const hours = Math.floor(diffMs / (1000 * 60 * 60));
@@ -34,10 +34,10 @@ export function getWorkDuration(start, end) {
 
 /**
  * ISO 형식의 날짜 문자열을 "~초 전", "~분 전", "~시간 전", "~일 전" 등으로 변환
- * @param {string} isoString - 예: "2025-05-19T23:07:55.55675"
- * @returns {string} - 한글 상대 시간 문자열
+ * @param isoString - 예: "2025-05-19T23:07:55.55675"
+ * @returns 한글 상대 시간 문자열
  */
-export function timeAgo(isoString) {
+export function timeAgo(isoString: string | null | undefined): string {
     if (!isoString) return '';
 
     // 소수점 이하 마이크로초가 6자리 넘는 경우 잘라내기
@@ -49,7 +49,7 @@ export function timeAgo(isoString) {
 
     const date = new Date(normalized);
     const now = new Date();
-    const diff = (now - date) / 1000; // 초 단위
+    const diff = (now.getTime() - date.getTime()) / 1000; // 초 단위
 
     if (diff < 60) {
         return `${Math.floor(diff)}초 전`;
@@ -62,7 +62,7 @@ export function timeAgo(isoString) {
     }
 }
 
-export function autoInsertColon(value) {
+export function autoInsertColon(value: string): string {
     // 숫자만 추출
     let numbers = value.replace(/\D/g, '').slice(0, 4);
 
@@ -82,7 +82,7 @@ export function autoInsertColon(value) {
 }
 
 // 가입일자 변환 함수
-export function formatJoinDate(isoString) {
+export function formatJoinDate(isoString: string): string {
     // 소수점 이하(마이크로초) 제거 및 Date 객체 생성
     const date = new Date(isoString.split('.')[0]);
     const year = date.getFullYear();
@@ -94,3 +94,4 @@ export function formatJoinDate(isoString) {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
+

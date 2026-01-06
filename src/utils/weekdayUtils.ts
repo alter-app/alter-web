@@ -1,6 +1,6 @@
 // 요일 관련 공용 상수 및 유틸리티 함수
 
-export const WEEKDAYS_KOR = {
+export const WEEKDAYS_KOR: Record<string, string> = {
     SUNDAY: '일',
     MONDAY: '월',
     TUESDAY: '화',
@@ -21,11 +21,12 @@ export const WEEKDAYS_KOR_ARRAY = [
 ];
 
 // 요일 키를 한국어로 변환하는 함수
-export const getWeekdayLabel = (weekdayKey) => {
+export const getWeekdayLabel = (weekdayKey: string): string => {
     return WEEKDAYS_KOR[weekdayKey] || weekdayKey;
 };
 
 // 요일 배열을 한국어 라벨로 변환하는 함수
-export const getWeekdayLabels = (weekdayKeys) => {
+export const getWeekdayLabels = (weekdayKeys: string[]): string[] => {
     return weekdayKeys.map(key => WEEKDAYS_KOR[key] || key);
 };
+
