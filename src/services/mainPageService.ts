@@ -1,7 +1,7 @@
 import apiClient from '../utils/apiClient';
 
 // 업장 목록 조회 로직
-export const getWorkplaceList = async () => {
+export const getWorkplaceList = async (): Promise<unknown> => {
     try {
         const response = await apiClient.get('/manager/workspaces');
         return response.data;
@@ -15,11 +15,11 @@ export const getWorkplaceList = async () => {
 
 // 지원자 목록 조회 로직
 export const getApplicants = async (
-    pageSize = 5,
-    status = null
-) => {
+    pageSize: number = 5,
+    status: string | null = null
+): Promise<unknown> => {
     try {
-        const params = { pageSize };
+        const params: Record<string, string | number> = { pageSize };
         if (status) {
             params.status = status;
         }
@@ -39,8 +39,8 @@ export const getApplicants = async (
 
 // 평판 요청 목록 조회 로직
 export const getReputationRequestList = async (
-    pageSize = 5
-) => {
+    pageSize: number = 5
+): Promise<unknown> => {
     try {
         const response = await apiClient.get('/manager/reputations/requests', {
             params: { pageSize },
@@ -54,3 +54,4 @@ export const getReputationRequestList = async (
         );
     }
 };
+

@@ -1,6 +1,16 @@
 import apiClient from '../utils/apiClient';
 
-const getBasePath = (scope) =>
+type Scope = 'APP' | 'MANAGER';
+
+interface RequestConfig {
+    path: string;
+    method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+    body?: unknown;
+    scope?: Scope;
+    params?: Record<string, unknown>;
+}
+
+const getBasePath = (scope: Scope): string =>
     scope === 'MANAGER' ? 'manager' : 'app';
 
 const request = async ({
@@ -9,9 +19,14 @@ const request = async ({
     body,
     scope = 'APP',
     params,
-}) => {
+}: RequestConfig): Promise<unknown> => {
     const basePath = getBasePath(scope);
-    const config = {
+    const config: {
+        method: string;
+        url: string;
+        data?: unknown;
+        params?: Record<string, unknown>;
+    } = {
         method,
         url: `/${basePath}/chat${path}`,
     };
@@ -28,17 +43,24 @@ const request = async ({
         const response = await apiClient(config);
         return response.data;
     } catch (error) {
+        const axiosError = error as { response?: { data?: { message?: string } }; message?: string };
         throw new Error(
-            error.response?.data?.message || error.message || '채팅 API 오류'
+            axiosError.response?.data?.message || axiosError.message || '채팅 API 오류'
         );
     }
 };
+
+interface CreateChatRoomParams {
+    opponentUserId: string | number;
+    opponentScope: Scope;
+    scope?: Scope;
+}
 
 export const createChatRoom = async ({
     opponentUserId,
     opponentScope,
     scope = 'APP',
-}) =>
+}: CreateChatRoomParams): Promise<unknown> =>
     request({
         path: '/rooms',
         method: 'POST',
@@ -49,12 +71,18 @@ export const createChatRoom = async ({
         },
     });
 
+interface GetChatRoomsParams {
+    cursor?: string | null;
+    pageSize?: number;
+    scope?: Scope;
+}
+
 export const getChatRooms = async ({
     cursor,
     pageSize = 10,
     scope = 'APP',
-}) => {
-    const params = {};
+}: GetChatRoomsParams): Promise<unknown> => {
+    const params: Record<string, string | number> = {};
     if (cursor) params.cursor = cursor;
     if (pageSize) params.pageSize = pageSize;
 
@@ -66,22 +94,34 @@ export const getChatRooms = async ({
     });
 };
 
+interface GetChatRoomDetailParams {
+    chatRoomId: string | number;
+    scope?: Scope;
+}
+
 export const getChatRoomDetail = async ({
     chatRoomId,
     scope = 'APP',
-}) =>
+}: GetChatRoomDetailParams): Promise<unknown> =>
     request({
         path: `/rooms/${chatRoomId}`,
         scope,
     });
+
+interface GetChatMessagesParams {
+    chatRoomId: string | number;
+    cursor?: string | null;
+    pageSize?: number;
+    scope?: Scope;
+}
 
 export const getChatMessages = async ({
     chatRoomId,
     cursor,
     pageSize = 20,
     scope = 'APP',
-}) => {
-    const params = {};
+}: GetChatMessagesParams): Promise<unknown> => {
+    const params: Record<string, string | number> = {};
     if (cursor) params.cursor = cursor;
     if (pageSize) params.pageSize = pageSize;
 
@@ -92,3 +132,4 @@ export const getChatMessages = async ({
         params,
     });
 };
+

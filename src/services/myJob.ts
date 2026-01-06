@@ -2,12 +2,12 @@ import apiClient from '../utils/apiClient';
 
 // 사용자 평판 요청 목록 조회 로직 (커서 페이징 지원)
 export const getUserReputationRequestsList = async (
-    pageSize = 10,
-    cursor = null,
-    status = 'REQUESTED'
-) => {
+    pageSize: number = 10,
+    cursor: string | null = null,
+    status: string = 'REQUESTED'
+): Promise<unknown> => {
     try {
-        const params = { status, pageSize };
+        const params: Record<string, string | number> = { status, pageSize };
         if (cursor) {
             params.cursor = cursor;
         }
@@ -24,7 +24,10 @@ export const getUserReputationRequestsList = async (
 };
 
 // 사용자용 평판 수락 및 작성 로직
-export const userSubmitReputation = async (requestId, keywordsPayload) => {
+export const userSubmitReputation = async (
+    requestId: string | number,
+    keywordsPayload: unknown
+): Promise<void> => {
     try {
         await apiClient.post(
             `/app/reputations/requests/${requestId}/accept`,
@@ -39,7 +42,9 @@ export const userSubmitReputation = async (requestId, keywordsPayload) => {
 };
 
 // 사용자용 평판 요청 거절 로직
-export const userDeclineReputation = async (requestId) => {
+export const userDeclineReputation = async (
+    requestId: string | number
+): Promise<void> => {
     try {
         await apiClient.patch(
             `/app/reputations/requests/${requestId}/decline`
@@ -51,10 +56,14 @@ export const userDeclineReputation = async (requestId) => {
 };
 
 // 근무 중인 업장 목록 조회 로직
-export const getUserWorkplaceList = async (pageSize) => {
+export const getUserWorkplaceList = async (pageSize?: number): Promise<unknown> => {
     try {
+        const params: Record<string, number> = {};
+        if (pageSize) {
+            params.pageSize = pageSize;
+        }
         const response = await apiClient.get('/app/users/me/workspaces', {
-            params: { pageSize },
+            params,
         });
 
         return response.data;
@@ -65,9 +74,12 @@ export const getUserWorkplaceList = async (pageSize) => {
 };
 
 // 사용자 스케줄 조회 로직
-export const getUserScheduleSelf = async (year = null, month = null) => {
+export const getUserScheduleSelf = async (
+    year: number | null = null,
+    month: number | null = null
+): Promise<unknown> => {
     try {
-        const params = {};
+        const params: Record<string, number> = {};
         if (year && month) {
             params.year = year;
             params.month = month;
@@ -85,7 +97,7 @@ export const getUserScheduleSelf = async (year = null, month = null) => {
 };
 
 // 사용자 계정 - 근무중인 업장의 점주/매니저 목록 조회
-export const getWorkplaceManagers = async (workplaceId) => {
+export const getWorkplaceManagers = async (workplaceId: string | number): Promise<unknown> => {
     try {
         const response = await apiClient.get(
             `/app/users/me/workspaces/${workplaceId}/managers`,
@@ -96,15 +108,16 @@ export const getWorkplaceManagers = async (workplaceId) => {
 
         return response.data;
     } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         console.error('점주/매니저 조회 오류:', error);
         throw new Error(
-            `점주/매니저 조회 중 오류가 발생했습니다: ${error.message}`
+            `점주/매니저 조회 중 오류가 발생했습니다: ${errorMessage}`
         );
     }
 };
 
 // 사용자 계정 - 근무중인 업장의 알바생 목록 조회
-export const getWorkplaceWorkers = async (workplaceId) => {
+export const getWorkplaceWorkers = async (workplaceId: string | number): Promise<unknown> => {
     try {
         const response = await apiClient.get(
             `/app/users/me/workspaces/${workplaceId}/workers`,
@@ -115,19 +128,20 @@ export const getWorkplaceWorkers = async (workplaceId) => {
 
         return response.data;
     } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         console.error('알바생 조회 오류:', error);
-        throw new Error(`알바생 조회 중 오류가 발생했습니다: ${error.message}`);
+        throw new Error(`알바생 조회 중 오류가 발생했습니다: ${errorMessage}`);
     }
 };
 
 // 업장 근무자 목록 조회 로직 (기존 함수 유지)
 export const getWorkplaceEmployees = async (
-    workplaceId,
-    pageSize = 10,
-    cursor = null
-) => {
+    workplaceId: string | number,
+    pageSize: number = 10,
+    cursor: string | null = null
+): Promise<unknown> => {
     try {
-        const params = { pageSize };
+        const params: Record<string, string | number> = { pageSize };
         if (cursor) {
             params.cursor = cursor;
         }
@@ -139,15 +153,20 @@ export const getWorkplaceEmployees = async (
 
         return response.data;
     } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         console.error('근무자 목록 조회 오류:', error);
         throw new Error(
-            `근무자 목록 조회 중 오류가 발생했습니다: ${error.message}`
+            `근무자 목록 조회 중 오류가 발생했습니다: ${errorMessage}`
         );
     }
 };
 
 // 업장별 스케줄 조회 로직
-export const getWorkplaceSchedule = async (workspaceId, year, month) => {
+export const getWorkplaceSchedule = async (
+    workspaceId: string | number,
+    year: number,
+    month: number
+): Promise<unknown> => {
     try {
         const response = await apiClient.get(
             `/app/schedules/workspaces/${workspaceId}`,
@@ -158,15 +177,19 @@ export const getWorkplaceSchedule = async (workspaceId, year, month) => {
 
         return response.data;
     } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
         console.error('업장 스케줄 조회 오류:', error);
         throw new Error(
-            `업장 스케줄 조회 중 오류가 발생했습니다: ${error.message}`
+            `업장 스케줄 조회 중 오류가 발생했습니다: ${errorMessage}`
         );
     }
 };
 
 // 사용자용 업장 평판 생성
-export const createWorkerReputation = async (workspaceId, keywordsPayload) => {
+export const createWorkerReputation = async (
+    workspaceId: string | number,
+    keywordsPayload: unknown
+): Promise<void> => {
     try {
         await apiClient.post('/app/reputations/requests/workspaces', {
             workspaceId: workspaceId,
@@ -180,12 +203,12 @@ export const createWorkerReputation = async (workspaceId, keywordsPayload) => {
 
 // 사용자가 보낸 평판 요청 목록 조회 (커서 페이징 지원)
 export const getUserSentReputationRequestsList = async (
-    pageSize = 10,
-    cursor = null,
-    status = null
-) => {
+    pageSize: number = 10,
+    cursor: string | null = null,
+    status: string | null = null
+): Promise<unknown> => {
     try {
-        const params = { pageSize };
+        const params: Record<string, string | number> = { pageSize };
         if (cursor) {
             params.cursor = cursor;
         }
@@ -205,7 +228,9 @@ export const getUserSentReputationRequestsList = async (
 };
 
 // 보낸 평판 요청 취소
-export const cancelSentReputationRequest = async (requestId) => {
+export const cancelSentReputationRequest = async (
+    requestId: string | number
+): Promise<void> => {
     try {
         await apiClient.patch(
             `/app/reputations/requests/sent/${requestId}/cancel`
@@ -217,7 +242,9 @@ export const cancelSentReputationRequest = async (requestId) => {
 };
 
 // 지원 취소 API
-export const cancelApplication = async (applicationId) => {
+export const cancelApplication = async (
+    applicationId: string | number
+): Promise<void> => {
     try {
         await apiClient.patch(
             `/app/users/me/postings/applications/${applicationId}/status`,
@@ -230,3 +257,4 @@ export const cancelApplication = async (applicationId) => {
         throw new Error('지원 취소 중 오류가 발생했습니다.');
     }
 };
+

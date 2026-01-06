@@ -1,9 +1,15 @@
 import styled from 'styled-components';
+import { InputHTMLAttributes } from 'react';
 
-const InputContainer = styled.input`
+interface InputContainerProps {
+    width?: string;
+    $borderColor?: string;
+}
+
+const InputContainer = styled.input<InputContainerProps>`
     width: 100%;
     height: 56px;
-    border: 1px solid #e5e5e5;
+    border: 1px solid ${({ $borderColor }) => $borderColor || '#e5e5e5'};
     border-radius: 12px;
     background-color: #f8f9fa;
     padding: 16px 20px;
@@ -42,6 +48,11 @@ const InputContainer = styled.input`
     }
 `;
 
+interface AuthInputProps extends InputHTMLAttributes<HTMLInputElement> {
+    width?: string;
+    borderColor?: string;
+}
+
 const AuthInput = ({
     width,
     borderColor,
@@ -49,7 +60,8 @@ const AuthInput = ({
     type,
     value,
     onChange,
-}) => (
+    ...props
+}: AuthInputProps) => (
     <InputContainer
         width={width}
         $borderColor={borderColor}
@@ -57,6 +69,7 @@ const AuthInput = ({
         type={type}
         value={value}
         onChange={onChange}
+        {...props}
     />
 );
 

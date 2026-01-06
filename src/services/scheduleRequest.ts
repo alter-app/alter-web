@@ -2,16 +2,16 @@ import apiClient from '../utils/apiClient';
 
 /**
  * 교환 가능한 스케줄 조회
- * @param {number} workspaceId - 업장 ID
- * @param {number} year - 조회할 연도
- * @param {number} month - 조회할 월
- * @returns {Promise} API 응답
+ * @param workspaceId - 업장 ID
+ * @param year - 조회할 연도
+ * @param month - 조회할 월
+ * @returns API 응답
  */
 export const getExchangeableSchedules = async (
-    workspaceId,
-    year,
-    month
-) => {
+    workspaceId: string | number,
+    year: number,
+    month: number
+): Promise<unknown> => {
     try {
         const response = await apiClient.get(
             `/app/workspaces/${workspaceId}/exchangeable-schedules`,
@@ -34,18 +34,18 @@ export const getExchangeableSchedules = async (
 
 /**
  * 보낸 대타 요청 목록 조회
- * @param {number} pageSize - 페이지 크기
- * @param {string} cursor - 커서
- * @param {string} status - 요청 상태 (PENDING, ACCEPTED, REJECTED_BY_TARGET, APPROVED, REJECTED_BY_APPROVER, CANCELLED, EXPIRED)
- * @returns {Promise} API 응답
+ * @param pageSize - 페이지 크기
+ * @param cursor - 커서
+ * @param status - 요청 상태 (PENDING, ACCEPTED, REJECTED_BY_TARGET, APPROVED, REJECTED_BY_APPROVER, CANCELLED, EXPIRED)
+ * @returns API 응답
  */
 export const getSentSubstituteRequests = async (
-    pageSize = 10,
-    cursor = null,
-    status = null
-) => {
+    pageSize: number = 10,
+    cursor: string | null = null,
+    status: string | null = null
+): Promise<unknown> => {
     try {
-        const params = { pageSize };
+        const params: Record<string, string | number> = { pageSize };
         if (cursor) {
             params.cursor = cursor;
         }
@@ -67,19 +67,22 @@ export const getSentSubstituteRequests = async (
     }
 };
 
+interface CreateSubstituteRequestData {
+    requestType: string;
+    targetId: string | number;
+    requestReason: string;
+}
+
 /**
  * 대타 요청 생성
- * @param {number} scheduleId - 스케줄 ID
- * @param {Object} data - 요청 데이터
- * @param {string} data.requestType - 요청 타입 (예: "ALL")
- * @param {number} data.targetId - 대상 ID (대타를 요청할 상대방)
- * @param {string} data.requestReason - 요청 사유
- * @returns {Promise} API 응답
+ * @param scheduleId - 스케줄 ID
+ * @param data - 요청 데이터
+ * @returns API 응답
  */
 export const createSubstituteRequest = async (
-    scheduleId,
-    data
-) => {
+    scheduleId: string | number,
+    data: CreateSubstituteRequestData
+): Promise<unknown> => {
     try {
         const response = await apiClient.post(
             `/app/schedules/${scheduleId}/substitute-requests`,
@@ -94,12 +97,12 @@ export const createSubstituteRequest = async (
 
 /**
  * 보낸 대타 요청 취소
- * @param {number} requestId - 대타 요청 ID
- * @returns {Promise} API 응답
+ * @param requestId - 대타 요청 ID
+ * @returns API 응답
  */
 export const cancelSubstituteRequest = async (
-    requestId
-) => {
+    requestId: string | number
+): Promise<unknown> => {
     try {
         const response = await apiClient.delete(
             `/app/users/me/substitute-requests/${requestId}`
@@ -113,18 +116,18 @@ export const cancelSubstituteRequest = async (
 
 /**
  * 받은 대타 요청 목록 조회
- * @param {number} pageSize - 페이지 크기
- * @param {string} cursor - 커서
- * @param {string} status - 요청 상태 (PENDING, ACCEPTED, REJECTED_BY_TARGET, APPROVED, REJECTED_BY_APPROVER, CANCELLED, EXPIRED)
- * @returns {Promise} API 응답
+ * @param pageSize - 페이지 크기
+ * @param cursor - 커서
+ * @param status - 요청 상태 (PENDING, ACCEPTED, REJECTED_BY_TARGET, APPROVED, REJECTED_BY_APPROVER, CANCELLED, EXPIRED)
+ * @returns API 응답
  */
 export const getReceivedSubstituteRequests = async (
-    pageSize = 10,
-    cursor = null,
-    status = null
-) => {
+    pageSize: number = 10,
+    cursor: string | null = null,
+    status: string | null = null
+): Promise<unknown> => {
     try {
-        const params = { pageSize };
+        const params: Record<string, string | number> = { pageSize };
         if (cursor) {
             params.cursor = cursor;
         }
@@ -148,12 +151,12 @@ export const getReceivedSubstituteRequests = async (
 
 /**
  * 받은 대타 요청 수락
- * @param {number} requestId - 대타 요청 ID
- * @returns {Promise} API 응답
+ * @param requestId - 대타 요청 ID
+ * @returns API 응답
  */
 export const acceptSubstituteRequest = async (
-    requestId
-) => {
+    requestId: string | number
+): Promise<unknown> => {
     try {
         const response = await apiClient.post(
             `/app/substitute-requests/${requestId}/accept`,
@@ -168,14 +171,14 @@ export const acceptSubstituteRequest = async (
 
 /**
  * 받은 대타 요청 거절
- * @param {number} requestId - 대타 요청 ID
- * @param {string} rejectionReason - 거절 사유
- * @returns {Promise} API 응답
+ * @param requestId - 대타 요청 ID
+ * @param rejectionReason - 거절 사유
+ * @returns API 응답
  */
 export const rejectSubstituteRequest = async (
-    requestId,
-    rejectionReason = '개인 사정으로 인한 거절'
-) => {
+    requestId: string | number,
+    rejectionReason: string = '개인 사정으로 인한 거절'
+): Promise<unknown> => {
     try {
         const response = await apiClient.post(
             `/app/substitute-requests/${requestId}/reject`,
@@ -189,3 +192,4 @@ export const rejectSubstituteRequest = async (
         throw error;
     }
 };
+

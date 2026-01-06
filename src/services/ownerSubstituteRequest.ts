@@ -2,18 +2,18 @@ import apiClient from '../utils/apiClient';
 
 /**
  * Owner 대타 요청 목록 조회
- * @param {number} pageSize - 페이지 크기
- * @param {string} cursor - 커서
- * @param {string} status - 요청 상태 (PENDING, ACCEPTED, REJECTED_BY_TARGET, APPROVED, REJECTED_BY_APPROVER, CANCELLED, EXPIRED)
- * @returns {Promise} API 응답
+ * @param pageSize - 페이지 크기
+ * @param cursor - 커서
+ * @param status - 요청 상태 (PENDING, ACCEPTED, REJECTED_BY_TARGET, APPROVED, REJECTED_BY_APPROVER, CANCELLED, EXPIRED)
+ * @returns API 응답
  */
 export const getOwnerSubstituteRequests = async (
-    pageSize = 10,
-    cursor = null,
-    status = null
-) => {
+    pageSize: number = 10,
+    cursor: string | null = null,
+    status: string | null = null
+): Promise<unknown> => {
     try {
-        const params = { pageSize };
+        const params: Record<string, string | number> = { pageSize };
         if (cursor) {
             params.cursor = cursor;
         }
@@ -37,14 +37,14 @@ export const getOwnerSubstituteRequests = async (
 
 /**
  * Owner 대타 요청 승인
- * @param {number} requestId - 대타 요청 ID
- * @param {string} approvalComment - 승인 코멘트
- * @returns {Promise} API 응답
+ * @param requestId - 대타 요청 ID
+ * @param approvalComment - 승인 코멘트
+ * @returns API 응답
  */
 export const approveOwnerSubstituteRequest = async (
-    requestId,
-    approvalComment = '승인합니다'
-) => {
+    requestId: string | number,
+    approvalComment: string = '승인합니다'
+): Promise<unknown> => {
     try {
         const response = await apiClient.post(
             `/manager/substitute-requests/${requestId}/approve`,
@@ -61,14 +61,14 @@ export const approveOwnerSubstituteRequest = async (
 
 /**
  * Owner 대타 요청 거절
- * @param {number} requestId - 대타 요청 ID
- * @param {string} approverRejectionReason - 승인자 거절 사유
- * @returns {Promise} API 응답
+ * @param requestId - 대타 요청 ID
+ * @param approverRejectionReason - 승인자 거절 사유
+ * @returns API 응답
  */
 export const rejectOwnerSubstituteRequest = async (
-    requestId,
-    approverRejectionReason = '승인 불가'
-) => {
+    requestId: string | number,
+    approverRejectionReason: string = '승인 불가'
+): Promise<unknown> => {
     try {
         const response = await apiClient.post(
             `/manager/substitute-requests/${requestId}/reject`,
@@ -83,3 +83,4 @@ export const rejectOwnerSubstituteRequest = async (
         throw error;
     }
 };
+

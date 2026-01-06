@@ -1,7 +1,7 @@
 import apiClient from '../utils/apiClient';
 
 // 사용자 평판 키워드 조회 (APP scope)
-export const getUserReputationKeywords = async () => {
+export const getUserReputationKeywords = async (): Promise<unknown> => {
     try {
         const response = await apiClient.get('/app/reputations/keywords', {
             params: { keywordType: 'REPU_TO_WORK' },
@@ -15,7 +15,7 @@ export const getUserReputationKeywords = async () => {
 };
 
 // 매니저 평판 키워드 조회 (MANAGER scope)
-export const getManagerReputationKeywords = async () => {
+export const getManagerReputationKeywords = async (): Promise<unknown> => {
     try {
         const response = await apiClient.get('/manager/reputations/keywords', {
             params: { keywordType: 'REPU_TO_USER' },
@@ -29,7 +29,10 @@ export const getManagerReputationKeywords = async () => {
 };
 
 // 평판 수락 및 작성 로직
-export const submitReputation = async (requestId, keywordsPayload) => {
+export const submitReputation = async (
+    requestId: string | number,
+    keywordsPayload: unknown
+): Promise<void> => {
     try {
         await apiClient.post(
             `/manager/reputations/requests/${requestId}/accept`,
@@ -44,7 +47,9 @@ export const submitReputation = async (requestId, keywordsPayload) => {
 };
 
 // 평판 요청 거절 로직
-export const declineReputation = async (requestId) => {
+export const declineReputation = async (
+    requestId: string | number
+): Promise<void> => {
     try {
         await apiClient.patch(
             `/manager/reputations/requests/${requestId}/decline`
@@ -54,3 +59,4 @@ export const declineReputation = async (requestId) => {
         throw new Error('평판 요청 거절 중 오류가 발생했습니다.');
     }
 };
+

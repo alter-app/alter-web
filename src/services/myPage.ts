@@ -1,7 +1,11 @@
 import apiClient from '../utils/apiClient';
 
+interface GetScrapPostListParams {
+    cursorInfo?: string | null;
+}
+
 // 공고 스크랩 리스트 목록 조회 로직
-export const getScrapPostList = async ({ cursorInfo }) => {
+export const getScrapPostList = async ({ cursorInfo }: GetScrapPostListParams): Promise<unknown> => {
     try {
         const response = await apiClient.get('/app/users/me/postings/favorites', {
             params: {
@@ -22,14 +26,20 @@ export const getScrapPostList = async ({ cursorInfo }) => {
     }
 };
 
+interface GetApplicationListParams {
+    pageSize?: number;
+    cursor?: string | null;
+    status?: string[] | null;
+}
+
 // 공고 지원 목록 조회 로직 (커서 페이징 및 상태 필터링 지원)
 export const getApplicationList = async ({
     pageSize = 10,
     cursor = null,
     status = null,
-}) => {
+}: GetApplicationListParams): Promise<unknown> => {
     try {
-        const params = { pageSize };
+        const params: Record<string, string | number | string[]> = { pageSize };
         if (cursor) {
             params.cursor = cursor;
         }
@@ -52,7 +62,7 @@ export const getApplicationList = async ({
                                 searchParams.append(key, item);
                             });
                         } else if (value !== null && value !== undefined) {
-                            searchParams.append(key, value);
+                            searchParams.append(key, String(value));
                         }
                     });
                     return searchParams.toString();
@@ -69,10 +79,14 @@ export const getApplicationList = async ({
     }
 };
 
+interface CancelApplicationParams {
+    applicationId: string | number;
+}
+
 // 공고 지원 취소 로직
 export const cancelApplication = async ({
     applicationId,
-}) => {
+}: CancelApplicationParams): Promise<unknown> => {
     try {
         const response = await apiClient.patch(
             `/app/users/me/postings/applications/${applicationId}/status`,
@@ -91,7 +105,7 @@ export const cancelApplication = async ({
 };
 
 // 사용자 정보 조회 로직
-export const getUserInfo = async () => {
+export const getUserInfo = async (): Promise<unknown> => {
     try {
         const response = await apiClient.get('/app/users/me');
         return response.data;
@@ -104,7 +118,7 @@ export const getUserInfo = async () => {
 };
 
 // 자격 정보 목록 조회 로직
-export const getCertificates = async () => {
+export const getCertificates = async (): Promise<unknown> => {
     try {
         const response = await apiClient.get('/app/users/me/certificates');
         return response.data;
@@ -116,10 +130,14 @@ export const getCertificates = async () => {
     }
 };
 
+interface DeleteCertificatesParams {
+    certificateId: string | number;
+}
+
 // 자격 정보 삭제 로직
 export const deleteCertificates = async ({
     certificateId,
-}) => {
+}: DeleteCertificatesParams): Promise<unknown> => {
     try {
         const response = await apiClient.delete(
             `/app/users/me/certificates/${certificateId}`
@@ -135,11 +153,11 @@ export const deleteCertificates = async ({
 };
 
 // 자격 정보 등록 로직
-export const addCertificates = async (addCertificate) => {
+export const addCertificates = async (addCertificate: unknown): Promise<unknown> => {
     try {
         const response = await apiClient.post('/app/users/me/certificates', {
             type: 'CERTIFICATE',
-            ...addCertificate,
+            ...(addCertificate as Record<string, unknown>),
         });
 
         return response.data;
@@ -153,15 +171,15 @@ export const addCertificates = async (addCertificate) => {
 
 // 자격 정보 수정 로직
 export const eidtCertificates = async (
-    editCertificate,
-    certificateId
-) => {
+    editCertificate: unknown,
+    certificateId: string | number
+): Promise<unknown> => {
     try {
         const response = await apiClient.put(
             `/app/users/me/certificates/${certificateId}`,
             {
                 type: 'CERTIFICATE',
-                ...editCertificate,
+                ...(editCertificate as Record<string, unknown>),
             }
         );
 
@@ -176,8 +194,8 @@ export const eidtCertificates = async (
 
 // 자격 정보 상세 조회 로직
 export const getCertificateDetail = async (
-    certificateId
-) => {
+    certificateId: string | number
+): Promise<unknown> => {
     try {
         const response = await apiClient.get(
             `/app/users/me/certificates/${certificateId}`
@@ -191,3 +209,4 @@ export const getCertificateDetail = async (
         );
     }
 };
+

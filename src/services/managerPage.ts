@@ -1,7 +1,7 @@
 import apiClient from '../utils/apiClient';
 
 // 매니저 정보 조회 로직
-export const getManagerInfo = async () => {
+export const getManagerInfo = async (): Promise<unknown> => {
     try {
         const response = await apiClient.get('/manager/me');
         return response.data;
@@ -13,22 +13,36 @@ export const getManagerInfo = async () => {
     }
 };
 
+interface GetPostingsApplicationsParams {
+    cursorInfo?: string | null;
+    checkedWorkplaceId?: string | number | null;
+    checkedStatusId?: string | null;
+}
+
 // 공고 지원 목록 조회 로직
 export const getPostingsApplications = async ({
     cursorInfo,
     checkedWorkplaceId,
     checkedStatusId,
-}) => {
+}: GetPostingsApplicationsParams): Promise<unknown> => {
     try {
+        const params: Record<string, string | number> = {
+            pageSize: 10,
+        };
+        if (cursorInfo) {
+            params.cursor = cursorInfo;
+        }
+        if (checkedWorkplaceId) {
+            params.workspaceId = checkedWorkplaceId;
+        }
+        if (checkedStatusId) {
+            params.status = checkedStatusId;
+        }
+
         const response = await apiClient.get(
             '/manager/postings/applications',
             {
-                params: {
-                    cursor: cursorInfo,
-                    pageSize: 10,
-                    workspaceId: checkedWorkplaceId,
-                    status: checkedStatusId,
-                },
+                params,
             }
         );
 
@@ -43,8 +57,8 @@ export const getPostingsApplications = async ({
 
 // 공고 지원 상세 조회 로직
 export const getPostingsApplicationDetail = async (
-    postingApplicationId
-) => {
+    postingApplicationId: string | number
+): Promise<unknown> => {
     try {
         const response = await apiClient.get(
             `/manager/postings/applications/${postingApplicationId}`
@@ -59,11 +73,16 @@ export const getPostingsApplicationDetail = async (
     }
 };
 
+interface UpdateApplicationStatusParams {
+    postingApplicationId: string | number;
+    status: string;
+}
+
 // 공고 지원 상태 변경 로직
 export const updateApplicationStatus = async ({
     postingApplicationId,
     status,
-}) => {
+}: UpdateApplicationStatusParams): Promise<unknown> => {
     try {
         const response = await apiClient.patch(
             `/manager/postings/applications/${postingApplicationId}/status`,
@@ -82,12 +101,18 @@ export const updateApplicationStatus = async ({
     }
 };
 
+interface GetSentReputationRequestsParams {
+    cursorInfo?: string | null;
+    status?: string[];
+    pageSize?: number;
+}
+
 // 보낸 평판 요청 목록 조회
 export const getSentReputationRequests = async ({
     cursorInfo,
     status,
     pageSize = 10,
-}) => {
+}: GetSentReputationRequestsParams): Promise<unknown> => {
     try {
         const statusParam =
             status && status.length > 0 ? status[0] : '';
@@ -116,8 +141,8 @@ export const getSentReputationRequests = async ({
 
 // 보낸 평판 요청 취소
 export const cancelReputationRequest = async (
-    requestId
-) => {
+    requestId: string | number
+): Promise<unknown> => {
     try {
         const response = await apiClient.patch(
             `/manager/reputations/requests/sent/${requestId}/cancel`
@@ -132,15 +157,21 @@ export const cancelReputationRequest = async (
     }
 };
 
+interface GetManagerReputationRequestsParams {
+    cursorInfo?: string | null;
+    pageSize?: number;
+    status?: string[];
+}
+
 // 받은 평판 요청 목록 조회
 export const getManagerReputationRequests = async ({
     cursorInfo,
     pageSize = 10,
     status = [],
-}) => {
+}: GetManagerReputationRequestsParams): Promise<unknown> => {
     try {
-        const params = {
-            cursor: cursorInfo,
+        const params: Record<string, string | number> = {
+            cursor: cursorInfo || '',
             pageSize,
         };
         if (status.length > 0) {
@@ -164,12 +195,18 @@ export const getManagerReputationRequests = async ({
     }
 };
 
+interface CreateWorkerReputationByManagerParams {
+    workspaceId: string | number;
+    targetUserId: string | number;
+    keywordsPayload: unknown;
+}
+
 // 근무자에게 평판 생성
 export const createWorkerReputationByManager = async ({
     workspaceId,
     targetUserId,
     keywordsPayload,
-}) => {
+}: CreateWorkerReputationByManagerParams): Promise<unknown> => {
     try {
         const response = await apiClient.post(
             '/manager/reputations/requests/users',
@@ -189,3 +226,4 @@ export const createWorkerReputationByManager = async ({
         );
     }
 };
+

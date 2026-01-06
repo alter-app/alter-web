@@ -1,9 +1,9 @@
 import apiClient from '../utils/apiClient';
 
 // 행정구역 주소 조회 로직
-export const getAddresses = async (code = '') => {
+export const getAddresses = async (code: string = ''): Promise<unknown> => {
     try {
-        const params = {};
+        const params: Record<string, string> = {};
         if (code) {
             params.code = code;
         }

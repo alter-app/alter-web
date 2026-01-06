@@ -1,4 +1,4 @@
-import { Client } from '@stomp/stompjs';
+import { Client, IMessage } from '@stomp/stompjs';
 import useAuthStore from '../store/authStore';
 
 const WS_URL =
@@ -10,16 +10,24 @@ const WS_URL =
           ) + '/ws-connect'
         : '');
 
-class ChatSocketManager {
-    constructor() {
-        this.client = null;
-        this.connected = false;
-        this.subscriptions = new Map();
-        this.pendingSubscriptions = [];
-        this.currentToken = '';
-    }
+interface ChatMessage {
+    id?: string;
+    senderId?: string;
+    content: string;
+    isMine?: boolean;
+    createdAt?: string;
+}
 
-    ensureConnected() {
+type Scope = 'APP' | 'MANAGER';
+
+class ChatSocketManager {
+    private client: Client | null = null;
+    private connected: boolean = false;
+    private subscriptions: Map<string | number, { unsubscribe: () => void }> = new Map();
+    private pendingSubscriptions: (() => void)[] = [];
+    private currentToken: string = '';
+
+    ensureConnected(): void {
         const accessToken =
             useAuthStore.getState().accessToken;
         if (!accessToken || !WS_URL) {
@@ -66,7 +74,7 @@ class ChatSocketManager {
                     frame.headers['message']
                 );
             },
-            onWebSocketError: (event) => {
+            onWebSocketError: (event: Event) => {
                 console.error('WebSocket 에러:', event);
             },
         });
@@ -74,7 +82,7 @@ class ChatSocketManager {
         this.client.activate();
     }
 
-    subscribe(chatRoomId, onMessage) {
+    subscribe(chatRoomId: string | number | null | undefined, onMessage: (message: ChatMessage) => void): () => void {
         if (!chatRoomId) return () => {};
 
         this.ensureConnected();
@@ -83,11 +91,11 @@ class ChatSocketManager {
             if (!this.client || !this.connected) return;
             const subscription = this.client.subscribe(
                 `/sub/chat.${chatRoomId}`,
-                (message) => {
+                (message: IMessage) => {
                     try {
                         const payload = JSON.parse(
                             message.body
-                        );
+                        ) as ChatMessage;
                         onMessage(payload);
                     } catch (error) {
                         console.error(
@@ -112,7 +120,7 @@ class ChatSocketManager {
         return () => this.unsubscribe(chatRoomId);
     }
 
-    unsubscribe(chatRoomId) {
+    unsubscribe(chatRoomId: string | number): void {
         const subscription =
             this.subscriptions.get(chatRoomId);
         if (subscription) {
@@ -121,7 +129,7 @@ class ChatSocketManager {
         }
     }
 
-    sendMessage({ chatRoomId, content, scope = 'APP' }) {
+    sendMessage({ chatRoomId, content, scope = 'APP' }: { chatRoomId: string | number; content: string; scope?: Scope }): void {
         if (!content || !content.trim()) return;
         this.ensureConnected();
         if (!this.client || !this.connected) {
@@ -142,7 +150,7 @@ class ChatSocketManager {
         });
     }
 
-    disconnect() {
+    disconnect(): void {
         this.subscriptions.forEach((subscription) =>
             subscription.unsubscribe()
         );
@@ -157,3 +165,4 @@ class ChatSocketManager {
 }
 
 export const chatSocketManager = new ChatSocketManager();
+
