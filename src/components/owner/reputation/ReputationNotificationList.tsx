@@ -5,10 +5,29 @@ import { useState, useEffect } from 'react';
 import { getReputationRequestList } from '../../../services/mainPageService';
 import { timeAgo } from '../../../utils/timeUtil';
 
+interface ReputationRequest {
+    id: string | number;
+    workspace?: {
+        businessName?: string;
+        [key: string]: unknown;
+    };
+    requester?: {
+        name?: string;
+        [key: string]: unknown;
+    };
+    createdAt?: string;
+    status?: {
+        value?: string;
+        description?: string;
+        [key: string]: unknown;
+    };
+    [key: string]: unknown;
+}
+
 const ReputationNotificationList = () => {
     const navigate = useNavigate();
     const [reputationRequest, setReputationRequest] =
-        useState([]);
+        useState<ReputationRequest[]>([]);
 
     useEffect(() => {
         fetchData();
@@ -18,10 +37,10 @@ const ReputationNotificationList = () => {
         try {
             const result = await getReputationRequestList(
                 3
-            );
-            setReputationRequest(result.data);
+            ) as { data?: unknown[]; [key: string]: unknown };
+            setReputationRequest((result.data || []) as ReputationRequest[]);
             console.log(result.data);
-        } catch (error) {
+        } catch (error: unknown) {
             console.error(
                 '평판 요청 목록 조회 오류:',
                 error
@@ -45,7 +64,7 @@ const ReputationNotificationList = () => {
                 <CardList>
                     {reputationRequest
                         .slice(0, 3)
-                        .map((item) => (
+                        .map((item: ReputationRequest) => (
                             <ReputationNotificationItem
                                 key={item.id}
                                 id={item.id}
@@ -59,9 +78,15 @@ const ReputationNotificationList = () => {
                                     '알 수 없음'
                                 }
                                 timeAgo={timeAgo(
-                                    item.createdAt
+                                    item.createdAt || ''
                                 )}
                                 status={item.status}
+                                onAccept={() => {
+                                    // Handle accept
+                                }}
+                                onReject={() => {
+                                    // Handle reject
+                                }}
                             />
                         ))}
                 </CardList>

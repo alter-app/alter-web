@@ -1,16 +1,30 @@
 import styled from 'styled-components';
 
+interface Keyword {
+    id: string | number;
+    emoji?: string;
+    description?: string;
+    [key: string]: unknown;
+}
+
+interface EpisodeInputCardProps {
+    selectedIds: (string | number)[];
+    allKeywords: Keyword[];
+    episodeInputs: Record<string | number, string>;
+    onInputChange: (id: string | number, value: string) => void;
+}
+
 const EpisodeInputCard = ({
     selectedIds,
     allKeywords,
     episodeInputs,
     onInputChange,
-}) => {
+}: EpisodeInputCardProps) => {
     return (
         <EpisodeInputSection>
-            {selectedIds.map((id) => {
+            {selectedIds.map((id: string | number) => {
                 const keyword = allKeywords.find(
-                    (k) => k.id === id
+                    (k: Keyword) => k.id === id
                 );
                 if (!keyword) return null;
                 return (

@@ -4,6 +4,19 @@ import GenderSelector from './GenderSelector';
 import styled from 'styled-components';
 import { formatPhoneNumber } from '../../utils/phoneUtils';
 
+interface SignUpStep1Props {
+    name: string;
+    setName: (value: string) => void;
+    phone: string;
+    setPhone: (value: string) => void;
+    birth: string;
+    setBirth: (value: string) => void;
+    gender: string;
+    setGender: (value: string) => void;
+    isValid: boolean;
+    onNext: () => void;
+}
+
 const SignUpStep1 = ({
     name,
     setName,
@@ -15,7 +28,7 @@ const SignUpStep1 = ({
     setGender,
     isValid,
     onNext,
-}) => (
+}: SignUpStep1Props) => (
     <Container>
         <InfoTitle>회원님의 정보를 알려주세요!</InfoTitle>
         <InfoDesc>

@@ -7,18 +7,35 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 dayjs.locale('ko');
 dayjs.extend(customParseFormat);
 
+interface ChatMessage {
+    id: string | number;
+    content?: string;
+    createdAt?: string;
+    senderId?: string | number;
+    senderName?: string;
+    isMine?: boolean;
+    [key: string]: unknown;
+}
+
+interface ChatMessageListProps {
+    messages: ChatMessage[];
+    onLoadMore?: () => void;
+    hasMore?: boolean;
+    isLoading?: boolean;
+}
+
 const ChatMessageList = ({
     messages,
     onLoadMore,
     hasMore,
     isLoading,
-}) => {
-    const listRef = useRef(null);
+}: ChatMessageListProps) => {
+    const listRef = useRef<HTMLDivElement>(null);
     const prevMessagesLengthRef = useRef(0);
     const isScrolledToBottomRef = useRef(true);
     const shouldAutoScrollRef = useRef(true);
 
-    const checkIfScrolledToBottom = (element) => {
+    const checkIfScrolledToBottom = (element: HTMLElement): boolean => {
         const threshold = 100; // 100px 이내면 맨 아래로 간주
         return (
             element.scrollHeight -
@@ -28,7 +45,7 @@ const ChatMessageList = ({
         );
     };
 
-    const handleScroll = (event) => {
+    const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
         const element = event.currentTarget;
         isScrolledToBottomRef.current =
             checkIfScrolledToBottom(element);
@@ -172,7 +189,19 @@ const MessageListContainer = styled.div`
     background: #f7f8fa;
 `;
 
-const MessageWrapper = styled.div`
+interface MessageWrapperProps {
+    $isMine?: boolean;
+}
+
+interface MessageBubbleProps {
+    $isMine?: boolean;
+}
+
+interface MessageTimestampProps {
+    $isMine?: boolean;
+}
+
+const MessageWrapper = styled.div<MessageWrapperProps>`
     display: flex;
     flex-direction: row;
     align-items: flex-end;
@@ -182,7 +211,7 @@ const MessageWrapper = styled.div`
     max-width: 80%;
 `;
 
-const MessageBubble = styled.div`
+const MessageBubble = styled.div<MessageBubbleProps>`
     padding: 12px 14px;
     border-radius: ${(props) =>
         props.$isMine
@@ -205,7 +234,7 @@ const MessageContent = styled.span`
     white-space: pre-wrap;
 `;
 
-const MessageTimestamp = styled.span`
+const MessageTimestamp = styled.span<MessageTimestampProps>`
     font-family: 'Pretendard';
     font-size: 12px;
     color: #999999;

@@ -2,6 +2,25 @@ import styled from 'styled-components';
 import { useState } from 'react';
 import ConfirmModal from '../../shared/ConfirmModal';
 
+interface OwnerSubstituteRequestCardProps {
+    substituteRequestId: string | number;
+    scheduleId: string | number;
+    startDateTime?: string;
+    endDateTime?: string;
+    position?: string;
+    requesterName?: string;
+    requestType?: string;
+    acceptedWorkerName?: string;
+    status?: string;
+    statusDescription?: string;
+    requestReason?: string;
+    createdAt?: string;
+    acceptedAt?: string;
+    processedAt?: string;
+    onAccept?: () => void;
+    onReject?: () => void;
+}
+
 const OwnerSubstituteRequestCard = ({
     substituteRequestId,
     scheduleId,
@@ -19,7 +38,7 @@ const OwnerSubstituteRequestCard = ({
     processedAt,
     onAccept,
     onReject,
-}) => {
+}: OwnerSubstituteRequestCardProps) => {
     const [showModal, setShowModal] = useState(false);
     const [modalType, setModalType] = useState('');
 
@@ -79,7 +98,7 @@ const OwnerSubstituteRequestCard = ({
     const canAccept = status === 'ACCEPTED';
     const canReject = status === 'ACCEPTED';
 
-    const formatDateTime = (dateTimeString) => {
+    const formatDateTime = (dateTimeString?: string): string => {
         if (!dateTimeString) return '';
         const date = new Date(dateTimeString);
         return date.toLocaleDateString('ko-KR', {
@@ -88,7 +107,7 @@ const OwnerSubstituteRequestCard = ({
         });
     };
 
-    const formatTime = (dateTimeString) => {
+    const formatTime = (dateTimeString?: string): string => {
         if (!dateTimeString) return '';
         const date = new Date(dateTimeString);
         return date.toLocaleTimeString('ko-KR', {
@@ -98,11 +117,11 @@ const OwnerSubstituteRequestCard = ({
         });
     };
 
-    const formatTimeAgo = (dateTimeString) => {
+    const formatTimeAgo = (dateTimeString?: string): string => {
         if (!dateTimeString) return '';
         const now = new Date();
         const past = new Date(dateTimeString);
-        const diffMs = now - past;
+        const diffMs = now.getTime() - past.getTime();
         const diffHours = Math.floor(
             diffMs / (1000 * 60 * 60)
         );
@@ -139,9 +158,9 @@ const OwnerSubstituteRequestCard = ({
     const handleModalConfirm = () => {
         setShowModal(false);
         if (modalType === 'accept') {
-            onAccept();
+            onAccept?.();
         } else if (modalType === 'reject') {
-            onReject();
+            onReject?.();
         }
     };
 
@@ -296,15 +315,20 @@ const ScheduleTime = styled.div`
     color: #666666;
 `;
 
-const StatusBadge = styled.div`
+interface StatusBadgeProps {
+    $color?: string;
+    $bgColor?: string;
+}
+
+const StatusBadge = styled.div<StatusBadgeProps>`
     padding: 4px 8px;
     border-radius: 6px;
     font-family: 'Pretendard';
     font-weight: 500;
     font-size: 12px;
-    color: ${(props) => props.$color};
-    background: ${(props) => props.$bgColor};
-    border: 1px solid ${(props) => props.$color}20;
+    color: ${(props) => props.$color || '#333333'};
+    background: ${(props) => props.$bgColor || '#f0f0f0'};
+    border: 1px solid ${(props) => (props.$color || '#333333')}20;
     white-space: nowrap;
 `;
 

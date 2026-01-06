@@ -4,22 +4,48 @@ import useAddressList from '../../hooks/useAddressList';
 import searchSvg from '../../assets/icons/searchSvg.svg';
 import closeIcon from '../../assets/icons/closeIcon.svg';
 
+interface Address {
+    code: string;
+    name: string;
+}
+
+interface Region {
+    code: string;
+    name: string;
+    fullName: string;
+    province: string;
+    district: string;
+    town: string;
+    provinceCode: string;
+    districtCode: string;
+    townCode: string;
+    level?: string;
+}
+
+interface RegionFilterProps {
+    isOpen: boolean;
+    onClose: () => void;
+    selectedRegions?: Region[];
+    onRegionsChange: (regions: Region[]) => void;
+    maxRegions?: number;
+}
+
 const RegionFilter = ({
     isOpen,
     onClose,
     selectedRegions = [],
     onRegionsChange,
     maxRegions = 10,
-}) => {
+}: RegionFilterProps) => {
     const [searchInput, setSearchInput] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
+    const [searchResults, setSearchResults] = useState<Region[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [activeTab, setActiveTab] = useState('시/도');
-    const [selectedSido, setSelectedSido] = useState(null);
+    const [selectedSido, setSelectedSido] = useState<Address | null>(null);
     const [selectedSigungu, setSelectedSigungu] =
-        useState(null);
-    const [regions, setRegions] = useState(selectedRegions);
-    const searchTimeoutRef = useRef(null);
+        useState<Address | null>(null);
+    const [regions, setRegions] = useState<Region[]>(selectedRegions);
+    const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     const {
         sidoList,
@@ -39,7 +65,7 @@ const RegionFilter = ({
         }
     }, [isOpen, loadSidoList]);
 
-    const handleSidoSelect = (sido) => {
+    const handleSidoSelect = (sido: Address) => {
         setSelectedSido(sido);
         setSelectedSigungu(null);
         resetDongList();
@@ -75,7 +101,7 @@ const RegionFilter = ({
         }
     };
 
-    const handleSigunguSelect = (sigungu) => {
+    const handleSigunguSelect = (sigungu: Address) => {
         setSelectedSigungu(sigungu);
         resetDongList();
         setActiveTab('동/읍/면');
@@ -118,7 +144,7 @@ const RegionFilter = ({
         }
     };
 
-    const handleDongSelect = (dong) => {
+    const handleDongSelect = (dong: Address) => {
         if (regions.length >= maxRegions) {
             alert(
                 `최대 ${maxRegions}개까지 선택할 수 있어요.`
@@ -180,11 +206,11 @@ const RegionFilter = ({
         }
     };
 
-    const handleRemoveRegion = (code) => {
+    const handleRemoveRegion = (code: string) => {
         setRegions(regions.filter((r) => r.code !== code));
     };
 
-    const handleSearch = async (keyword) => {
+    const handleSearch = async (keyword: string) => {
         if (!keyword.trim()) {
             setSearchResults([]);
             setIsSearching(false);
@@ -195,7 +221,7 @@ const RegionFilter = ({
         try {
             // 검색은 전체 주소를 순회하면서 매칭하는 방식으로 구현
             // 실제로는 백엔드에서 검색 API를 제공하는 것이 좋음
-            const allResults = [];
+            const allResults: Region[] = [];
 
             // 시/도 검색
             const sidoResults = sidoList.filter((item) =>
@@ -248,7 +274,7 @@ const RegionFilter = ({
         }
     };
 
-    const handleSearchInputChange = (e) => {
+    const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setSearchInput(value);
 
@@ -261,7 +287,7 @@ const RegionFilter = ({
         }, 300);
     };
 
-    const handleSearchResultClick = (result) => {
+    const handleSearchResultClick = (result: Region) => {
         if (result.level === '시/도') {
             const sido = sidoList.find(
                 (s) => s.code === result.code
@@ -422,7 +448,7 @@ const RegionFilter = ({
                                     </CheckIcon>
                                 )}
                             </RegionItem>
-                            {sidoList.map((sido) => (
+                            {sidoList.map((sido: Address) => (
                                 <RegionItem
                                     key={sido.code}
                                     $selected={
@@ -476,7 +502,7 @@ const RegionFilter = ({
                                     )}
                                 </RegionItem>
                                 {sigunguList.map(
-                                    (sigungu) => (
+                                    (sigungu: Address) => (
                                         <RegionItem
                                             key={
                                                 sigungu.code
@@ -534,7 +560,7 @@ const RegionFilter = ({
                                         </CheckIcon>
                                     )}
                                 </RegionItem>
-                                {dongList.map((dong) => (
+                                {dongList.map((dong: Address) => (
                                     <RegionItem
                                         key={dong.code}
                                         $selected={regions.some(
@@ -784,7 +810,15 @@ const Tabs = styled.div`
     gap: 8px;
 `;
 
-const Tab = styled.button`
+interface TabProps {
+    $active?: boolean;
+}
+
+interface RegionItemProps {
+    $selected?: boolean;
+}
+
+const Tab = styled.button<TabProps>`
     padding: 12px 16px;
     font-family: 'Pretendard';
     font-size: 14px;
@@ -813,7 +847,7 @@ const RegionColumn = styled.div`
     padding: 8px 0;
 `;
 
-const RegionItem = styled.div`
+const RegionItem = styled.div<RegionItemProps>`
     padding: 12px 20px;
     font-family: 'Pretendard';
     font-size: 15px;

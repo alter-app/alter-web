@@ -10,19 +10,48 @@ import {
 } from '../../services/myJob';
 import { timeAgo } from '../../utils/timeUtil';
 import Loader from '../../components/Loader';
+import { Reputation } from '../../types';
+
+interface TransformedReputation extends Reputation {
+    workplaceName: string;
+    reviewerName: string;
+    timeAgo: string;
+    rating: number;
+    isNew: boolean;
+    requesterType: string;
+}
+
+interface RawReputationData {
+    id: string | number;
+    createdAt?: string;
+    rating?: number;
+    isNew?: boolean;
+    requester?: {
+        type?: string;
+        name?: string;
+    };
+    requesterName?: string;
+    workplaceName?: string;
+    workspace?: {
+        businessName?: string;
+    };
+    target?: {
+        name?: string;
+    };
+}
 
 const ReputationListPage = () => {
-    const [reputations, setReputations] = useState([]);
+    const [reputations, setReputations] = useState<TransformedReputation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
-    const [nextCursor, setNextCursor] = useState(null);
+    const [nextCursor, setNextCursor] = useState<string | null>(null);
     const [isLoadingMore, setIsLoadingMore] =
         useState(false);
     const navigate = useNavigate();
 
     // 데이터 변환 함수
-    const transformReputationData = (data) => {
-        return (data || []).map((item) => {
+    const transformReputationData = (data: RawReputationData[]): TransformedReputation[] => {
+        return (data || []).map((item: RawReputationData) => {
             // 요청자 타입에 따른 로직 처리
             let workplaceName = '알 수 없는 업장';
             let reviewerName = '알 수 없는 요청자';
@@ -83,10 +112,10 @@ const ReputationListPage = () => {
                 setIsLoading(true);
 
                 const reputationData =
-                    await getUserReputationRequestsList(20);
+                    await getUserReputationRequestsList(20) as { data: RawReputationData[]; page?: { cursor?: string } };
                 const formattedReputations =
                     transformReputationData(
-                        reputationData.data
+                        reputationData.data || []
                     );
 
                 setReputations(formattedReputations);
@@ -121,9 +150,9 @@ const ReputationListPage = () => {
                 await getUserReputationRequestsList(
                     20,
                     nextCursor
-                );
+                ) as { data: RawReputationData[]; page?: { cursor?: string } };
             const newReputations = transformReputationData(
-                reputationData.data
+                reputationData.data || []
             );
 
             setReputations((prev) => [
@@ -145,7 +174,7 @@ const ReputationListPage = () => {
         }
     }, [hasMore, isLoadingMore, nextCursor]);
 
-    const handleAccept = (reputation) => {
+    const handleAccept = (reputation: TransformedReputation) => {
         try {
             console.log('평판 수락:', reputation);
             // 평판 작성 페이지로 이동
@@ -158,7 +187,7 @@ const ReputationListPage = () => {
         }
     };
 
-    const handleReject = async (reputation) => {
+    const handleReject = async (reputation: TransformedReputation) => {
         try {
             console.log('평판 거절:', reputation);
             await userDeclineReputation(reputation.id);
@@ -180,7 +209,7 @@ const ReputationListPage = () => {
     if (isLoading) {
         return (
             <PageContainer>
-                <PageHeader title='받은 평판' />
+                <PageHeader title='받은 평판' onBack={() => navigate(-1)} />
                 <LoadingContainer>
                     <Loader />
                 </LoadingContainer>

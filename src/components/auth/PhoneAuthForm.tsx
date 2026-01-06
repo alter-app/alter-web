@@ -73,10 +73,10 @@ const PhoneAuthForm = () => {
         };
     }, []);
 
-    const isValidPhoneNumber = (number) =>
+    const isValidPhoneNumber = (number: string): boolean =>
         /^\+82\d{9,10}$/.test(number);
 
-    const handleSendCode = async (e) => {
+    const handleSendCode = async (e: React.FormEvent) => {
         e.preventDefault();
         const formattedE164 =
             formatPhoneNumberToE164(phoneNumber);
@@ -99,14 +99,15 @@ const PhoneAuthForm = () => {
             setIsCodeSent(true);
         } catch (error) {
             // 이미 auth.js에서 reset되었으므로 에러 메시지만 표시
-            setPhoneError(error.message || '인증번호 전송 실패');
+            const errorMessage = error instanceof Error ? error.message : '인증번호 전송 실패';
+            setPhoneError(errorMessage);
             console.error('인증번호 전송 실패:', error);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleVerifyCode = async (e) => {
+    const handleVerifyCode = async (e: React.FormEvent) => {
         e.preventDefault();
         if (verificationCode.length !== 6) {
             setCodeError('6자리 인증번호를 입력하세요.');
@@ -136,7 +137,8 @@ const PhoneAuthForm = () => {
                 },
             });
         } catch (error) {
-            setCodeError(error.message || '');
+            const errorMessage = error instanceof Error ? error.message : '';
+            setCodeError(errorMessage);
         } finally {
             setLoading(false);
         }

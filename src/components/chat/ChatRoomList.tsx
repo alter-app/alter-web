@@ -7,14 +7,32 @@ import userIcon from '../../assets/icons/userIcon.png';
 dayjs.extend(relativeTime);
 dayjs.locale('ko');
 
+interface ChatRoom {
+    id: string | number;
+    opponentName?: string;
+    unreadCount?: number;
+    updatedAt?: string;
+    createdAt?: string;
+    latestMessageContent?: string;
+    [key: string]: unknown;
+}
+
+interface ChatRoomListProps {
+    rooms: ChatRoom[];
+    onSelect: (room: ChatRoom) => void;
+    isLoading?: boolean;
+    onLoadMore?: () => void;
+    hasMore?: boolean;
+}
+
 const ChatRoomList = ({
     rooms,
     onSelect,
     isLoading,
     onLoadMore,
     hasMore,
-}) => {
-    const handleScroll = (event) => {
+}: ChatRoomListProps) => {
+    const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
         if (!hasMore || isLoading) {
             return;
         }
@@ -35,7 +53,7 @@ const ChatRoomList = ({
         }
     };
 
-    const formatTime = (date) => {
+    const formatTime = (date: string | undefined) => {
         if (!date) return '';
         const now = dayjs();
         const messageDate = dayjs(date);
@@ -54,7 +72,7 @@ const ChatRoomList = ({
 
     return (
         <RoomListContainer onScroll={handleScroll}>
-            {rooms.map((room) => (
+            {rooms.map((room: ChatRoom) => (
                 <RoomItem
                     key={room.id}
                     onClick={() => onSelect(room)}
@@ -72,7 +90,7 @@ const ChatRoomList = ({
                                     {room.opponentName ||
                                         '알 수 없음'}
                                 </RoomTitle>
-                                {room.unreadCount > 0 && (
+                                {(room.unreadCount ?? 0) > 0 && (
                                     <UnreadCount>
                                         {room.unreadCount}
                                     </UnreadCount>

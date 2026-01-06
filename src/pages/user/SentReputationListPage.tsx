@@ -12,22 +12,45 @@ import {
 import { timeAgo } from '../../utils/timeUtil';
 import Loader from '../../components/Loader';
 
+interface FormattedSentReputation {
+    id: string | number;
+    targetName: string;
+    workplaceName: string;
+    timeAgo: string;
+    status: string;
+    statusDescription: string;
+}
+
+interface RawSentReputationData {
+    id: string | number;
+    createdAt?: string;
+    status?: {
+        value?: string;
+        description?: string;
+    };
+    target?: {
+        type?: string;
+        name?: string;
+    };
+    workspace?: {
+        businessName?: string;
+    };
+}
+
 const SentReputationListPage = () => {
-    const [sentReputations, setSentReputations] = useState(
-        []
-    );
+    const [sentReputations, setSentReputations] = useState<FormattedSentReputation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
-    const [nextCursor, setNextCursor] = useState(null);
+    const [nextCursor, setNextCursor] = useState<string | null>(null);
     const [isLoadingMore, setIsLoadingMore] =
         useState(false);
     const [selectedStatuses, setSelectedStatuses] =
-        useState([]);
+        useState<string[]>([]);
     const navigate = useNavigate();
 
     // 데이터 변환 함수
-    const transformSentReputationData = (data) => {
-        return (data || []).map((item) => {
+    const transformSentReputationData = (data: RawSentReputationData[]): FormattedSentReputation[] => {
+        return (data || []).map((item: RawSentReputationData) => {
             let targetName = '알 수 없는 대상';
             let workplaceName = '알 수 없는 업장';
 
@@ -71,10 +94,10 @@ const SentReputationListPage = () => {
                         selectedStatuses.length > 0
                             ? selectedStatuses[0]
                             : null
-                    );
+                    ) as { data: RawSentReputationData[]; page?: { cursor?: string } };
                 const formattedSentReputations =
                     transformSentReputationData(
-                        sentReputationData.data
+                        sentReputationData.data || []
                     );
 
                 setSentReputations(
@@ -117,10 +140,10 @@ const SentReputationListPage = () => {
                         selectedStatuses.length > 0
                             ? selectedStatuses[0]
                             : null
-                    );
+                    ) as { data: RawSentReputationData[]; page?: { cursor?: string } };
                 const newSentReputations =
                     transformSentReputationData(
-                        sentReputationData.data
+                        sentReputationData.data || []
                     );
 
                 setSentReputations((prev) => [
@@ -149,7 +172,7 @@ const SentReputationListPage = () => {
             selectedStatuses,
         ]);
 
-    const handleCancel = async (reputation) => {
+    const handleCancel = async (reputation: FormattedSentReputation) => {
         try {
             console.log('보낸 평판 취소:', reputation);
             await cancelSentReputationRequest(
@@ -164,10 +187,10 @@ const SentReputationListPage = () => {
                     selectedStatuses.length > 0
                         ? selectedStatuses.join(',')
                         : null
-                );
+                ) as { data: RawSentReputationData[]; page?: { cursor?: string } };
             const formattedSentReputations =
                 transformSentReputationData(
-                    sentReputationData.data
+                    sentReputationData.data || []
                 );
 
             setSentReputations(formattedSentReputations);

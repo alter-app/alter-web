@@ -1,15 +1,41 @@
 import KeywordButton from './KeywordButton';
 import styled from 'styled-components';
 
+interface Keyword {
+    id: string | number;
+    emoji?: string;
+    description?: string;
+    [key: string]: unknown;
+}
+
+interface Category {
+    id?: string | number;
+    name?: string;
+    category?: {
+        value?: string;
+        description?: string;
+        [key: string]: unknown;
+    };
+    keywords?: Keyword[];
+    [key: string]: unknown;
+}
+
+interface KeywordListProps {
+    selectedIds: (string | number)[];
+    onKeywordClick: (id: string | number) => void;
+    allKeywords: Keyword[];
+    categories?: Category[];
+}
+
 const KeywordList = ({
     selectedIds,
     onKeywordClick,
     allKeywords,
     categories,
-}) => {
+}: KeywordListProps) => {
     return (
         <KeywordListWrapper>
-            {categories?.map((category) => (
+            {categories?.map((category: Category) => (
                 <CategorySection
                     key={
                         category.category?.value ||
@@ -23,7 +49,7 @@ const KeywordList = ({
                     <CategoryKeywords>
                         {category.keywords
                             ?.reduce(
-                                (acc, keyword, index) => {
+                                (acc: Keyword[][], keyword: Keyword, index: number) => {
                                     if (index % 2 === 0) {
                                         acc.push([]);
                                     }
@@ -36,14 +62,14 @@ const KeywordList = ({
                             )
                             .map(
                                 (
-                                    keywordPair,
-                                    pairIndex
+                                    keywordPair: Keyword[],
+                                    pairIndex: number
                                 ) => (
                                     <KeywordRow
                                         key={pairIndex}
                                     >
                                         {keywordPair.map(
-                                            (keyword) => (
+                                            (keyword: Keyword) => (
                                                 <KeywordButton
                                                     key={
                                                         keyword.id

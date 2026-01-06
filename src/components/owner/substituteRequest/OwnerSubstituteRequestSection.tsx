@@ -1,12 +1,51 @@
 import styled from 'styled-components';
 import OwnerSubstituteRequestCard from './OwnerSubstituteRequestCard';
 
+interface SubstituteRequest {
+    schedule?: {
+        scheduleId?: string | number;
+        startDateTime?: string;
+        endDateTime?: string;
+        position?: string;
+        [key: string]: unknown;
+    };
+    requester?: {
+        workerName?: string;
+        [key: string]: unknown;
+    };
+    requestType?: {
+        value?: string;
+        [key: string]: unknown;
+    };
+    acceptedWorker?: {
+        workerName?: string;
+        [key: string]: unknown;
+    };
+    status?: {
+        value?: string;
+        description?: string;
+        [key: string]: unknown;
+    };
+    requestReason?: string;
+    createdAt?: string;
+    acceptedAt?: string;
+    processedAt?: string;
+    [key: string]: unknown;
+}
+
+interface OwnerSubstituteRequestSectionProps {
+    substituteRequests: SubstituteRequest[];
+    onViewAllClick?: () => void;
+    onAccept?: (request: SubstituteRequest) => void;
+    onReject?: (request: SubstituteRequest) => void;
+}
+
 const OwnerSubstituteRequestSection = ({
     substituteRequests,
     onViewAllClick,
     onAccept,
     onReject,
-}) => {
+}: OwnerSubstituteRequestSectionProps) => {
     return (
         <Section>
             <SectionCard>
@@ -16,12 +55,13 @@ const OwnerSubstituteRequestSection = ({
                 <CardList>
                     {substituteRequests.length > 0 ? (
                         substituteRequests.map(
-                            (request, index) => (
+                            (request: SubstituteRequest, index: number) => (
                                 <OwnerSubstituteRequestCard
                                     key={index}
+                                    substituteRequestId={(request as { id?: string | number }).id || index}
                                     scheduleId={
                                         request.schedule
-                                            ?.scheduleId
+                                            ?.scheduleId || index
                                     }
                                     startDateTime={
                                         request.schedule

@@ -4,8 +4,41 @@ import { useState, useEffect } from 'react';
 import { getApplicants } from '../../../services/mainPageService';
 import { useNavigate } from 'react-router-dom';
 
+interface Applicant {
+    id: string | number;
+    workspace?: {
+        name?: string;
+        [key: string]: unknown;
+    };
+    status?: {
+        description?: string;
+        [key: string]: unknown;
+    };
+    createdAt?: string;
+    schedule?: {
+        startTime: string;
+        endTime: string;
+        workingDays?: string[];
+        [key: string]: unknown;
+    };
+    applicant?: {
+        name?: string;
+        reputationSummary?: {
+            topKeywords?: Array<{
+                id?: string | number;
+                emoji?: string;
+                description?: string;
+                [key: string]: unknown;
+            }>;
+            [key: string]: unknown;
+        };
+        [key: string]: unknown;
+    };
+    [key: string]: unknown;
+}
+
 const ApplicantList = () => {
-    const [applicants, setApplicants] = useState([]);
+    const [applicants, setApplicants] = useState<Applicant[]>([]);
     const navigate = useNavigate();
     const goToApplicantList = () => navigate('/applicant');
 
@@ -15,8 +48,8 @@ const ApplicantList = () => {
 
     const fetchData = async () => {
         try {
-            const result = await getApplicants(3, 'SUBMITTED');
-            setApplicants(result.data);
+            const result = await getApplicants(3, 'SUBMITTED') as { data: Applicant[] };
+            setApplicants(result.data || []);
             console.log(result.data);
         } catch (error) {
             console.error('지원자 목록 조회 오류:', error);
@@ -33,8 +66,15 @@ const ApplicantList = () => {
             </SectionHeader>
             {applicants.length > 0 ? (
                 <CardList>
-                    {applicants.slice(0, 3).map((item) => (
-                        <ApplicantItem key={item.id} {...item} />
+                    {applicants.slice(0, 3).map((item: Applicant) => (
+                        <ApplicantItem 
+                            key={item.id} 
+                            workspace={item.workspace || { name: '알 수 없는 업장' }}
+                            status={item.status || { description: '알 수 없음' }}
+                            createdAt={item.createdAt}
+                            schedule={item.schedule || { startTime: '', endTime: '', workingDays: [] }}
+                            applicant={item.applicant || { name: '알 수 없는 지원자' }}
+                        />
                     ))}
                 </CardList>
             ) : (

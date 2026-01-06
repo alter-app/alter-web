@@ -11,24 +11,52 @@ import {
 } from '../../services/scheduleRequest';
 import { timeAgo } from '../../utils/timeUtil';
 import Loader from '../../components/Loader';
+import { SubstituteRequest } from '../../types';
+
+interface TransformedSubstituteRequest extends SubstituteRequest {
+    workspaceName: string;
+    scheduleDate: string;
+    scheduleTime: string;
+    position: string;
+    timeAgo: string;
+    status: string;
+    statusDescription: string;
+}
+
+interface RawSubstituteRequestData {
+    id: string | number;
+    createdAt?: string;
+    status?: {
+        value?: string;
+        description?: string;
+    };
+    schedule: {
+        startDateTime: string;
+        endDateTime: string;
+        position?: string;
+    };
+    workspace?: {
+        workspaceName?: string;
+    };
+}
 
 const SentSubstituteRequestListPage = () => {
     const [
         sentSubstituteRequests,
         setSentSubstituteRequests,
-    ] = useState([]);
+    ] = useState<TransformedSubstituteRequest[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
-    const [nextCursor, setNextCursor] = useState(null);
+    const [nextCursor, setNextCursor] = useState<string | null>(null);
     const [isLoadingMore, setIsLoadingMore] =
         useState(false);
     const [selectedStatuses, setSelectedStatuses] =
-        useState([]);
+        useState<string[]>([]);
     const navigate = useNavigate();
 
     // 데이터 변환 함수
-    const transformSentSubstituteRequestData = (data) => {
-        return (data || []).map((item) => {
+    const transformSentSubstituteRequestData = (data: RawSubstituteRequestData[]): TransformedSubstituteRequest[] => {
+        return (data || []).map((item: RawSubstituteRequestData) => {
             const startDate = new Date(
                 item.schedule.startDateTime
             );
@@ -89,7 +117,7 @@ const SentSubstituteRequestListPage = () => {
                             10,
                             null,
                             selectedStatus
-                        );
+                        ) as { data: { data?: RawSubstituteRequestData[]; page?: { cursor?: string } } };
                     const formattedSentSubstituteRequests =
                         transformSentSubstituteRequestData(
                             sentSubstituteRequestData.data
@@ -139,7 +167,7 @@ const SentSubstituteRequestListPage = () => {
                         10,
                         nextCursor,
                         selectedStatus
-                    );
+                    ) as { data: { data?: RawSubstituteRequestData[]; page?: { cursor?: string } } };
                 const formattedSentSubstituteRequests =
                     transformSentSubstituteRequestData(
                         sentSubstituteRequestData.data
@@ -170,7 +198,7 @@ const SentSubstituteRequestListPage = () => {
         }, [nextCursor, isLoadingMore, selectedStatuses]);
 
     // 대타 요청 취소
-    const handleCancel = async (request) => {
+    const handleCancel = async (request: TransformedSubstituteRequest) => {
         try {
             await cancelSubstituteRequest(request.id);
 
@@ -195,7 +223,7 @@ const SentSubstituteRequestListPage = () => {
     if (isLoading) {
         return (
             <PageContainer>
-                <PageHeader title='보낸 대타 요청' />
+                <PageHeader title='보낸 대타 요청' onBack={() => navigate(-1)} />
                 <LoadingContainer>
                     <Loader />
                 </LoadingContainer>
@@ -205,7 +233,7 @@ const SentSubstituteRequestListPage = () => {
 
     return (
         <PageContainer>
-            <PageHeader title='보낸 대타 요청' />
+            <PageHeader title='보낸 대타 요청' onBack={() => navigate(-1)} />
             <ContentContainer>
                 <SentSubstituteRequestStatusFilter
                     selectedStatuses={selectedStatuses}

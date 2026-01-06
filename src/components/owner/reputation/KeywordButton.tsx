@@ -1,11 +1,18 @@
 import styled from 'styled-components';
 
+interface KeywordButtonProps {
+    emoji?: string;
+    description?: string;
+    onClick?: () => void;
+    selected?: boolean;
+}
+
 const KeywordButton = ({
     emoji,
     description,
     onClick,
     selected,
-}) => {
+}: KeywordButtonProps) => {
     return (
         <StyleButton onClick={onClick} selected={selected}>
             <Emoji>{emoji}</Emoji>
@@ -16,7 +23,11 @@ const KeywordButton = ({
 
 export default KeywordButton;
 
-const StyleButton = styled.div`
+interface StyleButtonProps {
+    selected?: boolean;
+}
+
+const StyleButton = styled.div<StyleButtonProps>`
     background-color: #f4f4f4;
     background-color: ${({ selected }) =>
         selected ? '#2DE283' : '#f4f4f4'};

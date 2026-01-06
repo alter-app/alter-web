@@ -24,9 +24,32 @@ import mapIcon from '../../assets/icons/mapIcon.svg';
 import mapViewIcon from '../../assets/icons/mapViewIcon.svg';
 import listIcon from '../../assets/icons/listIcon.svg';
 
+interface JobPosting {
+    id: string | number;
+    scrapped?: boolean;
+    [key: string]: unknown;
+}
+
+interface Bounds {
+    [key: string]: unknown;
+}
+
+interface Region {
+    code: string;
+    name: string;
+    fullName: string;
+    province: string;
+    district: string;
+    town: string;
+    provinceCode: string;
+    districtCode: string;
+    townCode: string;
+    level?: string;
+}
+
 const JobLookupMap = () => {
     const navigate = useNavigate();
-    const [viewMode, setViewMode] = useState('map'); // 'map' or 'list'
+    const [viewMode, setViewMode] = useState<'map' | 'list'>('map'); // 'map' or 'list'
     const [listHeight, setListHeight] = useState(40);
     const [isDragging, setIsDragging] = useState(false);
     const [startY, setStartY] = useState(0);
@@ -37,9 +60,9 @@ const JobLookupMap = () => {
     const [velocity, setVelocity] = useState(0);
     const [lastY, setLastY] = useState(0);
     const [lastTime, setLastTime] = useState(0);
-    const [jobPostings, setJobPostings] = useState([]);
+    const [jobPostings, setJobPostings] = useState<JobPosting[]>([]);
     const [jobPostingsCursor, setJobPostingsCursor] =
-        useState('');
+        useState<string>('');
     const [
         jobPostingsTotalCount,
         setJobPostingsTotalCount,
@@ -50,28 +73,26 @@ const JobLookupMap = () => {
         useState(true);
     const [isWorkspaceView, setIsWorkspaceView] =
         useState(false); // 마커별 조회 모드인지 여부
-    const [savedBounds, setSavedBounds] = useState(null); // 마커 클릭 전 지도 뷰 좌표 저장
-    const savedBoundsRef = useRef(null); // ref로도 저장하여 즉시 접근 가능
+    const [savedBounds, setSavedBounds] = useState<Bounds | null>(null); // 마커 클릭 전 지도 뷰 좌표 저장
+    const savedBoundsRef = useRef<Bounds | null>(null); // ref로도 저장하여 즉시 접근 가능
     const [selectedPostId, setSelectedPostId] =
-        useState(null);
+        useState<string | number | null>(null);
     const [showDetailOverlay, setShowDetailOverlay] =
         useState(false);
     const [showApplyOverlay, setShowApplyOverlay] =
         useState(false);
-    const [applyPostId, setApplyPostId] = useState(null);
-    const mapRef = useRef(null);
+    const [applyPostId, setApplyPostId] = useState<string | number | null>(null);
+    const mapRef = useRef<any>(null);
     const [searchInput, setSearchInput] = useState('');
     const [searchKeyword, setSearchKeyword] = useState('');
     const [sortType, setSortType] = useState('LATEST');
     const isInitialFilterRef = useRef(true);
-    const valueOrEmpty = (value) => (value || '').trim();
+    const valueOrEmpty = (value: unknown): string => (value || '').toString().trim();
 
     // 리스트 모드용 state
     const [isFilterOpen, setIsFilterOpen] = useState(false);
-    const [selectedRegions, setSelectedRegions] = useState(
-        []
-    );
-    const selectedRegionsRef = useRef([]);
+    const [selectedRegions, setSelectedRegions] = useState<string[]>([]);
+    const selectedRegionsRef = useRef<string[]>([]);
 
     const handleSearchClick = () => {
         if (
@@ -119,13 +140,13 @@ const JobLookupMap = () => {
         }
     };
 
-    const handleMarkerClick = (bounds) => {
+    const handleMarkerClick = (bounds: Bounds) => {
         setSavedBounds(bounds);
         // ref에도 동시에 저장하여 즉시 접근 가능
         savedBoundsRef.current = bounds;
     };
 
-    const handlePostSelect = (post) => {
+    const handlePostSelect = (post: JobPosting) => {
         setSelectedPostId(post.id);
         setShowDetailOverlay(true);
     };
@@ -135,7 +156,7 @@ const JobLookupMap = () => {
         setSelectedPostId(null);
     };
 
-    const handleApply = (postDetail) => {
+    const handleApply = (postDetail: JobPosting) => {
         // 상세 오버레이 닫기
         handleCloseDetailOverlay();
         // 지원 오버레이 열기
@@ -157,7 +178,7 @@ const JobLookupMap = () => {
         console.log('지원이 완료되었습니다.');
     };
 
-    const handleJobPostingsUpdate = (data) => {
+    const handleJobPostingsUpdate = (data: { postings?: JobPosting[]; cursor?: string; totalCount?: number; [key: string]: unknown }) => {
         if (viewMode === 'map') {
             setJobPostings(data.postings || []);
             setJobPostingsCursor(data.cursor || '');
@@ -172,7 +193,7 @@ const JobLookupMap = () => {
 
     // 리스트 모드용 공고 리스트 조회 함수
     const fetchListPostList = useCallback(
-        async (cursor) => {
+        async (cursor: string) => {
             // 선택된 지역 정보 파싱
             let province = '';
             let district = '';
@@ -181,7 +202,7 @@ const JobLookupMap = () => {
             const currentRegions =
                 selectedRegionsRef.current;
             if (currentRegions.length > 0) {
-                const firstRegion = currentRegions[0];
+                const firstRegion = currentRegions[0] as Region;
                 province = firstRegion.province || '';
                 district = firstRegion.district || '';
                 town = firstRegion.town || '';
@@ -233,7 +254,7 @@ const JobLookupMap = () => {
         }
     }, [searchKeyword, sortType]);
 
-    const handleSearchInputChange = (value) => {
+    const handleSearchInputChange = (value: string) => {
         setSearchInput(value);
     };
 
@@ -255,7 +276,7 @@ const JobLookupMap = () => {
         setSearchKeyword(trimmedValue);
     };
 
-    const handleSortChange = (value) => {
+    const handleSortChange = (value: string) => {
         if (value === sortType) {
             if (
                 mapRef.current &&
@@ -289,13 +310,13 @@ const JobLookupMap = () => {
         document.body.style.overflow = 'hidden';
 
         // Flutter 웹뷰에서 네이티브 화면 정보 수신
-        const handleNativeDataInjected = (event) => {
+        const handleNativeDataInjected = (event: CustomEvent<{ screen?: { statusBarHeight?: number; bottomPadding?: number; [key: string]: unknown } }>) => {
             if (event.detail && event.detail.screen) {
-                window.nativeScreenInfo =
+                (window as any).nativeScreenInfo =
                     event.detail.screen;
                 console.log(
                     '네이티브 화면 정보 수신:',
-                    window.nativeScreenInfo
+                    (window as any).nativeScreenInfo
                 );
 
                 // 화면 정보에 따라 동적으로 스타일 적용
@@ -321,7 +342,7 @@ const JobLookupMap = () => {
     }, []);
 
     // 네이티브 화면 정보에 따른 스타일 적용 함수
-    const applyNativeScreenStyles = (screenInfo) => {
+    const applyNativeScreenStyles = (screenInfo: { statusBarHeight?: number; bottomPadding?: number; [key: string]: unknown }) => {
         const { statusBarHeight, bottomPadding } =
             screenInfo;
 
@@ -338,7 +359,7 @@ const JobLookupMap = () => {
         // 지도 컨테이너 스타일 조정
         const mapContainer = document.querySelector(
             '[data-testid="map-container"]'
-        );
+        ) as HTMLElement | null;
         if (mapContainer) {
             mapContainer.style.paddingTop = `${statusBarHeight}px`;
         }
@@ -360,7 +381,7 @@ const JobLookupMap = () => {
 
     // 리스트 모드일 때 초기 로드 및 필터 변경 시 데이터 로드
     const selectedRegionsKey = JSON.stringify(
-        selectedRegions.map((r) => r.code)
+        selectedRegions.map((r: Region) => r.code)
     );
 
     useEffect(() => {
@@ -377,7 +398,7 @@ const JobLookupMap = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedRegionsKey]);
 
-    const handleTouchStart = (e) => {
+    const handleTouchStart = (e: React.TouchEvent) => {
         setIsDragging(true);
         const touchY = e.touches[0].clientY;
         setStartY(touchY);
@@ -387,7 +408,7 @@ const JobLookupMap = () => {
         setVelocity(0);
     };
 
-    const handleTouchMove = (e) => {
+    const handleTouchMove = (e: TouchEvent) => {
         if (!isDragging) return;
 
         e.preventDefault();
@@ -470,7 +491,7 @@ const JobLookupMap = () => {
         setVelocity(0);
     };
 
-    const handleMouseDown = (e) => {
+    const handleMouseDown = (e: React.MouseEvent) => {
         setIsDragging(true);
         const mouseY = e.clientY;
         setStartY(mouseY);
@@ -480,7 +501,7 @@ const JobLookupMap = () => {
         setVelocity(0);
     };
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: MouseEvent) => {
         if (!isDragging) return;
 
         const currentY = e.clientY;
@@ -621,14 +642,14 @@ const JobLookupMap = () => {
                             businessName='현재 위치'
                             searchKeyword={searchKeyword}
                             sortType={sortType}
-                            onJobPostingsUpdate={(data) => {
+                            onJobPostingsUpdate={(data: { data?: JobPosting[]; cursor?: string; totalCount?: number; [key: string]: unknown }) => {
                                 if (
                                     typeof data ===
                                         'object' &&
                                     data.data
                                 ) {
                                     setJobPostings(
-                                        data.data
+                                        data.data || []
                                     );
                                     setJobPostingsCursor(
                                         data.cursor || ''
@@ -671,8 +692,8 @@ const JobLookupMap = () => {
                                             false
                                         );
                                     }
-                                } else {
-                                    setJobPostings(data);
+                                } else if (Array.isArray(data)) {
+                                    setJobPostings(data as JobPosting[]);
                                 }
                             }}
                             onMapMoved={() =>
@@ -783,7 +804,7 @@ const JobLookupMap = () => {
                                     scrollableTarget='scrollableListArea'
                                 >
                                     {listPostings.map(
-                                        (post) => (
+                                        (post: JobPosting) => (
                                             <JobPostItem
                                                 key={
                                                     post.id
@@ -802,7 +823,7 @@ const JobLookupMap = () => {
                                                     post.scrapped
                                                 }
                                                 onScrapChange={(
-                                                    value
+                                                    value: boolean
                                                 ) =>
                                                     toggleScrap(
                                                         post.id,
@@ -990,12 +1011,13 @@ const SearchButton = styled.button`
     position: absolute;
     top: ${() => {
         // Flutter 웹뷰에서 네이티브 화면 정보가 있으면 사용
+        const nativeScreenInfo = (window as any).nativeScreenInfo as { statusBarHeight?: number } | undefined;
         if (
-            window.nativeScreenInfo &&
-            window.nativeScreenInfo.statusBarHeight
+            nativeScreenInfo &&
+            nativeScreenInfo.statusBarHeight
         ) {
             return (
-                window.nativeScreenInfo.statusBarHeight + 20
+                nativeScreenInfo.statusBarHeight + 20
             );
         }
         return '20px';
@@ -1102,7 +1124,12 @@ const MapContainer = styled.div`
     -webkit-overflow-scrolling: touch;
 `;
 
-const CurrentLocationButton = styled.button`
+interface CurrentLocationButtonProps {
+    $listHeight?: number;
+    $isAtCurrentLocation?: boolean;
+}
+
+const CurrentLocationButton = styled.button<CurrentLocationButtonProps>`
     position: absolute;
     bottom: 160px;
     right: 20px;
@@ -1174,23 +1201,29 @@ const ListSection = styled.div`
     overflow: hidden;
 `;
 
-const JobListContainer = styled.div`
+interface JobListContainerProps {
+    $height?: number;
+    $isDragging?: boolean;
+}
+
+const JobListContainer = styled.div<JobListContainerProps>`
     position: fixed;
     bottom: ${() => {
         // Flutter 웹뷰에서 네이티브 화면 정보가 있으면 사용
+        const nativeScreenInfo = (window as any).nativeScreenInfo as { bottomPadding?: number } | undefined;
         if (
-            window.nativeScreenInfo &&
-            window.nativeScreenInfo.bottomPadding
+            nativeScreenInfo &&
+            nativeScreenInfo.bottomPadding
         ) {
             return (
-                window.nativeScreenInfo.bottomPadding + 70
+                nativeScreenInfo.bottomPadding + 70
             );
         }
         return '50px';
     }};
     left: 0;
     right: 0;
-    height: ${(props) => Math.max(40, props.$height)}px;
+    height: ${(props) => Math.max(40, props.$height || 40)}px;
     background: #ffffff;
     border-radius: 20px 20px 0 0;
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
@@ -1213,7 +1246,69 @@ const JobListContainer = styled.div`
     }
 `;
 
-const ToggleButton = styled.button`
+const CurrentLocationButton = styled.button<CurrentLocationButtonProps>`
+    position: absolute;
+    bottom: 160px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    border: none;
+    border-radius: 50%;
+    background: ${(props) =>
+        props.$isAtCurrentLocation ? '#399982' : '#ffffff'};
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        background: ${(props) =>
+            props.$isAtCurrentLocation
+                ? '#399982'
+                : '#f0f0f0'};
+
+        svg path {
+            fill: ${(props) =>
+                props.$isAtCurrentLocation
+                    ? '#ffffff'
+                    : '#333'};
+        }
+    }
+
+    &:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    svg path {
+        fill: ${(props) =>
+            props.$isAtCurrentLocation ? '#ffffff' : '#333'};
+        transition: fill 0.2s ease;
+    }
+
+    @media (max-width: 768px) {
+        width: 44px;
+        height: 44px;
+        bottom: 150px;
+        right: 16px;
+    }
+
+    @media (max-width: 480px) {
+        width: 40px;
+        height: 40px;
+        bottom: 140px;
+        right: 12px;
+    }
+`;
+
+const ToggleButton = styled.button<ToggleButtonProps>`
     position: absolute;
     bottom: 100px;
     right: 20px;

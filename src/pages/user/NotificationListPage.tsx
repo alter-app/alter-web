@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PageHeader from '../../components/shared/PageHeader';
@@ -7,12 +8,14 @@ import { getNotifications } from '../../services/notification';
 import { timeAgo } from '../../utils/timeUtil';
 import Loader from '../../components/Loader';
 import BottomNavigation from '../../layouts/BottomNavigation';
+import { Notification } from '../../types';
 
 const NotificationListPage = () => {
-    const [notifications, setNotifications] = useState([]);
+    const navigate = useNavigate();
+    const [notifications, setNotifications] = useState<Notification[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
-    const [cursor, setCursor] = useState(null);
+    const [cursor, setCursor] = useState<string | null>(null);
     const [isLoadingMore, setIsLoadingMore] =
         useState(false);
     const [totalCount, setTotalCount] = useState(0);
@@ -20,7 +23,7 @@ const NotificationListPage = () => {
     // 알림 목록 조회
     const fetchNotifications = useCallback(
         async (
-            currentCursor = null,
+            currentCursor: string | null = null,
             isLoadMore = false
         ) => {
             if (isLoadMore) {
@@ -33,7 +36,7 @@ const NotificationListPage = () => {
                 const response = await getNotifications(
                     10, // pageSize
                     currentCursor
-                );
+                ) as { data?: Notification[]; page?: { cursor?: string; totalCount?: number } };
 
                 const newNotifications =
                     response.data || [];
@@ -86,6 +89,7 @@ const NotificationListPage = () => {
                 <PageHeader
                     title='알림'
                     showBackButton={false}
+                    onBack={() => {}}
                 />
                 <LoadingContainer>
                     <Loader />

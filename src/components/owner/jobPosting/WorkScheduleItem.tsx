@@ -14,12 +14,28 @@ const days = [
     { label: '일', value: 'SUNDAY' },
 ];
 
+interface Schedule {
+    workingDays?: string[];
+    startTime?: string;
+    endTime?: string;
+    position?: string;
+    positionsNeeded?: number;
+    [key: string]: unknown;
+}
+
+interface WorkScheduleItemProps {
+    schedule: Schedule;
+    index: number;
+    onChange: (updates: Partial<Schedule>) => void;
+    onRemove: () => void;
+}
+
 const WorkScheduleItem = ({
     schedule,
     index,
     onChange,
     onRemove,
-}) => {
+}: WorkScheduleItemProps) => {
     // props로 받은 값으로 상태 초기화 (상위에서 관리하므로 useEffect로 동기화)
     const [selectedDays, setSelectedDays] = useState(
         schedule.workingDays || []
@@ -46,10 +62,10 @@ const WorkScheduleItem = ({
     }, [schedule]);
 
     // 요일 클릭 시
-    const handleDayToggle = (value) => {
-        let next;
+    const handleDayToggle = (value: string) => {
+        let next: string[];
         if (selectedDays.includes(value)) {
-            next = selectedDays.filter((v) => v !== value);
+            next = selectedDays.filter((v: string) => v !== value);
         } else {
             next = [...selectedDays, value];
         }
@@ -59,31 +75,31 @@ const WorkScheduleItem = ({
     };
 
     // 시간 입력 핸들러
-    const handleStartTimeChange = (e) => {
+    const handleStartTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const formatted = autoInsertColon(e.target.value);
         setStartTime(formatted);
         if (onChange) onChange({ startTime: formatted });
     };
-    const handleEndTimeChange = (e) => {
+    const handleEndTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const formatted = autoInsertColon(e.target.value);
         setEndTime(formatted);
         if (onChange) onChange({ endTime: formatted });
     };
 
     // 포지션 입력 핸들러
-    const handlePositionChange = (e) => {
+    const handlePositionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setPosition(value);
         if (onChange) onChange({ position: value });
     };
 
     // 필요 인원 수 입력 핸들러
-    const handlePositionsNeededChange = (e) => {
+    const handlePositionsNeededChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const inputValue = e.target.value;
 
-        // 빈 값이면 빈 값으로 설정 (입력 중에는 자유롭게 입력 가능)
+        // 빈 값이면 1로 설정 (최소값)
         if (inputValue === '') {
-            setPositionsNeeded('');
+            setPositionsNeeded(1);
             return;
         }
 
@@ -100,7 +116,7 @@ const WorkScheduleItem = ({
     };
 
     // blur 시 최소값 보장
-    const handlePositionsNeededBlur = (e) => {
+    const handlePositionsNeededBlur = (e: React.FocusEvent<HTMLInputElement>) => {
         const inputValue = e.target.value;
         const numValue = parseInt(inputValue);
         // 빈 값이거나 1보다 작으면 1로 설정
@@ -257,7 +273,11 @@ const TopRow = styled.div`
     }
 `;
 
-const Row = styled.div`
+interface RowProps {
+    $hasMarginTop?: boolean;
+}
+
+const Row = styled.div<RowProps>`
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -320,7 +340,11 @@ const WorkingDaysCategory = styled.div`
     }
 `;
 
-const DayBox = styled.button`
+interface DayBoxProps {
+    $isSelected?: boolean;
+}
+
+const DayBox = styled.button<DayBoxProps>`
     font-family: 'Pretendard';
     font-weight: 400;
     font-size: 15px;
@@ -417,7 +441,11 @@ const StyledCheckbox = styled.input.attrs({
     cursor: pointer;
 `;
 
-const TimeGap = styled.div`
+interface TimeGapProps {
+    $isTimeInput?: boolean;
+}
+
+const TimeGap = styled.div<TimeGapProps>`
     display: flex;
     justify-content: flex-end;
     gap: 8px;

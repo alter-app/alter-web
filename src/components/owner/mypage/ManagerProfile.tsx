@@ -4,7 +4,16 @@ import userIcon from '../../../assets/icons/userIcon.png';
 import { useNavigate } from 'react-router-dom';
 import settingIcon from '../../../assets/icons/setting.svg';
 
-const ManagerProfile = ({ manager }) => {
+interface ManagerProfileProps {
+    manager?: {
+        name?: string;
+        nickname?: string;
+        createdAt?: string;
+        [key: string]: unknown;
+    };
+}
+
+const ManagerProfile = ({ manager }: ManagerProfileProps) => {
     const { name, nickname, createdAt } = manager || {};
     const navigate = useNavigate();
 

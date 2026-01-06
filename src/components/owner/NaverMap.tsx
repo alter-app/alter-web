@@ -20,7 +20,20 @@ import {
 const NAVER_MAP_CLIENT_ID = import.meta.env
     .VITE_NAVER_MAP_CLIENT_ID;
 
-const NaverMap = forwardRef(
+interface NaverMapProps {
+    latitude?: number;
+    longitude?: number;
+    businessName?: string;
+    onJobPostingsUpdate?: (data: { data?: unknown[]; cursor?: string; totalCount?: number; [key: string]: unknown }) => void;
+    onMapMoved?: () => void;
+    onCurrentLocationStatusChange?: (isAtCurrent: boolean) => void;
+    onMapBackgroundClick?: () => void;
+    onMarkerClick?: (bounds: unknown) => void;
+    searchKeyword?: string;
+    sortType?: string;
+}
+
+const NaverMap = forwardRef<any, NaverMapProps>(
     (
         {
             latitude,
@@ -36,37 +49,37 @@ const NaverMap = forwardRef(
         },
         ref
     ) => {
-        const mapRef = useRef(null);
+        const mapRef = useRef<any>(null);
         const [currentLocation, setCurrentLocation] =
-            useState(() => {
+            useState<{ latitude: number; longitude: number }>(() => {
                 return {
                     latitude: latitude || 37.5665,
                     longitude: longitude || 126.978,
                 };
             });
         const [locationPermission, setLocationPermission] =
-            useState('requesting');
-        const [markers, setMarkers] = useState([]);
+            useState<string>('requesting');
+        const [markers, setMarkers] = useState<any[]>([]);
         const [mapInstance, setMapInstance] =
-            useState(null);
-        const [jobPostings, setJobPostings] = useState([]);
+            useState<any>(null);
+        const [jobPostings, setJobPostings] = useState<any[]>([]);
         const [jobPostingsCursor, setJobPostingsCursor] =
-            useState('');
+            useState<string>('');
         const [
             jobPostingsTotalCount,
             setJobPostingsTotalCount,
-        ] = useState(0);
+        ] = useState<number>(0);
         const [isMapLoaded, setIsMapLoaded] =
-            useState(false);
+            useState<boolean>(false);
         const [hasSearched, setHasSearched] =
-            useState(false);
-        const hasSearchedRef = useRef(false);
+            useState<boolean>(false);
+        const hasSearchedRef = useRef<boolean>(false);
         const [
             isAtCurrentLocation,
             setIsAtCurrentLocation,
-        ] = useState(true);
-        const searchKeywordRef = useRef(searchKeyword);
-        const sortTypeRef = useRef(sortType);
+        ] = useState<boolean>(true);
+        const searchKeywordRef = useRef<string>(searchKeyword);
+        const sortTypeRef = useRef<string>(sortType);
 
         useEffect(() => {
             searchKeywordRef.current = searchKeyword;
@@ -94,7 +107,7 @@ const NaverMap = forwardRef(
         ]);
 
         // 지도 영역의 공고 리스트 로드
-        const loadJobPostingsInBounds = async (map) => {
+        const loadJobPostingsInBounds = async (map: any) => {
             try {
                 const bounds = map.getBounds();
                 const sw = bounds.getSW(); // 남서쪽 모서리
@@ -124,7 +137,7 @@ const NaverMap = forwardRef(
                             searchKeywordRef.current,
                         sortType: sortTypeRef.current,
                     }
-                );
+                ) as { data?: unknown[]; page?: { cursor?: string; totalCount?: number }; [key: string]: unknown };
                 console.log('공고 리스트 응답:', response);
 
                 if (
@@ -133,10 +146,10 @@ const NaverMap = forwardRef(
                 ) {
                     setJobPostings(response.data);
                     setJobPostingsCursor(
-                        response.page.cursor || ''
+                        response.page?.cursor || ''
                     );
                     setJobPostingsTotalCount(
-                        response.page.totalCount || 0
+                        response.page?.totalCount || 0
                     );
                     // 외부 컴포넌트에 공고 리스트 업데이트 알림 (렌더링 완료 후)
                     if (onJobPostingsUpdate) {
@@ -144,11 +157,11 @@ const NaverMap = forwardRef(
                             onJobPostingsUpdate({
                                 data: response.data,
                                 cursor:
-                                    response.page.cursor ||
+                                    response.page?.cursor ||
                                     '',
                                 totalCount:
                                     response.page
-                                        .totalCount || 0,
+                                        ?.totalCount || 0,
                             });
                         }, 0);
                     }
@@ -163,7 +176,7 @@ const NaverMap = forwardRef(
 
         // 저장된 좌표로 공고 리스트 로드
         const loadJobPostingsInBoundsWithCoordinates =
-            async (map, bounds) => {
+            async (map: any, bounds: any) => {
                 try {
                     const response =
                         await getMapJobPostings(
@@ -177,7 +190,7 @@ const NaverMap = forwardRef(
                                 sortType:
                                     sortTypeRef.current,
                             }
-                        );
+                        ) as { data?: unknown[]; page?: { cursor?: string; totalCount?: number }; [key: string]: unknown };
 
                     if (
                         response.data &&
@@ -185,10 +198,10 @@ const NaverMap = forwardRef(
                     ) {
                         setJobPostings(response.data);
                         setJobPostingsCursor(
-                            response.page.cursor || ''
+                            response.page?.cursor || ''
                         );
                         setJobPostingsTotalCount(
-                            response.page.totalCount || 0
+                            response.page?.totalCount || 0
                         );
                         // 외부 컴포넌트에 공고 리스트 업데이트 알림 (렌더링 완료 후)
                         if (onJobPostingsUpdate) {
@@ -197,10 +210,10 @@ const NaverMap = forwardRef(
                                     data: response.data,
                                     cursor:
                                         response.page
-                                            .cursor || '',
+                                            ?.cursor || '',
                                     totalCount:
                                         response.page
-                                            .totalCount ||
+                                            ?.totalCount ||
                                         0,
                                 });
                             }, 0);
@@ -216,7 +229,7 @@ const NaverMap = forwardRef(
 
         // 특정 업장의 공고 조회 함수
         const loadWorkspacePostings = async (
-            workspaceId
+            workspaceId: string | number
         ) => {
             try {
                 console.log(
@@ -226,7 +239,7 @@ const NaverMap = forwardRef(
 
                 const response = await getWorkspacePostings(
                     workspaceId
-                );
+                ) as { data?: unknown[]; [key: string]: unknown };
                 console.log('업장 공고 응답:', response);
 
                 if (
@@ -246,7 +259,7 @@ const NaverMap = forwardRef(
                                 data: response.data,
                                 cursor: '',
                                 totalCount:
-                                    response.data.length,
+                                    response.data?.length || 0,
                             });
                         }, 0);
                     }
@@ -260,7 +273,7 @@ const NaverMap = forwardRef(
         };
 
         // 추가 데이터 로드 함수
-        const loadMoreJobPostings = async (cursor) => {
+        const loadMoreJobPostings = async (cursor: string) => {
             if (mapInstance) {
                 try {
                     // 전달받은 cursor 사용, 없으면 현재 상태 사용
@@ -315,7 +328,7 @@ const NaverMap = forwardRef(
                                 sortType:
                                     sortTypeRef.current,
                             }
-                        );
+                        ) as { data?: unknown[]; page?: { cursor?: string; totalCount?: number }; [key: string]: unknown };
 
                     console.log(
                         '추가 데이터 로드 응답:',
@@ -327,10 +340,10 @@ const NaverMap = forwardRef(
                         Array.isArray(response.data)
                     ) {
                         // 상태 업데이트
-                        setJobPostings((prev) => {
+                        setJobPostings((prev: any[]) => {
                             const newData = [
                                 ...prev,
-                                ...response.data,
+                                ...(response.data || []),
                             ];
 
                             // 렌더링 완료 후 콜백 호출
@@ -340,11 +353,11 @@ const NaverMap = forwardRef(
                                         data: newData,
                                         cursor:
                                             response.page
-                                                .cursor ||
+                                                ?.cursor ||
                                             '',
                                         totalCount:
                                             response.page
-                                                .totalCount ||
+                                                ?.totalCount ||
                                             0,
                                     });
                                 }, 0);
@@ -354,10 +367,10 @@ const NaverMap = forwardRef(
                         });
 
                         setJobPostingsCursor(
-                            response.page.cursor || ''
+                            response.page?.cursor || ''
                         );
                         setJobPostingsTotalCount(
-                            response.page.totalCount || 0
+                            response.page?.totalCount || 0
                         );
                     }
                 } catch (error) {
@@ -371,7 +384,7 @@ const NaverMap = forwardRef(
 
         // ref를 통해 외부에서 호출할 수 있는 함수들 노출
         useImperativeHandle(ref, () => ({
-            refreshMarkers: (filters = {}) => {
+            refreshMarkers: (filters: { searchKeyword?: string; sortType?: string } = {}) => {
                 if (
                     Object.prototype.hasOwnProperty.call(
                         filters,
@@ -379,7 +392,7 @@ const NaverMap = forwardRef(
                     )
                 ) {
                     searchKeywordRef.current =
-                        filters.searchKeyword;
+                        (filters as { searchKeyword?: string }).searchKeyword || '';
                 }
                 if (
                     Object.prototype.hasOwnProperty.call(
@@ -387,7 +400,7 @@ const NaverMap = forwardRef(
                         'sortType'
                     )
                 ) {
-                    sortTypeRef.current = filters.sortType;
+                    sortTypeRef.current = (filters as { sortType?: string }).sortType || 'LATEST';
                 }
                 if (mapInstance) {
                     // 검색 실행 표시
@@ -400,7 +413,7 @@ const NaverMap = forwardRef(
             },
             loadMoreJobPostings,
             loadWorkspacePostings,
-            loadJobPostingsInBounds: (bounds) => {
+            loadJobPostingsInBounds: (bounds: any) => {
                 if (mapInstance && bounds) {
                     // 저장된 좌표로 공고 리스트 로드
                     loadJobPostingsInBoundsWithCoordinates(
@@ -418,7 +431,7 @@ const NaverMap = forwardRef(
                 if (mapInstance) {
                     // 현재 위치로 지도 이동만 (마커/리스트 조회 없음)
                     const center =
-                        new window.naver.maps.LatLng(
+                        new (window as any).naver.maps.LatLng(
                             currentLocation.latitude,
                             currentLocation.longitude
                         );
@@ -432,7 +445,7 @@ const NaverMap = forwardRef(
         }));
 
         // 지도 영역의 마커 로드
-        const loadMarkersInBounds = async (map) => {
+        const loadMarkersInBounds = async (map: any) => {
             try {
                 const bounds = map.getBounds();
                 const sw = bounds.getSW(); // 남서쪽 모서리
@@ -455,7 +468,7 @@ const NaverMap = forwardRef(
                 const response = await getMapMarkers(
                     coordinate1,
                     coordinate2
-                );
+                ) as { data?: unknown[]; [key: string]: unknown };
                 console.log('마커 응답:', response);
 
                 if (
@@ -464,7 +477,7 @@ const NaverMap = forwardRef(
                 ) {
                     setMarkers(response.data);
                 }
-            } catch (error) {
+            } catch (error: unknown) {
                 console.error('마커 로드 실패:', error);
             }
         };
@@ -486,25 +499,26 @@ const NaverMap = forwardRef(
                         longitude: location.longitude,
                     });
                     setLocationPermission('granted');
-                } catch (error) {
+                } catch (error: unknown) {
+                    const err = error as { message?: string; code?: number };
                     console.log(
                         '위치 정보 획득 실패:',
-                        error.message
+                        err.message || '알 수 없는 오류'
                     );
 
                     // 에러 처리
-                    if (error.code === 1) {
+                    if (err.code === 1) {
                         // PERMISSION_DENIED
                         setLocationPermission('denied');
                         alert(
                             '위치 권한이 필요합니다. 브라우저 설정에서 위치 권한을 허용해주세요.'
                         );
-                    } else if (error.code === 2) {
+                    } else if (err.code === 2) {
                         // POSITION_UNAVAILABLE
                         setLocationPermission(
                             'unavailable'
                         );
-                    } else if (error.code === 3) {
+                    } else if (err.code === 3) {
                         // TIMEOUT
                         setLocationPermission('timeout');
                     } else {
@@ -525,10 +539,11 @@ const NaverMap = forwardRef(
                             '기본 위치 사용:',
                             fallbackLocation
                         );
-                    } catch (fallbackError) {
+                    } catch (fallbackError: unknown) {
+                        const fallbackErr = fallbackError as { message?: string };
                         console.log(
                             '기본 위치도 사용할 수 없음:',
-                            fallbackError.message
+                            fallbackErr.message || '알 수 없는 오류'
                         );
                     }
                 }
@@ -611,7 +626,7 @@ const NaverMap = forwardRef(
                 window.naver.maps.Event.addListener(
                     map,
                     'click',
-                    (e) => {
+                    (e: any) => {
                         // 마커가 아닌 지도 배경을 클릭한 경우
                         if (
                             !e.overlay ||
@@ -871,7 +886,11 @@ NaverMap.displayName = 'NaverMap';
 
 export default NaverMap;
 
-const MapContainer = styled.div`
+interface MapContainerProps {
+    $isMapLoaded: boolean;
+}
+
+const MapContainer = styled.div<MapContainerProps>`
     width: 100%;
     height: 100%;
     border-radius: 0;

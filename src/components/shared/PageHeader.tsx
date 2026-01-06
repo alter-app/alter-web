@@ -1,11 +1,17 @@
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
+interface PageHeaderProps {
+    title: string;
+    onBack?: () => void;
+    showBackButton?: boolean;
+}
+
 const PageHeader = ({
     title,
     onBack,
     showBackButton = true,
-}) => {
+}: PageHeaderProps) => {
     const navigate = useNavigate();
 
     const handleBack = () => {
@@ -45,7 +51,11 @@ const PageHeader = ({
 
 export default PageHeader;
 
-const Header = styled.div`
+interface HeaderProps {
+    $showBackButton?: boolean;
+}
+
+const Header = styled.div<HeaderProps>`
     position: fixed;
     top: 0;
     left: 0;
@@ -69,7 +79,7 @@ const Header = styled.div`
 
     @media (max-width: 480px) {
         height: 56px;
-        padding-left: ${(props) =>
+        padding-left: ${(props: HeaderProps) =>
             props.$showBackButton ? '12px' : '24px'};
 
         @supports (padding: max(0px)) {
@@ -81,7 +91,7 @@ const Header = styled.div`
 
     @media (max-width: 360px) {
         height: 52px;
-        padding-left: ${(props) =>
+        padding-left: ${(props: HeaderProps) =>
             props.$showBackButton ? '10px' : '24px'};
 
         @supports (padding: max(0px)) {
@@ -125,7 +135,11 @@ const BackButton = styled.button`
     }
 `;
 
-const HeaderTitle = styled.h1`
+interface HeaderTitleProps {
+    $hasBackButton?: boolean;
+}
+
+const HeaderTitle = styled.h1<HeaderTitleProps>`
     font-family: 'Pretendard';
     font-weight: 600;
     font-size: 24px;
@@ -136,13 +150,13 @@ const HeaderTitle = styled.h1`
 
     @media (max-width: 480px) {
         font-size: 20px;
-        margin-left: ${(props) =>
+        margin-left: ${(props: HeaderTitleProps) =>
             props.$hasBackButton ? '10px' : '0'};
     }
 
     @media (max-width: 360px) {
         font-size: 18px;
-        margin-left: ${(props) =>
+        margin-left: ${(props: HeaderTitleProps) =>
             props.$hasBackButton ? '8px' : '0'};
     }
 `;

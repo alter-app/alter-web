@@ -1,6 +1,19 @@
 import styled from 'styled-components';
+import React from 'react';
 
-const ConfirmModal = ({
+interface ConfirmModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    title?: string;
+    message?: string;
+    confirmText?: string;
+    cancelText?: string;
+    confirmColor?: string;
+    showCancel?: boolean;
+}
+
+const ConfirmModal: React.FC<ConfirmModalProps> = ({
     isOpen,
     onClose,
     onConfirm,
@@ -151,11 +164,15 @@ const CancelButton = styled.button`
     }
 `;
 
-const ConfirmButton = styled.button`
+interface ConfirmButtonProps {
+    $confirmColor?: string;
+}
+
+const ConfirmButton = styled.button<ConfirmButtonProps>`
     flex: 1;
     height: 48px;
     border: none;
-    background: ${(props) => props.$confirmColor};
+    background: ${(props) => props.$confirmColor || '#2de283'};
     color: #ffffff;
     border-radius: 8px;
     font-family: 'Pretendard';

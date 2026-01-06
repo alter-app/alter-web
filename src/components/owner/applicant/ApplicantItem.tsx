@@ -5,13 +5,44 @@ import Calendar from '../../../assets/icons/workplace/Calendar.svg';
 import { timeAgo, formatTimeToHHMM } from '../../../utils/timeUtil';
 import { getKoreanDays } from '../../../utils/weekUtil';
 
+interface ApplicantItemProps {
+    workspace: {
+        name?: string;
+        [key: string]: unknown;
+    };
+    status: {
+        description?: string;
+        [key: string]: unknown;
+    };
+    createdAt?: string;
+    schedule: {
+        startTime: string;
+        endTime: string;
+        workingDays?: string[];
+        [key: string]: unknown;
+    };
+    applicant: {
+        name?: string;
+        reputationSummary?: {
+            topKeywords?: Array<{
+                id?: string | number;
+                emoji?: string;
+                description?: string;
+                [key: string]: unknown;
+            }>;
+            [key: string]: unknown;
+        };
+        [key: string]: unknown;
+    };
+}
+
 const ApplicantItem = ({
     workspace,
     status,
     createdAt,
     schedule,
     applicant,
-}) => {
+}: ApplicantItemProps) => {
     const startTime = formatTimeToHHMM(schedule.startTime);
     const endTime = formatTimeToHHMM(schedule.endTime);
 
@@ -39,12 +70,12 @@ const ApplicantItem = ({
                 </InfoGroup>
                 <InfoGroup>
                     <img src={Calendar} alt='희망 근무 요일' />
-                    <Date>{getKoreanDays(schedule.workingDays)}</Date>
+                    <Date>{getKoreanDays(schedule.workingDays || [])}</Date>
                 </InfoGroup>
             </ScheduleInfoSection>
             <Row>
                 <KeywordArea count={keywords.length}>
-                    {keywords.map((keyword) => (
+                    {keywords.map((keyword: { id?: string | number; emoji?: string; description?: string; [key: string]: unknown }) => (
                         <KeywordTag key={keyword.id}>
                             {keyword.emoji} {keyword.description}
                         </KeywordTag>
@@ -156,7 +187,11 @@ const Row = styled.div`
     gap: 8px;
 `;
 
-const KeywordArea = styled.div`
+interface KeywordAreaProps {
+    count?: number;
+}
+
+const KeywordArea = styled.div<KeywordAreaProps>`
     display: flex;
     gap: 5px 5px;
     flex-wrap: wrap;

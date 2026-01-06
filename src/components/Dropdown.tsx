@@ -2,15 +2,28 @@ import styled, { css } from 'styled-components';
 import { useState, useEffect, useRef } from 'react';
 import ArrowDownIcon from '../assets/icons/dropdown.svg';
 
+interface DropdownOption {
+    id: string | number;
+    name: string;
+    [key: string]: unknown;
+}
+
+interface DropdownProps {
+    options?: DropdownOption[];
+    onChange?: (id: string | number) => void;
+    width?: number;
+    value?: string | number;
+}
+
 const Dropdown = ({
     options = [],
     onChange,
     width,
     value,
-}) => {
+}: DropdownProps) => {
     const list = options;
-    const selectRef = useRef(null);
-    const [currentValue, setCurrentValue] = useState(() => {
+    const selectRef = useRef<HTMLDivElement>(null);
+    const [currentValue, setCurrentValue] = useState<DropdownOption | null>(() => {
         // value prop이 있으면 해당 값을 찾아서 설정
         if (value && list.length > 0) {
             const found = list.find(
@@ -38,9 +51,10 @@ const Dropdown = ({
 
     // 외부 클릭 감지되면 드롭다운 닫음
     useEffect(() => {
-        const handleClick = (e) => {
+        const handleClick = (e: MouseEvent) => {
             if (
                 selectRef.current &&
+                e.target instanceof Node &&
                 !selectRef.current.contains(e.target)
             ) {
                 setShowOptions(false);
@@ -75,7 +89,7 @@ const Dropdown = ({
                     <Option
                         key={item.id}
                         value={item.id}
-                        onClick={(e) => {
+                        onClick={(e: React.MouseEvent<HTMLLIElement>) => {
                             e.stopPropagation();
                             setCurrentValue(item);
                             setShowOptions(false);
@@ -91,7 +105,23 @@ const Dropdown = ({
 };
 export default Dropdown;
 
-const SelectBox = styled.div`
+interface SelectBoxProps {
+    width?: number;
+}
+
+interface LabelProps {
+    width?: number;
+}
+
+interface SelectOptionsProps {
+    $show?: boolean;
+}
+
+interface DropdownIconProps {
+    open?: boolean;
+}
+
+const SelectBox = styled.div<SelectBoxProps>`
     position: relative;
     width: ${({ width }) =>
         width ? `${width}px` : '250px'};
@@ -122,7 +152,7 @@ const ArrowWrapper = styled.div`
     align-items: center;
 `;
 
-const Label = styled.div`
+const Label = styled.div<LabelProps>`
     font-size: 14px;
     display: inline-block;
     font-family: 'Pretendard';
@@ -142,7 +172,7 @@ const Label = styled.div`
     }
 `;
 
-const SelectOptions = styled.ul`
+const SelectOptions = styled.ul<SelectOptionsProps>`
     position: absolute;
     top: calc(100% + 4px);
     left: 0;
@@ -189,7 +219,7 @@ const Option = styled.li`
     }
 `;
 
-const DropdownIcon = styled.img`
+const DropdownIcon = styled.img<DropdownIconProps>`
     width: 20px;
     height: 20px;
     display: flex;

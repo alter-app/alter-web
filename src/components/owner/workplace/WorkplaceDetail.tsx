@@ -6,9 +6,21 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import WorkplaceSchedule from './WorkplaceSchedule';
 
+interface WorkplaceDetailInfo {
+    businessName?: string;
+    businessRegistrationNo?: string;
+    contact?: string;
+    businessType?: string;
+    description?: string;
+    fullAddress?: string;
+    latitude?: number;
+    longitude?: number;
+    [key: string]: unknown;
+}
+
 const WorkplaceDetail = () => {
     const [workplaceDetailInfo, setWorkplaceDetailInfo] =
-        useState([]);
+        useState<WorkplaceDetailInfo>({});
     const { id } = useParams();
 
     useEffect(() => {
@@ -17,8 +29,8 @@ const WorkplaceDetail = () => {
 
     const fetchWorkplaceDetailInfo = async () => {
         try {
-            const result = await getWorkplaceDetailInfo(id);
-            setWorkplaceDetailInfo(result.data);
+            const result = await getWorkplaceDetailInfo(id || '') as { data?: WorkplaceDetailInfo; [key: string]: unknown };
+            setWorkplaceDetailInfo(result.data || {});
             console.log(result.data);
         } catch (error) {
             console.error('업장 정보 조회 오류:', error);
@@ -29,33 +41,33 @@ const WorkplaceDetail = () => {
         <>
             <Container>
                 <Title>
-                    {workplaceDetailInfo.businessName}
+                    {workplaceDetailInfo.businessName || '업장 정보'}
                 </Title>
                 <Contents>
                     <WorkplaceInfo
                         businessRegistrationNo={
-                            workplaceDetailInfo.businessRegistrationNo
+                            workplaceDetailInfo.businessRegistrationNo || ''
                         }
                         contact={
-                            workplaceDetailInfo.contact
+                            workplaceDetailInfo.contact || ''
                         }
                         businessType={
-                            workplaceDetailInfo.businessType
+                            workplaceDetailInfo.businessType || ''
                         }
                         description={
-                            workplaceDetailInfo.description
+                            workplaceDetailInfo.description || ''
                         }
                         fullAddress={
-                            workplaceDetailInfo.fullAddress
+                            workplaceDetailInfo.fullAddress || ''
                         }
                         latitude={
-                            workplaceDetailInfo.latitude
+                            workplaceDetailInfo.latitude || 0
                         }
                         longitude={
-                            workplaceDetailInfo.longitude
+                            workplaceDetailInfo.longitude || 0
                         }
                         businessName={
-                            workplaceDetailInfo.businessName
+                            workplaceDetailInfo.businessName || ''
                         }
                     />
                     <WorkplaceEmployeeList id={id} />

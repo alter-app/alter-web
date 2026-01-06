@@ -1,8 +1,17 @@
 import styled from 'styled-components';
 
-const ScheduleItem = ({ day, date, workplace, time, hours }) => {
+interface ScheduleItemProps {
+    day: string;
+    date: string;
+    workplace: string;
+    time: string;
+    hours: string;
+    onClick?: () => void;
+}
+
+const ScheduleItem = ({ day, date, workplace, time, hours, onClick }: ScheduleItemProps) => {
     return (
-        <ItemContainer>
+        <ItemContainer onClick={onClick} style={{ cursor: onClick ? 'pointer' : 'default' }}>
             <DateInfo>
                 <Day day={day}>{day}</Day>
                 <Date>{date}일</Date>
@@ -37,7 +46,11 @@ const DateInfo = styled.div`
     margin-right: 16px;
 `;
 
-const Day = styled.span`
+interface DayProps {
+    day?: string;
+}
+
+const Day = styled.span<DayProps>`
     font-family: 'Pretendard';
     font-weight: 600;
     font-size: 16px;

@@ -18,8 +18,13 @@ const ScheduleRequestPage = () => {
         workplaceName: '업장',
     };
 
+    interface Schedule {
+        id: string | number;
+        [key: string]: unknown;
+    }
+
     const [selectedSchedule, setSelectedSchedule] =
-        useState(null);
+        useState<Schedule | null>(null);
     const [requestReason, setRequestReason] = useState('');
     const [currentYear, setCurrentYear] = useState(
         new Date().getFullYear()
@@ -31,11 +36,11 @@ const ScheduleRequestPage = () => {
     const [isConfirmModalOpen, setIsConfirmModalOpen] =
         useState(false);
 
-    const handleScheduleSelect = (schedule) => {
+    const handleScheduleSelect = (schedule: Schedule) => {
         setSelectedSchedule(schedule);
     };
 
-    const handleReasonChange = (reason) => {
+    const handleReasonChange = (reason: string) => {
         setRequestReason(reason);
     };
 
@@ -79,6 +84,8 @@ const ScheduleRequestPage = () => {
                 requestReason: requestReason.trim(),
             };
 
+            if (!selectedSchedule) return;
+            
             await createSubstituteRequest(
                 selectedSchedule.id,
                 requestData
@@ -158,7 +165,11 @@ const ContentWrapper = styled.div`
     gap: 24px;
 `;
 
-const SubmitButton = styled.button`
+interface SubmitButtonProps {
+    $disabled?: boolean;
+}
+
+const SubmitButton = styled.button<SubmitButtonProps>`
     width: 100%;
     height: 48px;
     background: ${(props) =>

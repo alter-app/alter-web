@@ -1,7 +1,11 @@
 import styled from 'styled-components';
 import addButton from '../../../assets/icons/addButton.svg';
 
-const AddScheduleButton = ({ onClick }) => {
+interface AddScheduleButtonProps {
+    onClick: () => void;
+}
+
+const AddScheduleButton = ({ onClick }: AddScheduleButtonProps) => {
     return (
         <Container onClick={onClick}>
             <img src={addButton} alt='근무 일정 추가' />

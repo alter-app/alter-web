@@ -1,7 +1,12 @@
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
-const RouteButton = ({ text, path }) => {
+interface RouteButtonProps {
+    text: string;
+    path: string;
+}
+
+const RouteButton = ({ text, path }: RouteButtonProps) => {
     const navigate = useNavigate();
     const onNavigate = () => navigate(path);
     return (

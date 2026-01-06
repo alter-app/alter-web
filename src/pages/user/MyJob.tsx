@@ -29,23 +29,49 @@ import {
 import { timeAgo } from '../../utils/timeUtil';
 import { useNavigate } from 'react-router-dom';
 import Loader from '../../components/Loader';
+import { Workplace, Reputation, SubstituteRequest, Application, Schedule } from '../../types';
+
+interface FormattedReputation extends Reputation {
+    workplaceName: string;
+    reviewerName: string;
+    timeAgo: string;
+    rating: number;
+    isNew: boolean;
+    requesterType: string;
+}
+
+interface FormattedSentReputation {
+    id: string | number;
+    targetName: string;
+    workplaceName: string;
+    timeAgo: string;
+    status: string;
+    statusDescription: string;
+}
+
+interface FormattedApplication {
+    id: string | number;
+    workplaceName: string;
+    status: string;
+    position: string;
+    wage: string;
+    applicationDate: string;
+}
 
 const MyJob = () => {
-    const [workplaces, setWorkplaces] = useState([]);
-    const [reputations, setReputations] = useState([]);
-    const [sentReputations, setSentReputations] = useState(
-        []
-    );
+    const [workplaces, setWorkplaces] = useState<Workplace[]>([]);
+    const [reputations, setReputations] = useState<FormattedReputation[]>([]);
+    const [sentReputations, setSentReputations] = useState<FormattedSentReputation[]>([]);
     const [
         sentSubstituteRequests,
         setSentSubstituteRequests,
-    ] = useState([]);
+    ] = useState<SubstituteRequest[]>([]);
     const [
         receivedSubstituteRequests,
         setReceivedSubstituteRequests,
-    ] = useState([]);
-    const [applications, setApplications] = useState([]);
-    const [schedules, setSchedules] = useState([]);
+    ] = useState<SubstituteRequest[]>([]);
+    const [applications, setApplications] = useState<FormattedApplication[]>([]);
+    const [schedules, setSchedules] = useState<Schedule[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
@@ -60,9 +86,9 @@ const MyJob = () => {
                     await getUserReputationRequestsList(3);
 
                 // API 데이터를 컴포넌트에 맞게 변환
-                const formattedReputations = (
+                const formattedReputations: FormattedReputation[] = (
                     reputationData.data || []
-                ).map((item) => {
+                ).map((item: any): FormattedReputation => {
                     // 요청자 타입에 따른 로직 처리
                     let workplaceName = '알 수 없는 업장';
                     let reviewerName = '알 수 없는 요청자';
@@ -135,9 +161,9 @@ const MyJob = () => {
                     );
 
                 // API 데이터를 컴포넌트에 맞게 변환
-                const formattedSentReputations = (
+                const formattedSentReputations: FormattedSentReputation[] = (
                     sentReputationData.data || []
-                ).map((item) => {
+                ).map((item: any): FormattedSentReputation => {
                     let targetName = '알 수 없는 대상';
                     let workplaceName = '알 수 없는 업장';
 
@@ -194,10 +220,10 @@ const MyJob = () => {
                     );
 
                 // API 데이터를 컴포넌트에 맞게 변환
-                const formattedSentSubstituteRequests = (
+                const formattedSentSubstituteRequests: SubstituteRequest[] = (
                     sentSubstituteRequestData.data?.data ||
                     []
-                ).map((item) => {
+                ).map((item: any): SubstituteRequest => {
                     const startDate = new Date(
                         item.schedule.startDateTime
                     );
@@ -259,11 +285,11 @@ const MyJob = () => {
                             null,
                             'PENDING'
                         );
-                    const formattedReceivedSubstituteRequests =
+                    const formattedReceivedSubstituteRequests: SubstituteRequest[] =
                         (
                             receivedSubstituteRequestData
                                 .data?.data || []
-                        ).map((item) => {
+                        ).map((item: any): SubstituteRequest => {
                             const startDate = new Date(
                                 item.schedule.startDateTime
                             );
@@ -353,9 +379,9 @@ const MyJob = () => {
                     });
 
                 // API 데이터를 컴포넌트에 맞게 변환
-                const formattedApplications = (
+                const formattedApplications: FormattedApplication[] = (
                     applicationData.data || []
-                ).map((item) => ({
+                ).map((item: any): FormattedApplication => ({
                     id: item.id,
                     workplaceName:
                         item.posting?.workspace?.name ||
@@ -385,9 +411,9 @@ const MyJob = () => {
                     await getUserWorkplaceList(3);
 
                 // API 데이터를 컴포넌트에 맞게 변환
-                const formattedWorkplaces = (
+                const formattedWorkplaces: Workplace[] = (
                     workplaceData.data?.data || []
-                ).map((item) => {
+                ).map((item: any): Workplace => {
                     let nextShiftText = '정보 없음';
 
                     if (item.nextShiftDateTime) {
@@ -447,9 +473,9 @@ const MyJob = () => {
                     await getUserScheduleSelf();
 
                 // API 데이터를 컴포넌트에 맞게 변환
-                const formattedSchedules = (
+                const formattedSchedules: Schedule[] = (
                     scheduleData.data || []
-                ).map((item) => {
+                ).map((item: any): Schedule => {
                     const startDate = new Date(
                         item.startDateTime
                     );
@@ -459,7 +485,7 @@ const MyJob = () => {
 
                     // 근무 시간 계산 (시간 단위)
                     const workHours = Math.round(
-                        (endDate - startDate) /
+                        (endDate.getTime() - startDate.getTime()) /
                             (1000 * 60 * 60)
                     );
 
@@ -506,7 +532,7 @@ const MyJob = () => {
         fetchData();
     }, []);
 
-    const handleWorkplaceClick = (workplace) => {
+    const handleWorkplaceClick = (workplace: Workplace) => {
         console.log('근무지 클릭:', workplace);
         navigate(
             `/my-job/workplace/${
@@ -515,7 +541,7 @@ const MyJob = () => {
         );
     };
 
-    const handleApplicationClick = (application) => {
+    const handleApplicationClick = (application: FormattedApplication) => {
         // 지원 상세 페이지로 이동하는 로직
     };
 
@@ -540,7 +566,7 @@ const MyJob = () => {
     };
 
     const handleReceivedSubstituteRequestAccept = async (
-        request
+        request: SubstituteRequest
     ) => {
         try {
             await acceptSubstituteRequest(request.id);
@@ -557,7 +583,7 @@ const MyJob = () => {
     };
 
     const handleReceivedSubstituteRequestReject = async (
-        request
+        request: SubstituteRequest
     ) => {
         try {
             await rejectSubstituteRequest(request.id);
@@ -574,7 +600,7 @@ const MyJob = () => {
     };
 
     const handleSentSubstituteRequestCancel = async (
-        request
+        request: SubstituteRequest
     ) => {
         try {
             await cancelSubstituteRequest(request.id);
@@ -597,7 +623,7 @@ const MyJob = () => {
     };
 
     const handleSentReputationCancel = async (
-        reputation
+        reputation: FormattedSentReputation
     ) => {
         try {
             await cancelSentReputationRequest(
@@ -610,10 +636,10 @@ const MyJob = () => {
                     3,
                     null,
                     'REQUESTED'
-                );
-            const formattedSentReputations = (
+                ) as { data: unknown[] };
+            const formattedSentReputations: FormattedSentReputation[] = (
                 sentReputationData.data || []
-            ).map((item) => {
+            ).map((item: any): FormattedSentReputation => {
                 let targetName = '알 수 없는 대상';
                 let workplaceName = '알 수 없는 업장';
 
@@ -656,7 +682,7 @@ const MyJob = () => {
     };
 
     // 지원 취소 핸들러
-    const handleApplicationCancel = async (application) => {
+    const handleApplicationCancel = async (application: FormattedApplication) => {
         try {
             await cancelApplication(application.id);
 
@@ -665,10 +691,10 @@ const MyJob = () => {
                 await getApplicationList({
                     pageSize: 3,
                     status: ['SUBMITTED'], // 지원완료 상태만 조회
-                });
-            const formattedApplications = (
+                }) as { data: unknown[] };
+            const formattedApplications: FormattedApplication[] = (
                 applicationData.data || []
-            ).map((item) => ({
+            ).map((item: any): FormattedApplication => ({
                 id: item.id,
                 workplaceName:
                     item.posting?.workspace?.name ||
@@ -698,7 +724,7 @@ const MyJob = () => {
         navigate('/schedule-list');
     };
 
-    const handleReputationAccept = async (reputation) => {
+    const handleReputationAccept = async (reputation: FormattedReputation) => {
         try {
             // 평판 작성 페이지로 이동
             navigate('/reputation-write', {
@@ -710,7 +736,7 @@ const MyJob = () => {
         }
     };
 
-    const handleReputationReject = async (reputation) => {
+    const handleReputationReject = async (reputation: FormattedReputation) => {
         try {
             await userDeclineReputation(reputation.id);
 
@@ -734,6 +760,7 @@ const MyJob = () => {
                 <PageHeader
                     title='내 알바'
                     showBackButton={false}
+                    onBack={() => {}}
                 />
                 <Container>
                     <LoadingMessage>

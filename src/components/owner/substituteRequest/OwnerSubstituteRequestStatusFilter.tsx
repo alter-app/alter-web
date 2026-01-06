@@ -1,14 +1,19 @@
 import styled from 'styled-components';
 import { useState } from 'react';
 
+interface OwnerSubstituteRequestStatusFilterProps {
+    selectedStatuses: string[];
+    onStatusChange: (statuses: string[]) => void;
+}
+
 const OwnerSubstituteRequestStatusFilter = ({
     selectedStatuses,
     onStatusChange,
-}) => {
+}: OwnerSubstituteRequestStatusFilterProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
     // 상태별 색상 매핑
-    const getStatusColor = (statusValue) => {
+    const getStatusColor = (statusValue: string): string => {
         switch (statusValue) {
             case 'PENDING':
                 return '#ffa726';
@@ -48,7 +53,7 @@ const OwnerSubstituteRequestStatusFilter = ({
         },
     ];
 
-    const handleStatusSelect = (status) => {
+    const handleStatusSelect = (status: string) => {
         // 하나의 상태만 선택 가능
         if (selectedStatuses.includes(status)) {
             // 이미 선택된 상태를 클릭하면 선택 해제
@@ -168,7 +173,11 @@ const FilterText = styled.span`
     text-align: left;
 `;
 
-const FilterIcon = styled.div`
+interface FilterIconProps {
+    $isOpen?: boolean;
+}
+
+const FilterIcon = styled.div<FilterIconProps>`
     display: flex;
     align-items: center;
     justify-content: center;
@@ -192,7 +201,11 @@ const FilterDropdown = styled.div`
     margin-top: 4px;
 `;
 
-const FilterOption = styled.div`
+interface FilterOptionProps {
+    $isSelected?: boolean;
+}
+
+const FilterOption = styled.div<FilterOptionProps>`
     padding: 12px 16px;
     cursor: pointer;
     display: flex;
@@ -221,10 +234,14 @@ const FilterOption = styled.div`
     }
 `;
 
-const StatusIndicator = styled.div`
+interface StatusIndicatorProps {
+    $color?: string;
+}
+
+const StatusIndicator = styled.div<StatusIndicatorProps>`
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: ${(props) => props.$color};
+    background: ${(props) => props.$color || '#6b7280'};
     flex-shrink: 0;
 `;

@@ -3,6 +3,34 @@ import styled from 'styled-components';
 import AuthInput from './AuthInput';
 import AuthButton from './AuthButton';
 
+interface SignUpStep2Props {
+    nickname: string;
+    setNickname: (value: string) => void;
+    checkNickname: (nickname: string) => Promise<boolean>;
+    nicknameChecked: boolean;
+    setNicknameChecked: (value: boolean) => void;
+    nicknameCheckMessage: string;
+    setNicknameCheckMessage: (value: string) => void;
+    email: string;
+    setEmail: (value: string) => void;
+    checkEmail: (email: string) => Promise<{ success: boolean; duplicated?: boolean; message?: string }>;
+    emailChecked: boolean;
+    setEmailChecked: (value: boolean) => void;
+    emailCheckMessage: string;
+    setEmailCheckMessage: (value: string) => void;
+    password: string;
+    passwordCheck: string;
+    setPassword: (value: string) => void;
+    setPasswordCheck: (value: string) => void;
+    agreed: boolean;
+    setAgreed: (value: boolean) => void;
+    adAgreed: boolean;
+    setAdAgreed: (value: boolean) => void;
+    isValid: boolean;
+    onPrev: () => void;
+    onSubmit: () => void;
+}
+
 const SignUpStep2 = ({
     nickname,
     setNickname,
@@ -29,7 +57,7 @@ const SignUpStep2 = ({
     isValid,
     onPrev,
     onSubmit,
-}) => (
+}: SignUpStep2Props) => (
     <Container>
         <TopSection>
             <BackButton onClick={onPrev}>
@@ -155,7 +183,7 @@ const SignUpStep2 = ({
                         } else {
                             setEmailChecked(false);
                             setEmailCheckMessage(
-                                result.message
+                                result.message || '이메일 중복 확인 실패'
                             );
                         }
                     }}

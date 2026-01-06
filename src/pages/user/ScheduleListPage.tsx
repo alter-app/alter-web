@@ -6,12 +6,30 @@ import PageHeader from '../../components/shared/PageHeader';
 import ScheduleItem from '../../components/user/myJob/ScheduleItem';
 import { getUserScheduleSelf } from '../../services/myJob';
 import Loader from '../../components/Loader';
+import { Schedule } from '../../types';
+
+interface TransformedSchedule extends Schedule {
+    day: string;
+    date: string;
+    workplace: string;
+    time: string;
+    hours: string;
+}
+
+interface RawScheduleData {
+    shiftId: string | number;
+    startDateTime: string;
+    endDateTime: string;
+    workspace?: {
+        workspaceName?: string;
+    };
+}
 
 const ScheduleListPage = () => {
-    const [schedules, setSchedules] = useState([]);
+    const [schedules, setSchedules] = useState<TransformedSchedule[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
-    const [nextCursor, setNextCursor] = useState(null);
+    const [nextCursor, setNextCursor] = useState<string | null>(null);
     const [isLoadingMore, setIsLoadingMore] =
         useState(false);
     const [currentYear, setCurrentYear] = useState(
@@ -23,14 +41,14 @@ const ScheduleListPage = () => {
     const navigate = useNavigate();
 
     // 데이터 변환 함수
-    const transformScheduleData = (data) => {
-        return (data || []).map((item) => {
+    const transformScheduleData = (data: RawScheduleData[]): TransformedSchedule[] => {
+        return (data || []).map((item: RawScheduleData) => {
             const startDate = new Date(item.startDateTime);
             const endDate = new Date(item.endDateTime);
 
             // 근무 시간 계산 (시간 단위)
             const workHours = Math.round(
-                (endDate - startDate) / (1000 * 60 * 60)
+                (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60)
             );
 
             return {
@@ -74,10 +92,10 @@ const ScheduleListPage = () => {
                     await getUserScheduleSelf(
                         currentYear,
                         currentMonth
-                    );
+                    ) as { data: RawScheduleData[] };
                 const formattedSchedules =
                     transformScheduleData(
-                        scheduleData.data
+                        scheduleData.data || []
                     );
 
                 setSchedules(formattedSchedules);
@@ -101,15 +119,15 @@ const ScheduleListPage = () => {
 
     // 월별 스케줄 로드
     const fetchMonthlySchedules = useCallback(
-        async (year, month) => {
+        async (year: number, month: number) => {
             try {
                 setIsLoading(true);
 
                 const scheduleData =
-                    await getUserScheduleSelf(year, month);
+                    await getUserScheduleSelf(year, month) as { data: RawScheduleData[] };
                 const formattedSchedules =
                     transformScheduleData(
-                        scheduleData.data
+                        scheduleData.data || []
                     );
 
                 setSchedules(formattedSchedules);
@@ -151,7 +169,7 @@ const ScheduleListPage = () => {
     };
 
     // 스케줄 클릭 핸들러
-    const handleScheduleClick = (schedule) => {
+    const handleScheduleClick = (schedule: TransformedSchedule) => {
         console.log('스케줄 클릭:', schedule);
         // 스케줄 상세 페이지로 이동하는 로직 (필요시 구현)
     };
@@ -159,7 +177,7 @@ const ScheduleListPage = () => {
     if (isLoading) {
         return (
             <PageContainer>
-                <PageHeader title='내 일정' />
+                <PageHeader title='내 일정' onBack={() => navigate(-1)} />
                 <LoadingContainer>
                     <Loader />
                 </LoadingContainer>

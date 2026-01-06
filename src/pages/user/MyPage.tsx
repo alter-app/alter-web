@@ -8,13 +8,13 @@ import BottomNavigation from '../../layouts/BottomNavigation';
 import PageHeader from '../../components/shared/PageHeader';
 
 const MyPage = () => {
-    const [userInfo, setUserInfo] = useState([]);
-    const [activeTab, setActiveTab] = useState('scrap');
+    const [userInfo, setUserInfo] = useState<unknown>(null);
+    const [activeTab, setActiveTab] = useState<'scrap' | 'certificate'>('scrap');
 
     // 사용자 정보 조회 요청
     useEffect(() => {
         const fetchUserInfo = async () => {
-            const result = await getUserInfo();
+            const result = await getUserInfo() as { data: unknown };
             setUserInfo(result.data);
         };
         fetchUserInfo();
@@ -92,7 +92,11 @@ const TabContainer = styled.div`
     border-bottom: 1px solid #e0e0e0;
 `;
 
-const Tab = styled.button`
+interface TabProps {
+    $active?: boolean;
+}
+
+const Tab = styled.button<TabProps>`
     flex: 1;
     padding: 16px 0;
     background: none;

@@ -2,6 +2,21 @@ import { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 import dropdownIcon from '../../../assets/icons/dropdown.svg';
 
+interface Workplace {
+    id: string | number;
+    businessName?: string;
+    [key: string]: unknown;
+}
+
+interface StatusFilterProps {
+    selectedStatus: string;
+    onStatusChange: (status: string) => void;
+    selectedWorkplace: string | number | null;
+    onWorkplaceChange: (workplaceId: string | number | null) => void;
+    workplaceList: Workplace[];
+    totalCount: number;
+}
+
 const StatusFilter = ({
     selectedStatus,
     onStatusChange,
@@ -9,12 +24,12 @@ const StatusFilter = ({
     onWorkplaceChange,
     workplaceList,
     totalCount,
-}) => {
+}: StatusFilterProps) => {
     const [isWorkplaceOpen, setIsWorkplaceOpen] =
         useState(false);
     const [isStatusOpen, setIsStatusOpen] = useState(false);
-    const workplaceRef = useRef(null);
-    const statusRef = useRef(null);
+    const workplaceRef = useRef<HTMLDivElement>(null);
+    const statusRef = useRef<HTMLDivElement>(null);
 
     const statusOptions = [
         { value: '', label: '전체 상태' },
@@ -30,7 +45,7 @@ const StatusFilter = ({
     // 현재 선택된 값의 라벨 찾기
     const getSelectedWorkplaceLabel = () => {
         const workplace = workplaceList.find(
-            (w) => w.id === selectedWorkplace
+            (w: Workplace) => w.id === selectedWorkplace
         );
         return workplace
             ? workplace.businessName
@@ -46,15 +61,17 @@ const StatusFilter = ({
 
     // 외부 클릭 감지
     useEffect(() => {
-        const handleClickOutside = (event) => {
+        const handleClickOutside = (event: MouseEvent) => {
             if (
                 workplaceRef.current &&
+                event.target instanceof Node &&
                 !workplaceRef.current.contains(event.target)
             ) {
                 setIsWorkplaceOpen(false);
             }
             if (
                 statusRef.current &&
+                event.target instanceof Node &&
                 !statusRef.current.contains(event.target)
             ) {
                 setIsStatusOpen(false);
@@ -73,12 +90,12 @@ const StatusFilter = ({
         };
     }, []);
 
-    const handleWorkplaceSelect = (workplaceId) => {
+    const handleWorkplaceSelect = (workplaceId: string | number) => {
         onWorkplaceChange(workplaceId);
         setIsWorkplaceOpen(false);
     };
 
-    const handleStatusSelect = (statusValue) => {
+    const handleStatusSelect = (statusValue: string) => {
         onStatusChange(statusValue);
         setIsStatusOpen(false);
     };
@@ -114,7 +131,7 @@ const StatusFilter = ({
                         {isWorkplaceOpen && (
                             <DropdownMenu>
                                 {workplaceList.map(
-                                    (workplace) => (
+                                    (workplace: Workplace) => (
                                         <DropdownItem
                                             key={
                                                 workplace.id
@@ -325,7 +342,15 @@ const FilterText = styled.span`
     }
 `;
 
-const FilterIcon = styled.span`
+interface FilterIconProps {
+    $isOpen?: boolean;
+}
+
+interface DropdownItemProps {
+    $isSelected?: boolean;
+}
+
+const FilterIcon = styled.span<FilterIconProps>`
     display: flex;
     align-items: center;
     justify-content: center;
@@ -394,7 +419,7 @@ const DropdownMenu = styled.div`
     }
 `;
 
-const DropdownItem = styled.div`
+const DropdownItem = styled.div<DropdownItemProps>`
     padding: 12px 16px;
     font-family: 'Pretendard';
     font-weight: ${(props) =>

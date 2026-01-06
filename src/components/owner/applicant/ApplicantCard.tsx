@@ -17,15 +17,69 @@ import Profile from '../../../assets/icons/applicant/Profile.svg';
 import TimeCircle from '../../../assets/icons/applicant/TimeCircle.svg';
 import Calendar from '../../../assets/icons/workplace/Calendar.svg';
 
-const ApplicantCard = ({ application }) => {
+interface Application {
+    id: string | number;
+    status: {
+        value: string;
+        description?: string;
+    };
+    schedule: {
+        startTime: string;
+        endTime: string;
+        workingDays?: string[];
+        [key: string]: unknown;
+    };
+    applicant?: {
+        name?: string;
+        reputationSummary?: {
+            topKeywords?: Array<{
+                id?: string | number;
+                emoji?: string;
+                description?: string;
+                [key: string]: unknown;
+            }>;
+            [key: string]: unknown;
+        };
+        [key: string]: unknown;
+    };
+    workspace?: {
+        name?: string;
+        [key: string]: unknown;
+    };
+    createdAt?: string;
+    [key: string]: unknown;
+}
+
+interface ApplicantDetail {
+    name?: string;
+    gender?: string;
+    birthday?: string;
+    contact?: string;
+    email?: string;
+    reputationSummary?: {
+        summaryDescription?: string;
+    };
+    userCertificates?: Array<{
+        certificateId?: string | number;
+        name?: string;
+        [key: string]: unknown;
+    }>;
+    [key: string]: unknown;
+}
+
+interface ApplicantCardProps {
+    application: Application;
+}
+
+const ApplicantCard = ({ application }: ApplicantCardProps) => {
     const [showDetails, setShowDetails] = useState(false);
     const [applicationDetail, setApplicationDetail] =
-        useState(null);
+        useState<ApplicantDetail | null>(null);
     const [description, setDescription] = useState('');
     const [showConfirmModal, setShowConfirmModal] =
         useState(false);
     const [pendingStatus, setPendingStatus] =
-        useState(null);
+        useState<string | null>(null);
     const [currentStatus, setCurrentStatus] = useState(
         application.status
     );
@@ -46,7 +100,7 @@ const ApplicantCard = ({ application }) => {
             const response =
                 await getPostingsApplicationDetail(
                     application.id
-                );
+                ) as { data: { applicant: ApplicantDetail; description: string } };
             setApplicationDetail(response.data.applicant);
             setDescription(response.data.description);
         } catch (error) {
@@ -61,13 +115,13 @@ const ApplicantCard = ({ application }) => {
         setShowDetails(!showDetails);
     };
 
-    const handleUpdateStatus = async (status) => {
+    const handleUpdateStatus = async (status: string) => {
         try {
             await updateApplicationStatus({
                 postingApplicationId: application.id,
                 status: status,
             });
-            setCurrentStatus((prev) => ({
+            setCurrentStatus((prev: { value: string; description?: string }) => ({
                 ...prev,
                 value: status,
             }));
@@ -79,7 +133,7 @@ const ApplicantCard = ({ application }) => {
     };
 
     const keywords =
-        application.applicant.reputationSummary
+        application.applicant?.reputationSummary
             ?.topKeywords || [];
 
     return (
@@ -87,7 +141,7 @@ const ApplicantCard = ({ application }) => {
             <Card>
                 <TopSection>
                     <WorkplaceName>
-                        {application.workspace.name}
+                        {application.workspace?.name || '알 수 없는 업장'}
                     </WorkplaceName>
                     <StatusTag
                         $color={color}
@@ -101,7 +155,7 @@ const ApplicantCard = ({ application }) => {
                     <InfoGroup>
                         <img src={Profile} alt='이름' />
                         <Name>
-                            {application.applicant.name}
+                            {application.applicant?.name || '알 수 없는 지원자'}
                         </Name>
                     </InfoGroup>
                     <TimeAgo>
@@ -127,7 +181,7 @@ const ApplicantCard = ({ application }) => {
                         <Date>
                             {getKoreanDays(
                                 application.schedule
-                                    .workingDays
+                                    ?.workingDays || []
                             )}
                         </Date>
                     </InfoGroup>
@@ -138,7 +192,7 @@ const ApplicantCard = ({ application }) => {
                         <KeywordArea
                             count={keywords.length}
                         >
-                            {keywords.map((keyword) => (
+                            {keywords.map((keyword: { id?: string | number; emoji?: string; description?: string; [key: string]: unknown }) => (
                                 <KeywordTag
                                     key={keyword.id}
                                 >
@@ -180,7 +234,7 @@ const ApplicantCard = ({ application }) => {
                                 </DetailLabel>
                                 <DetailValue>
                                     {genderToKorean(
-                                        applicationDetail.gender
+                                        applicationDetail.gender || ''
                                     )}
                                 </DetailValue>
                             </DetailRow>
@@ -243,7 +297,7 @@ const ApplicantCard = ({ application }) => {
                                 .userCertificates.length >
                                 0 ? (
                                 applicationDetail.userCertificates.map(
-                                    (cert) => (
+                                    (cert: { certificateId?: string | number; id?: string | number; certificateName?: string; publisherName?: string; issuedAt?: string; [key: string]: unknown }) => (
                                         <CertRow
                                             key={
                                                 cert.certificateId ||
@@ -305,18 +359,22 @@ const ApplicantCard = ({ application }) => {
                 )}
             </Card>
 
-            {showConfirmModal && (
-                <ConfirmModal
-                    status={pendingStatus}
-                    onConfirm={() =>
-                        handleUpdateStatus(pendingStatus)
+            <ConfirmModal
+                isOpen={showConfirmModal}
+                onClose={() => {
+                    setShowConfirmModal(false);
+                    setPendingStatus(null);
+                }}
+                onConfirm={() => {
+                    if (pendingStatus) {
+                        handleUpdateStatus(pendingStatus);
                     }
-                    onCancel={() => {
-                        setShowConfirmModal(false);
-                        setPendingStatus(null);
-                    }}
-                />
-            )}
+                }}
+                title="상태 변경"
+                message={`정말로 ${pendingStatus === 'ACCEPTED' ? '수락' : '거절'}하시겠습니까?`}
+                confirmText={pendingStatus === 'ACCEPTED' ? '수락' : '거절'}
+                cancelText="취소"
+            />
         </>
     );
 };
@@ -359,7 +417,12 @@ const WorkplaceName = styled.h4`
     flex: 1;
 `;
 
-const StatusTag = styled.div`
+interface StatusTagProps {
+    $color?: string;
+    $background?: string;
+}
+
+const StatusTag = styled.div<StatusTagProps>`
     padding: 6px 12px;
     border-radius: 20px;
     font-family: 'Pretendard';
@@ -422,7 +485,11 @@ const Row = styled.div`
     gap: 8px;
 `;
 
-const KeywordArea = styled.div`
+interface KeywordAreaProps {
+    count?: number;
+}
+
+const KeywordArea = styled.div<KeywordAreaProps>`
     display: flex;
     gap: 5px 5px;
     flex-wrap: wrap;

@@ -1,6 +1,12 @@
 import styled from 'styled-components';
 
-const ConfirmModal = ({ onConfirm, onCancel, status }) => {
+interface ConfirmModalProps {
+    onConfirm: () => void;
+    onCancel: () => void;
+    status: 'ACCEPTED' | 'REJECTED';
+}
+
+const ConfirmModal = ({ onConfirm, onCancel, status }: ConfirmModalProps) => {
     return (
         <ModalOverlay>
             <ModalBox>
@@ -85,7 +91,11 @@ const ModalCancelButton = styled.button`
     color: #111;
 `;
 
-const ModalConfirmButton = styled.button`
+interface ModalConfirmButtonProps {
+    $accept?: boolean;
+}
+
+const ModalConfirmButton = styled.button<ModalConfirmButtonProps>`
     flex: 1;
     padding: 10px 0;
     font-size: 14px;

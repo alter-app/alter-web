@@ -1,6 +1,12 @@
 import styled from 'styled-components';
 
-const DetailInputField = ({ name, value, onChange }) => {
+interface DetailInputFieldProps {
+    name: string;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+}
+
+const DetailInputField = ({ name, value, onChange }: DetailInputFieldProps) => {
     return (
         <Container>
             <Title>상세내용</Title>

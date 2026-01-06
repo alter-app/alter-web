@@ -12,26 +12,60 @@ import {
 } from '../../services/scheduleRequest';
 import { timeAgo } from '../../utils/timeUtil';
 import Loader from '../../components/Loader';
+import { SubstituteRequest } from '../../types';
+
+interface TransformedReceivedSubstituteRequest extends SubstituteRequest {
+    workspaceName: string;
+    requesterName: string;
+    scheduleDate: string;
+    scheduleTime: string;
+    position: string;
+    timeAgo: string;
+    status: string;
+    statusDescription: string;
+    requestReason: string;
+}
+
+interface RawReceivedSubstituteRequestData {
+    id: string | number;
+    createdAt?: string;
+    requestReason?: string;
+    status?: {
+        value?: string;
+        description?: string;
+    };
+    schedule: {
+        startDateTime: string;
+        endDateTime: string;
+        position?: string;
+    };
+    workspace?: {
+        workspaceName?: string;
+    };
+    requester?: {
+        workerName?: string;
+    };
+}
 
 const ReceivedSubstituteRequestListPage = () => {
     const [
         receivedSubstituteRequests,
         setReceivedSubstituteRequests,
-    ] = useState([]);
+    ] = useState<TransformedReceivedSubstituteRequest[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
-    const [nextCursor, setNextCursor] = useState(null);
+    const [nextCursor, setNextCursor] = useState<string | null>(null);
     const [isLoadingMore, setIsLoadingMore] =
         useState(false);
     const [selectedStatuses, setSelectedStatuses] =
-        useState([]);
+        useState<string[]>([]);
     const navigate = useNavigate();
 
     // 데이터 변환 함수
     const transformReceivedSubstituteRequestData = (
-        data
-    ) => {
-        return (data || []).map((item) => {
+        data: RawReceivedSubstituteRequestData[]
+    ): TransformedReceivedSubstituteRequest[] => {
+        return (data || []).map((item: RawReceivedSubstituteRequestData) => {
             const startDate = new Date(
                 item.schedule.startDateTime
             );
@@ -96,7 +130,7 @@ const ReceivedSubstituteRequestListPage = () => {
                             10,
                             null,
                             selectedStatus
-                        );
+                        ) as { data: { data?: RawReceivedSubstituteRequestData[]; page?: { cursor?: string } } };
                     const formattedReceivedSubstituteRequests =
                         transformReceivedSubstituteRequestData(
                             receivedSubstituteRequestData
@@ -146,7 +180,7 @@ const ReceivedSubstituteRequestListPage = () => {
                         10,
                         nextCursor,
                         selectedStatus
-                    );
+                    ) as { data: { data?: RawReceivedSubstituteRequestData[]; page?: { cursor?: string } } };
                 const formattedReceivedSubstituteRequests =
                     transformReceivedSubstituteRequestData(
                         receivedSubstituteRequestData.data
@@ -177,7 +211,7 @@ const ReceivedSubstituteRequestListPage = () => {
         }, [nextCursor, isLoadingMore, selectedStatuses]);
 
     // 대타 요청 수락
-    const handleAccept = async (request) => {
+    const handleAccept = async (request: TransformedReceivedSubstituteRequest) => {
         try {
             await acceptSubstituteRequest(request.id);
 
@@ -193,7 +227,7 @@ const ReceivedSubstituteRequestListPage = () => {
     };
 
     // 대타 요청 거절
-    const handleReject = async (request) => {
+    const handleReject = async (request: TransformedReceivedSubstituteRequest) => {
         try {
             await rejectSubstituteRequest(request.id);
 
@@ -211,7 +245,7 @@ const ReceivedSubstituteRequestListPage = () => {
     if (isLoading) {
         return (
             <PageContainer>
-                <PageHeader title='받은 대타 요청' />
+                <PageHeader title='받은 대타 요청' onBack={() => navigate(-1)} />
                 <LoadingContainer>
                     <Loader />
                 </LoadingContainer>

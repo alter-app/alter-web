@@ -1,19 +1,27 @@
-import { useRef } from "react";
+import { useRef, ChangeEvent } from "react";
 import AuthInput from "./AuthInput";
 
-function DateInput({ value, onChange, placeholder }) {
-    const dateRef = useRef();
+interface DateInputProps {
+    value: string;
+    onChange: (value: string) => void;
+    placeholder?: string;
+}
+
+function DateInput({ value, onChange, placeholder }: DateInputProps) {
+    const dateRef = useRef<HTMLInputElement>(null);
 
     // 버튼 클릭 시 달력 열기
     const handleCalendarClick = () => {
-        if (dateRef.current.showPicker) {
-            dateRef.current.showPicker();
-        } else {
-            dateRef.current.click();
+        if (dateRef.current) {
+            if ('showPicker' in dateRef.current && typeof dateRef.current.showPicker === 'function') {
+                dateRef.current.showPicker();
+            } else {
+                dateRef.current.click();
+            }
         }
     };
 
-    const handleDateChange = (e) => {
+    const handleDateChange = (e: ChangeEvent<HTMLInputElement>) => {
         onChange(e.target.value);
     };
 

@@ -6,6 +6,20 @@ import { declineReputation } from '../../../services/reputationService';
 import { useNavigate } from 'react-router-dom';
 import ConfirmModal from '../../shared/ConfirmModal';
 
+interface ReputationNotificationItemProps {
+    id: string | number;
+    workspaceName?: string;
+    targetName?: string;
+    timeAgo?: string;
+    status?: {
+        value?: string;
+        description?: string;
+        [key: string]: unknown;
+    };
+    onAccept?: () => void;
+    onReject?: () => void;
+}
+
 const ReputationNotificationItem = ({
     id,
     workspaceName,
@@ -14,7 +28,7 @@ const ReputationNotificationItem = ({
     status,
     onAccept,
     onReject,
-}) => {
+}: ReputationNotificationItemProps) => {
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
 
@@ -84,9 +98,10 @@ const ReputationNotificationItem = ({
                 window.location.reload();
             }
             setShowModal(false);
-        } catch (error) {
+        } catch (error: unknown) {
+            const err = error as { message?: string };
             console.error('평판 거절 오류:', error);
-            alert(error.message);
+            alert(err.message || '평판 거절 중 오류가 발생했습니다.');
         }
     };
 
@@ -212,7 +227,12 @@ const Name = styled.span`
     font-size: 14px;
 `;
 
-const StatusBadge = styled.div`
+interface StatusBadgeProps {
+    $color?: string;
+    $bgColor?: string;
+}
+
+const StatusBadge = styled.div<StatusBadgeProps>`
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -221,9 +241,9 @@ const StatusBadge = styled.div`
     font-family: 'Pretendard';
     font-weight: 600;
     font-size: 13px;
-    color: ${(props) => props.$color};
-    background: ${(props) => props.$bgColor};
-    border: 1px solid ${(props) => props.$color};
+    color: ${(props) => props.$color || '#333333'};
+    background: ${(props) => props.$bgColor || '#f0f0f0'};
+    border: 1px solid ${(props) => props.$color || '#333333'};
     width: fit-content;
 `;
 

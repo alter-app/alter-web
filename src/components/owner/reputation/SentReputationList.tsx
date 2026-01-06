@@ -8,20 +8,42 @@ import {
 import { timeAgo } from '../../../utils/timeUtil';
 import SentReputationCard from '../../user/myJob/SentReputationCard';
 
-const SentReputationList = ({ limit = 3 }) => {
+interface ReputationRequest {
+    id: string | number;
+    target?: {
+        name?: string;
+        [key: string]: unknown;
+    };
+    requester?: {
+        name?: string;
+        [key: string]: unknown;
+    };
+    createdAt?: string;
+    status?: {
+        value?: string;
+        description?: string;
+        [key: string]: unknown;
+    };
+    [key: string]: unknown;
+}
+
+interface SentReputationListProps {
+    limit?: number;
+}
+
+const SentReputationList = ({ limit = 3 }: SentReputationListProps) => {
     const navigate = useNavigate();
-    const [requests, setRequests] = useState([]);
+    const [requests, setRequests] = useState<ReputationRequest[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchRequests = async () => {
             try {
-                const result =
-                    await getSentReputationRequests({
-                        cursorInfo: '',
-                        status: ['REQUESTED'],
-                        pageSize: limit,
-                    });
+                const result = await getSentReputationRequests({
+                    cursorInfo: '',
+                    status: ['REQUESTED'],
+                    pageSize: limit,
+                }) as { data?: ReputationRequest[]; [key: string]: unknown };
                 setRequests(result.data || []);
             } catch (error) {
                 console.error(
@@ -36,7 +58,7 @@ const SentReputationList = ({ limit = 3 }) => {
         fetchRequests();
     }, [limit]);
 
-    const handleCancelRequest = async (request) => {
+    const handleCancelRequest = async (request: ReputationRequest) => {
         try {
             console.log('보낸 평판 취소:', request);
             await cancelReputationRequest(request.id);
@@ -46,7 +68,7 @@ const SentReputationList = ({ limit = 3 }) => {
                 cursorInfo: '',
                 status: ['REQUESTED'],
                 pageSize: limit,
-            });
+            }) as { data?: ReputationRequest[]; [key: string]: unknown };
             setRequests(result.data || []);
         } catch (error) {
             console.error('보낸 평판 취소 오류:', error);
@@ -87,7 +109,7 @@ const SentReputationList = ({ limit = 3 }) => {
 
                 <CardList>
                     {requests.length > 0 ? (
-                        requests.map((request) => (
+                        requests.map((request: ReputationRequest) => (
                             <SentReputationCard
                                 key={request.id}
                                 targetName={
@@ -100,14 +122,14 @@ const SentReputationList = ({ limit = 3 }) => {
                                     '업장 정보 없음'
                                 }
                                 timeAgo={timeAgo(
-                                    request.createdAt
+                                    request.createdAt || ''
                                 )}
                                 status={
-                                    request.status.value
+                                    request.status?.value || ''
                                 }
                                 statusDescription={
                                     request.status
-                                        .description
+                                        ?.description || ''
                                 }
                                 onCancel={() =>
                                     handleCancelRequest(

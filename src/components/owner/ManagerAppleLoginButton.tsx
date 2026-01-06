@@ -14,7 +14,7 @@ const ManagerAppleLoginButton = () => {
                     .VITE_OAUTH_REDIRECT_URI,
                 usePopup: true,
             }}
-            onSuccess={(response) => {
+            onSuccess={(response: any) => {
                 const authorizationCode =
                     response.authorization.code;
                 console.log(
@@ -28,7 +28,7 @@ const ManagerAppleLoginButton = () => {
                     },
                 });
             }}
-            onError={(error) => {
+            onError={(error: any) => {
                 console.error(error);
             }}
             style={{

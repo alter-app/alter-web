@@ -16,7 +16,12 @@ const GenderContainer = styled.div`
     }
 `;
 
-const GenderSelector = ({ value, onChange }) => {
+interface GenderSelectorProps {
+    value: string;
+    onChange: (value: string) => void;
+}
+
+const GenderSelector = ({ value, onChange }: GenderSelectorProps) => {
     const [dimensions, setDimensions] = useState({
         height: '56px',
         fontSize: '18px',

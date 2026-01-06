@@ -12,13 +12,21 @@ const payTypes = [
     { label: '월급', value: 'MONTHLY' },
 ];
 
+interface WageInputFieldProps {
+    name: string;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    payType: string;
+    onPayTypeChange: (value: string) => void;
+}
+
 const WageInputField = ({
     name,
     value,
     onChange,
     payType,
     onPayTypeChange,
-}) => {
+}: WageInputFieldProps) => {
     const [workHour, setWorkHour] = useState('');
 
     return (
@@ -201,7 +209,11 @@ const RadioInput = styled.input.attrs({ type: 'radio' })`
     cursor: pointer;
 `;
 
-const RadioText = styled.span`
+interface RadioTextProps {
+    checked?: boolean;
+}
+
+const RadioText = styled.span<RadioTextProps>`
     font-family: 'Pretendard';
     font-weight: 400;
     font-size: 14px;

@@ -1,6 +1,13 @@
 import styled from 'styled-components';
 
-const NotificationItem = ({ title, body, timeAgo }) => {
+interface NotificationItemProps {
+    id?: string | number;
+    title: string;
+    body: string;
+    timeAgo: string;
+}
+
+const NotificationItem = ({ id, title, body, timeAgo }: NotificationItemProps) => {
     return (
         <ItemContainer>
             <IconWrapper>

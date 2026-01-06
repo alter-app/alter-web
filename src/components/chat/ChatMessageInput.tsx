@@ -1,10 +1,15 @@
-import { useState } from 'react';
+import { useState, FormEvent, ChangeEvent } from 'react';
 import styled from 'styled-components';
 
-const ChatMessageInput = ({ onSend, disabled }) => {
+interface ChatMessageInputProps {
+    onSend: (message: string) => void;
+    disabled?: boolean;
+}
+
+const ChatMessageInput = ({ onSend, disabled }: ChatMessageInputProps) => {
     const [value, setValue] = useState('');
 
-    const handleSubmit = (event) => {
+    const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (!value.trim()) return;
         onSend(value.trim());
@@ -16,7 +21,7 @@ const ChatMessageInput = ({ onSend, disabled }) => {
             <MessageInput
                 type='text'
                 value={value}
-                onChange={(event) =>
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
                     setValue(event.target.value)
                 }
                 placeholder='메시지를 입력하세요'

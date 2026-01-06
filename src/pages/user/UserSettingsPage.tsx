@@ -44,6 +44,7 @@ const UserSettingsPage = () => {
             <PageHeader
                 title='설정'
                 showBackButton={true}
+                onBack={() => navigate(-1)}
             />
             <Container>
                 <SettingsContent>

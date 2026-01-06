@@ -1,5 +1,14 @@
 import styled from 'styled-components';
 
+interface JobTitleFieldProps {
+    placeholder?: string;
+    title: string;
+    name: string;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    readOnly?: boolean;
+}
+
 const JobTitleField = ({
     placeholder,
     title,
@@ -7,7 +16,7 @@ const JobTitleField = ({
     value,
     onChange,
     readOnly = false,
-}) => {
+}: JobTitleFieldProps) => {
     return (
         <StyledFieldGroup>
             <StyledFieldLabel>{title}</StyledFieldLabel>
