@@ -9,7 +9,7 @@ export interface AuthData {
     accessToken: string;
     refreshToken: string;
     authorizationId: string;
-    scope: 'USER' | 'MANAGER';
+    scope: 'USER' | 'MANAGER' | 'APP';
 }
 
 export interface TokenResponse {

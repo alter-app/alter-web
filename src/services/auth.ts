@@ -3,19 +3,39 @@ import {
     RecaptchaVerifier,
     signInWithPhoneNumber,
     signInWithCredential,
+    ConfirmationResult,
+    UserCredential,
 } from 'firebase/auth';
 import { auth } from '../firebase.config';
 import useAuthStore from '../store/authStore';
 import apiClient from '../utils/apiClient';
-import axios from 'axios';
+import { AuthData } from '../types';
+import { NavigateFunction } from 'react-router-dom';
 
 const backend = import.meta.env.VITE_API_URL;
 
+// Window 객체에 추가되는 속성들에 대한 타입 정의
+declare global {
+    interface Window {
+        recaptchaVerifier: RecaptchaVerifier | null;
+        recaptchaWidgetId: number | undefined;
+        grecaptcha?: {
+            reset: (widgetId: number) => void;
+        };
+    }
+}
+
+// Firebase 에러 타입
+interface FirebaseError {
+    code?: string;
+    message?: string;
+}
+
 // reCAPTCHA 초기화
 export async function initializeRecaptcha(
-    containerId = 'recaptcha-container',
-    onVerified
-) {
+    containerId: string = 'recaptcha-container',
+    onVerified?: (response: string) => void
+): Promise<RecaptchaVerifier | null> {
     try {
         // 1. 이미 인스턴스가 있고 위젯도 렌더링된 상태라면 기존 것 반환
         if (window.recaptchaVerifier && window.recaptchaWidgetId !== undefined) {
@@ -34,14 +54,14 @@ export async function initializeRecaptcha(
             containerId,
             {
                 size: 'invisible',
-                callback: (response) => {
+                callback: (response: string) => {
                     if (onVerified) onVerified(response);
                 },
                 'expired-callback': () => {
                     resetRecaptcha(); // 만료 시 리셋
                     alert('reCAPTCHA가 만료되었습니다. 다시 시도해주세요.');
                 },
-                'error-callback': (error) => {
+                'error-callback': (error: Error) => {
                     console.error('reCAPTCHA error callback:', error);
                     // 401 에러 등 초기화 실패 시 처리
                     if (window.recaptchaVerifier) {
@@ -71,7 +91,7 @@ export async function initializeRecaptcha(
 }
 
 // reCAPTCHA 정리 (완전 삭제)
-export function clearRecaptcha(containerId = 'recaptcha-container') {
+export function clearRecaptcha(containerId: string = 'recaptcha-container'): void {
     if (window.recaptchaVerifier) {
         try {
             window.recaptchaVerifier.clear();
@@ -89,7 +109,7 @@ export function clearRecaptcha(containerId = 'recaptcha-container') {
 }
 
 // reCAPTCHA 리셋 (에러 수정됨)
-export function resetRecaptcha() {
+export function resetRecaptcha(): void {
     // window.recaptchaVerifier.reset()은 존재하지 않는 함수입니다.
     // 대신 grecaptcha.reset(widgetId)를 사용해야 합니다.
     if (window.grecaptcha && window.recaptchaWidgetId !== undefined) {
@@ -102,7 +122,7 @@ export function resetRecaptcha() {
 }
 
 // reCAPTCHA 인증번호 전송
-export async function sendPhoneVerification(phoneNumber) {
+export async function sendPhoneVerification(phoneNumber: string): Promise<string> {
     if (!window.recaptchaVerifier) {
         // 인스턴스가 없으면 재초기화 시도 (방어 코드)
         await initializeRecaptcha();
@@ -115,7 +135,7 @@ export async function sendPhoneVerification(phoneNumber) {
 
     try {
         const verifier = window.recaptchaVerifier;
-        const confirmationResult = await signInWithPhoneNumber(
+        const confirmationResult: ConfirmationResult = await signInWithPhoneNumber(
             auth,
             phoneNumber,
             verifier
@@ -125,33 +145,35 @@ export async function sendPhoneVerification(phoneNumber) {
         // 실패 시 리셋하여 다시 시도 가능하게 함
         resetRecaptcha();
 
+        const firebaseError = error as FirebaseError;
         // 에러 메시지 매핑
-        throw new Error(getFirebaseErrorMsg(error.code));
+        throw new Error(getFirebaseErrorMsg(firebaseError.code));
     }
 }
 
 // reCAPTCHA 인증번호 검증
 export async function verifyPhoneCode(
-    verificationId,
-    code
-) {
+    verificationId: string,
+    code: string
+): Promise<string | undefined> {
     try {
         const credential = PhoneAuthProvider.credential(
             verificationId,
             code
         );
-        const result = await signInWithCredential(
+        const result: UserCredential = await signInWithCredential(
             auth,
             credential
         );
-        return result.user?.phoneNumber;
+        return result.user?.phoneNumber || undefined;
     } catch (error) {
-        throw new Error(getFirebaseErrorMsg(error.code));
+        const firebaseError = error as FirebaseError;
+        throw new Error(getFirebaseErrorMsg(firebaseError.code));
     }
 }
 
 // Firebase 에러 메시지 매핑
-function getFirebaseErrorMsg(code) {
+function getFirebaseErrorMsg(code?: string): string {
     switch (code) {
         case 'auth/invalid-phone-number':
             return '잘못된 전화번호 형식입니다.';
@@ -177,9 +199,11 @@ function getFirebaseErrorMsg(code) {
 }
 
 // 닉네임 중복 검사 로직
-export const checkNicknameDuplicate = async (nickname) => {
+export const checkNicknameDuplicate = async (nickname: string): Promise<boolean> => {
     try {
-        const response = await apiClient.post(
+        const response = await apiClient.post<{
+            data: { duplicated: boolean };
+        }>(
             '/public/users/exists/nickname',
             { nickname }
         );
@@ -193,10 +217,32 @@ export const checkNicknameDuplicate = async (nickname) => {
     }
 };
 
+interface EmailDuplicateResponse {
+    success: boolean;
+    duplicated?: boolean;
+    message?: string;
+}
+
+interface FieldError {
+    field: string;
+    message: string;
+}
+
+interface ErrorResponse {
+    response?: {
+        data?: {
+            data?: FieldError[];
+            message?: string;
+        };
+    };
+}
+
 // 이메일 중복 검사 로직
-export const checkEmailDuplicate = async (email) => {
+export const checkEmailDuplicate = async (email: string): Promise<EmailDuplicateResponse> => {
     try {
-        const response = await apiClient.post(
+        const response = await apiClient.post<{
+            data: { duplicated: boolean };
+        }>(
             '/public/users/exists/email',
             { email }
         );
@@ -208,13 +254,14 @@ export const checkEmailDuplicate = async (email) => {
         };
     } catch (error) {
         console.error('이메일 중복 검사 오류:', error);
+        const axiosError = error as ErrorResponse;
         // 백엔드에서 오는 상세한 오류 메시지 사용
         if (
-            error.response?.data?.data &&
-            error.response.data.data.length > 0
+            axiosError.response?.data?.data &&
+            axiosError.response.data.data.length > 0
         ) {
             const emailError =
-                error.response.data.data.find(
+                axiosError.response.data.data.find(
                     (err) => err.field === 'email'
                 );
             if (emailError) {
@@ -228,14 +275,14 @@ export const checkEmailDuplicate = async (email) => {
         return {
             success: false,
             message:
-                error.response?.data?.message ||
+                axiosError.response?.data?.message ||
                 '이메일 확인 중 오류가 발생했습니다.',
         };
     }
 };
 
 // 회원가입 요청을 처리하는 로직
-export const signUp = async (userData) => {
+export const signUp = async (userData: unknown): Promise<unknown> => {
     try {
         const response = await apiClient.post(
             '/public/users/signup',
@@ -245,22 +292,39 @@ export const signUp = async (userData) => {
         return response.data;
     } catch (error) {
         console.error('회원가입 오류:', error);
+        const axiosError = error as ErrorResponse;
         throw new Error(
-            error.response?.data?.message ||
+            axiosError.response?.data?.message ||
                 '회원가입에 실패했습니다.'
         );
     }
 };
 
+interface SocialLoginErrorResponse {
+    response?: {
+        data?: {
+            code?: string;
+            data?: unknown;
+        };
+    };
+}
+
 // 사용자 소셜 로그인 요청 로직
 export const loginWithProvider = async (
-    provider,
-    authorizationCode,
-    setAuth,
-    navigate
-) => {
+    provider: string,
+    authorizationCode: string,
+    setAuth: (authData: AuthData) => void,
+    navigate: NavigateFunction
+): Promise<void> => {
     try {
-        const response = await apiClient.post(
+        const response = await apiClient.post<{
+            data: {
+                accessToken: string;
+                refreshToken: string;
+                authorizationId: string;
+                scope: 'USER' | 'MANAGER' | 'APP';
+            };
+        }>(
             '/public/users/login-social',
             {
                 provider,
@@ -279,19 +343,21 @@ export const loginWithProvider = async (
             accessToken,
             refreshToken,
             authorizationId,
-            scope,
+            scope: scope as 'USER' | 'MANAGER' | 'APP',
         });
         // scope에 따라 적절한 페이지로 리다이렉트
-        if (scope === 'APP') {
-            return navigate('/job-lookup-map');
+        if (scope === 'APP' || scope === 'USER') {
+            navigate('/job-lookup-map');
         } else if (scope === 'MANAGER') {
-            return navigate('/main');
+            navigate('/main');
         }
     } catch (error) {
         console.error('백엔드로 code 전송 실패:', error);
-        const data = error.response?.data || {};
+        const axiosError = error as SocialLoginErrorResponse;
+        const data = axiosError.response?.data || {};
 
-        const errorHandlers = {
+        type ErrorHandler = () => void;
+        const errorHandlers: Record<string, ErrorHandler> = {
             A002: () => {
                 alert('매니저 이용자가 아닙니다.');
                 navigate('/login');
@@ -318,7 +384,6 @@ export const loginWithProvider = async (
                 alert('일반 사용자 가입을 진행해주세요.');
                 navigate('/login');
             },
-
             default: () => {
                 alert('네트워크 오류가 발생했습니다.');
                 navigate('/error');
@@ -326,20 +391,36 @@ export const loginWithProvider = async (
         };
 
         (
-            errorHandlers[data.code] ||
+            errorHandlers[data.code || ''] ||
             errorHandlers.default
         )();
     }
 };
 
+interface LoginData {
+    email: string;
+    password: string;
+}
+
+interface LoginError extends Error {
+    data?: unknown;
+}
+
 // ID/PW 로그인 요청을 처리하는 로직
 export const loginIDPW = async (
-    userData,
-    setAuth,
-    navigate
-) => {
+    userData: LoginData,
+    setAuth: (authData: AuthData) => void,
+    navigate: NavigateFunction
+): Promise<void> => {
     try {
-        const response = await apiClient.post(
+        const response = await apiClient.post<{
+            data: {
+                accessToken: string;
+                refreshToken: string;
+                authorizationId: string;
+                scope: 'USER' | 'MANAGER' | 'APP';
+            };
+        }>(
             '/public/users/login',
             userData
         );
@@ -356,34 +437,37 @@ export const loginIDPW = async (
             accessToken,
             refreshToken,
             authorizationId,
-            scope,
+            scope: scope as 'USER' | 'MANAGER' | 'APP',
         });
 
         // scope에 따라 적절한 페이지로 리다이렉트
-        if (scope === 'APP') {
-            return navigate('/job-lookup-map');
+        if (scope === 'APP' || scope === 'USER') {
+            navigate('/job-lookup-map');
         } else if (scope === 'MANAGER') {
-            return navigate('/main');
+            navigate('/main');
         }
     } catch (error) {
         console.error('로그인 오류:', error);
+        const axiosError = error as ErrorResponse;
         // 실패 시 에러 메시지 처리
         const err = new Error(
-            error.response?.data?.message ||
+            axiosError.response?.data?.message ||
                 '로그인에 실패했습니다.'
-        );
-        err.data = error.response?.data;
+        ) as LoginError;
+        err.data = axiosError.response?.data;
         throw err;
     }
 };
 
 // IDPW 회원가입 세션 생성 로직
-export const createSignupSession = async (phone) => {
+export const createSignupSession = async (phone: string): Promise<string> => {
     try {
         // 하이픈 제거
         const phoneWithoutHyphen = phone.replace(/-/g, '');
 
-        const response = await apiClient.post(
+        const response = await apiClient.post<{
+            data: { signupSessionId: string };
+        }>(
             '/public/users/signup-session',
             {
                 contact: phoneWithoutHyphen,
@@ -393,15 +477,16 @@ export const createSignupSession = async (phone) => {
         return response.data.data.signupSessionId;
     } catch (error) {
         console.error('회원가입 세션 생성 중 오류:', error);
+        const axiosError = error as ErrorResponse;
         throw new Error(
-            error.response?.data?.message ||
+            axiosError.response?.data?.message ||
                 '회원가입 세션 생성 중 오류가 발생했습니다.'
         );
     }
 };
 
 // 로그아웃 처리 로직
-export const logout = async (scope) => {
+export const logout = async (scope: string): Promise<unknown> => {
     const lowerScope = scope.toLowerCase();
 
     try {
@@ -418,9 +503,11 @@ export const logout = async (scope) => {
 };
 
 // 아이디 찾기 - 휴대폰 인증 후 아이디 조회
-export const findUserIdByPhone = async (phoneNumber) => {
+export const findUserIdByPhone = async (phoneNumber: string): Promise<string> => {
     try {
-        const response = await apiClient.post(
+        const response = await apiClient.post<{
+            data: { maskedEmail: string };
+        }>(
             '/public/users/find-email',
             {
                 contact: phoneNumber,
@@ -430,8 +517,9 @@ export const findUserIdByPhone = async (phoneNumber) => {
         return response.data.data.maskedEmail; // 마스킹된 이메일 반환
     } catch (error) {
         console.error('아이디 찾기 오류:', error);
+        const axiosError = error as ErrorResponse;
         throw new Error(
-            error.response?.data?.message ||
+            axiosError.response?.data?.message ||
                 '아이디 찾기에 실패했습니다.'
         );
     }
@@ -439,11 +527,13 @@ export const findUserIdByPhone = async (phoneNumber) => {
 
 // 비밀번호 재설정 세션 생성
 export const createPasswordResetSession = async (
-    email,
-    phoneNumber
-) => {
+    email: string,
+    phoneNumber: string
+): Promise<string> => {
     try {
-        const response = await apiClient.post(
+        const response = await apiClient.post<{
+            data: { sessionId: string };
+        }>(
             '/public/users/password-reset/session',
             {
                 email,
@@ -457,8 +547,9 @@ export const createPasswordResetSession = async (
             '비밀번호 재설정 세션 생성 오류:',
             error
         );
+        const axiosError = error as ErrorResponse;
         throw new Error(
-            error.response?.data?.message ||
+            axiosError.response?.data?.message ||
                 '비밀번호 재설정 세션 생성에 실패했습니다.'
         );
     }
@@ -466,9 +557,9 @@ export const createPasswordResetSession = async (
 
 // 비밀번호 재설정
 export const resetPassword = async (
-    sessionId,
-    newPassword
-) => {
+    sessionId: string,
+    newPassword: string
+): Promise<unknown> => {
     try {
         const response = await apiClient.post(
             '/public/users/password-reset',
@@ -481,11 +572,13 @@ export const resetPassword = async (
         return response.data.data;
     } catch (error) {
         console.error('비밀번호 재설정 오류:', error);
+        const axiosError = error as ErrorResponse;
         throw new Error(
-            error.response?.data?.message ||
+            axiosError.response?.data?.message ||
                 '비밀번호 재설정에 실패했습니다.'
         );
     }
 };
 
-// refreshAccessToken 함수는 src/services/refreshToken.js로 분리됨
+// refreshAccessToken 함수는 src/services/refreshToken.ts로 분리됨
+
